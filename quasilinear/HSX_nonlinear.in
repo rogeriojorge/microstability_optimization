@@ -1,0 +1,131 @@
+&zgrid_parameters
+ zed_equal_arc = .false.
+! ntheta = 128
+! nzgrid = 64
+ nzed = 128
+ nperiod = 1
+ boundary_option="periodic"
+ shat_zero = 0.1
+/
+
+&geo_knobs
+ geo_option = 'vmec'
+/
+&vmec_parameters
+ vmec_filename = 'wout_HSX.nc'
+ torflux = 0.1
+ nfield_periods = 3.8044 ! zed_scalefac = real(nfp)/nfield_periods
+ surface_option = 0
+ verbose = .true.
+ zeta_center = 0.0
+/
+
+
+&physics_flags
+ full_flux_surface = .false.
+ nonlinear = .true.
+ adiabatic_option="field-line-average-term"
+/
+
+&parameters
+ zeff = 1.0
+ beta = 0.0
+ vnew_ref = 0.01
+ rhostar = 0.003
+/
+
+&vpamu_grids_parameters
+ nvgrid = 16
+ nmu = 8
+ vpa_max = 3.0
+/
+
+&time_advance_knobs
+ explicit_option="rk2"
+/
+
+&kt_grids_knobs
+ grid_option='box'
+/
+
+&kt_grids_box_parameters
+ ny = 64
+ nx = 64
+ y0 = 11.314
+ x0 = 11.314
+/
+
+&init_g_knobs
+ chop_side = F
+ phiinit=   1.0e-2
+ restart_file = "nc/cyclone_low_res.nc"
+ ginit_option= "noise"
+/
+
+&knobs
+ fphi =   1.0
+ fapar =  0.0
+ fbpar = 0.0
+ zed_upwind = 0.02
+ time_upwind = 0.02
+ vpa_upwind = 0.02
+ delt = 0.01
+ nstep = 50000
+ mat_gen = .false.
+/
+
+&species_knobs
+ nspec= 1
+ species_option = 'stella'
+/
+
+&species_parameters_1
+ z=   1.0
+ mass=   1.0
+ dens=   1.0
+ temp=   1.0
+ tprim = 6.0
+ fprim = 2.2
+ type='ion'
+/
+
+&stella_diagnostics_knobs
+ nwrite = 50
+ nsave = 1000
+ save_for_restart = .false.
+ write_omega = .false.
+ write_phi_vs_time = .true.
+ write_gvmus = .false.
+ write_gzvs = .false.
+ !write_radial_fluxes = .true.
+ write_fluxes_kxkyz = .true.
+ flux_norm = .true.
+ write_kspectra = .true.
+/
+
+&reinit_knobs
+ delt_adj = 2.0
+ delt_minimum = 1.e-4
+/
+
+&layouts_knobs
+ xyzs_layout = 'yxzs'
+ vms_layout = 'vms'
+/
+
+&neoclassical_input
+ include_neoclassical_terms = .false.
+ neo_option = 'sfincs'
+/
+
+&sfincs_input
+ nproc_sfincs = 2
+ nxi = 16
+ nx = 5
+/
+
+&dissipation
+ iiknob = 0.0
+ hyper_dissipation = .true.
+ D_hyper = 0.5
+/

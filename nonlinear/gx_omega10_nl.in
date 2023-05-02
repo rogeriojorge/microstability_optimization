@@ -1,0 +1,139 @@
+
+ debug = false
+
+[Dimensions]
+ ntheta = 256
+ nperiod = 1
+ ny = 96
+ nx = 192
+
+ nhermite = 16
+ nlaguerre = 8
+ nspecies = 1
+
+[Domain]
+ y0 = 12.0
+ boundary = "linked"
+
+[Physics]
+ beta = 0.0
+ nonlinear_mode = true
+
+[Time]
+ dt = 0.5
+ cfl = 0.8
+ t_max = 400.0
+ scheme = "rk4"
+
+[Initialization]
+ ikpar_init = 0
+ init_field = "density"
+ init_amp = 1.0e-3
+
+[Geometry]
+
+ geo_option = "vmec"
+ vmec_file = "wout_omega10.nc"
+ 
+ #Field line label zeta - q*theta. alpha = 0.0 usually coerresponds to a
+ #field line on the outboard side
+ alpha = 0.0
+ 
+ # Number of points along the field line = 2*nzgrid + 1
+ nzgrid = 125
+ 
+ # Number of poloidal turns.
+ # The field line goes from (-npol*PI, npol*PI]
+ # Extra info : In GS2 or GX files this would correspond to  nperiod = (npol+1)/2.
+ npol = 4
+ 
+ # Normalized toroidal flux (or s) is how vmec labels surfaces.
+ # s goes from [0,1] where 0 is the magnetic axis and 1 is the
+ # last closed flux surface.
+ desired_normalized_toroidal_flux = 0.250
+ 
+ 
+ #######################################################################################
+ ###--WARNING: Don't change the options below unless you know what you are doing--######
+ #######################################################################################
+ 
+ # If you want to cut the flux tube before npol*PI
+ flux_tube_cut = "none"
+ 
+ # Use only if flux_tube_cut="custom"
+ # The length of the flux tube on one side
+ # Make sure that the custom length in radians < npol*PI
+ # Buggy right now.
+ custom_length = 0.4200
+ 
+ 
+ # Use only if flux_tube_cut="gds21", "gbdrift0"
+ # This will terminate the field line at after "which_crossing" number of zero crossings
+ # of gds21 or gbdrift0 
+ which_crossing = 4
+ 
+ vmec_surface_option = 0
+
+[Boltzmann]
+ add_Boltzmann_species = true
+ Boltzmann_type = "electrons"
+ tau_fac = 1.0
+
+[Dissipation]
+ closure_model = "none"
+ hypercollisions = true 
+ nu_hyper_m = 0.1
+ p_hyper_m = 6
+ nu_hyper_l = 0.1
+ p_hyper_l = 6
+
+ hyper = true
+ D_hyper = 0.05
+ p_hyper = 2
+
+[Restart]
+ restart = false
+ save_for_restart = true
+ nsave  = 1000
+
+[Diagnostics]
+ nwrite = 10
+ fluxes = true
+ free_energy = false
+ all_zonal_scalars = false
+ all_zonal = false
+ fixed_amplitude = false
+
+[Qspectra]
+ky = true
+kx = true
+z  = true
+
+[Wspectra]
+species          = false
+hermite          = false
+laguerre         = false
+hermite_laguerre = true
+kx               = false
+ky               = true
+kxky             = false
+kperp            = false
+z                = true
+
+[Pspectra]
+species          = false
+kx               = true
+ky               = true
+kxky             = false
+kperp            = false
+
+[species]
+ z     = [ 1.0,      -1.0     ]
+ mass  = [ 1.0,       2.7e-4  ]
+ dens  = [ 1.0,       1.0     ]
+ temp  = [ 1.0,       1.0     ]
+ tprim = [ 3.0,       3.0     ]
+ fprim = [ 1.0,       1.0     ]
+ uprim = [ 0.0,       0.0     ]
+ vnewk = [ 0.01,      0.01    ]
+ type  = [ "ion",  "electron" ]

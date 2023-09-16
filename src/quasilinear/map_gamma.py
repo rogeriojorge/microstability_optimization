@@ -81,7 +81,7 @@ output_csv = os.path.join(OUT_DIR,f'{output_dir}.csv')
 vmec = Vmec(vmec_file)
 #### Auxiliary functions
 # Get growth rates
-def getgamma(stellFile, fractionToConsider=0.35, savefig=False):
+def getgamma(stellFile, fractionToConsider=0.3, savefig=False):
     f = netCDF4.Dataset(stellFile,'r',mmap=False)
     phi2 = np.log(f.variables['phi2'][()])
     t = f.variables['t'][()]
@@ -123,7 +123,7 @@ def eigenPlot(stellFile):
     x = f.variables['theta'][()]
     plt.figure()
     omega_average_array = np.array(f.variables['omega_average'][()])
-    fractionToConsider=0.4
+    fractionToConsider=0.3
     tX   = f.variables['t'][()]
     startIndexX  = int(len(tX)*(1-fractionToConsider))
     omega_average_array_gamma = np.mean(omega_average_array[startIndexX:,:,0,1],axis=0)

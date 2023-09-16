@@ -77,7 +77,7 @@ with open(f_log, 'w') as fp:
 p.wait()
 print('Time to run gs2 =',time.time()-start_time,'s')
 
-fractionToConsider = 0.6 # fraction of time from the simulation period to consider
+fractionToConsider = 0.3 # fraction of time from the simulation period to consider
 
 file2read = netCDF4.Dataset(os.path.join(this_path,gs2_input_name[:-3]+".out.nc"),'r')
 tX = file2read.variables['t'][()]

@@ -22,13 +22,13 @@ from simsopt.util import MpiPartition
 from simsopt.solve import least_squares_mpi_solve
 from simsopt.mhd import QuasisymmetryRatioResidual
 from simsopt.objectives import LeastSquaresProblem
-from to_gs2_function import to_gs2
-from quasilinear_estimate import quasilinear_estimate
+from quasilinear_gs2 import quasilinear_estimate
 from scipy.optimize import dual_annealing
 import argparse
-this_path = Path(__file__).parent.resolve()
-# sys.path.insert(1, os.path.join(this_path, '..', 'plotting'))
-import vmecPlot2
+this_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(1, os.path.join(this_path, '..', 'util'))
+from to_gs2 import to_gs2 # pylint: disable=import-error
+import vmecPlot2 # pylint: disable=import-error
 mpi = MpiPartition()
 def pprint(*args, **kwargs):
     if MPI.COMM_WORLD.rank == 0:
@@ -130,7 +130,7 @@ if use_previous_results_if_available and (os.path.isfile(os.path.join(OUT_DIR,'i
         time.sleep(0.2)
     filename = os.path.join(dest, 'input.final')
 else:
-    filename = os.path.join(this_path, initial_config)
+    filename = os.path.join(this_path, '..', 'vmec_inputs', initial_config)
 os.chdir(OUT_DIR)
 vmec = Vmec(filename, verbose=False, mpi=mpi)
 vmec.keep_all_files = True
@@ -163,7 +163,7 @@ def CalculateGrowthRate(v: Vmec):
         f_wout = v.output_file.split('/')[-1]
         gs2_input_name = f"gs2-{f_wout[5:-3]}"
         gs2_input_file = os.path.join(OUT_DIR,f'{gs2_input_name}.in')
-        shutil.copy(os.path.join(this_path,'gs2Input.in'),gs2_input_file)
+        shutil.copy(os.path.join(this_path,'..','GK_inputs','gs2Input-linear.in'),gs2_input_file)
         gridout_file = os.path.join(OUT_DIR,f'grid_{gs2_input_name}.out')
         replace(gs2_input_file,' gridout_file = "grid.out"',f' gridout_file = "grid_{gs2_input_name}.out"')
         replace(gs2_input_file,' nstep = 150',f' nstep = {nstep}')

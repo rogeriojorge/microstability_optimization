@@ -51,16 +51,13 @@ elif args.type == 4:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH/wout_final.nc')
     output_dir = 'out_map_location_nfp4_QH_QH_least_squares'
 
-s_radius_array = np.linspace(0.1, 1, 5)
-alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, 5)
-
 # Define the desired values
 desired_s_radius = 0.25
 desired_alpha = 0
 
 # Create arrays without the desired values
-s_radius_array = np.linspace(0.1, 1, 6)
-alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, 6)
+s_radius_array = np.linspace(0.1, 1, 12)
+alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, 12)
 
 # Add the desired values to the arrays
 s_radius_array = np.sort(np.append(s_radius_array, desired_s_radius))
@@ -322,8 +319,8 @@ if __name__ == '__main__':
     clb.ax.set_title(r'$\gamma$', usetex=True)
     plt.ylabel(r'$s$', fontsize=16)
     plt.xlabel(r'$\alpha$', fontsize=16)
-    formatter = StrMethodFormatter(f"{{x:.2f}}")
-    ax.xaxis.set_major_formatter(formatter)
+    formatter = StrMethodFormatter(f"{{x:.1f}}")
+    ax.xaxis.set_major_formatter(formatter);ax.yaxis.set_major_formatter(formatter)
     matplotlib.rc('font', size=20)
     if plot_extent_fix_gamma:
         plt.clim(plot_gamma_min, plot_gamma_max)
@@ -343,8 +340,8 @@ if __name__ == '__main__':
     clb.ax.set_title(r'$\omega$', usetex=True)
     plt.ylabel(r'$s$', fontsize=16)
     plt.xlabel(r'$\alpha$', fontsize=16)
-    formatter = StrMethodFormatter(f"{{x:.2f}}")
-    ax.xaxis.set_major_formatter(formatter)
+    formatter = StrMethodFormatter(f"{{x:.1f}}")
+    ax.xaxis.set_major_formatter(formatter);ax.yaxis.set_major_formatter(formatter)
     # plt.gca().set_aspect('equal')
     ax.tick_params(axis='x', labelsize=14)
     ax.tick_params(axis='y', labelsize=14)
@@ -361,8 +358,8 @@ if __name__ == '__main__':
     clb.ax.set_title(r'$k_y$', usetex=True)
     plt.ylabel(r'$s$', fontsize=16)
     plt.xlabel(r'$\alpha$', fontsize=16)
-    formatter = StrMethodFormatter(f"{{x:.2f}}")
-    ax.xaxis.set_major_formatter(formatter)
+    formatter = StrMethodFormatter(f"{{x:.1f}}")
+    ax.xaxis.set_major_formatter(formatter);ax.yaxis.set_major_formatter(formatter)
     # plt.gca().set_aspect('equal')
     ax.tick_params(axis='x', labelsize=14)
     ax.tick_params(axis='y', labelsize=14)
@@ -379,8 +376,8 @@ if __name__ == '__main__':
     clb.ax.set_title(r'$\gamma/\langle k_{\perp}^2 \rangle$', usetex=True)
     plt.ylabel(r'$s$', fontsize=16)
     plt.xlabel(r'$\alpha$', fontsize=16)
-    formatter = StrMethodFormatter(f"{{x:.2f}}")
-    ax.xaxis.set_major_formatter(formatter)
+    formatter = StrMethodFormatter(f"{{x:.1f}}")
+    ax.xaxis.set_major_formatter(formatter);ax.yaxis.set_major_formatter(formatter)
     matplotlib.rc('font', size=20)
     if plot_extent_fix_weighted_gamma:
         plt.clim(plot_weighted_gamma_min, plot_weighted_gamma_max)

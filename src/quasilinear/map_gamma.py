@@ -22,7 +22,7 @@ import warnings
 import matplotlib.cbook
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=1)
+parser.add_argument("--type", type=int, default=0)
 args = parser.parse_args()
 matplotlib.use('Agg') 
 warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
@@ -33,6 +33,9 @@ from to_gs2 import to_gs2 # pylint: disable=import-error
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 
+if args.type == 0:
+    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
+    output_dir = 'out_map_nfp4_QH_initial'
 if args.type == 1:
     vmec_file = os.path.join(this_path,'output_MAXITER350_least_squares_nfp2_QA_QA_onlyQS/wout_final.nc')
     output_dir = 'out_map_nfp2_QA_QA_onlyQS'
@@ -224,7 +227,7 @@ def run_gs2(ln, lt):
     try:
         gs2_input_name = f"gs2Input-LN{ln:.1f}-LT{lt:.1f}"
         gs2_input_file = os.path.join(OUT_DIR,f'{gs2_input_name}.in')
-        shutil.copy(os.path.join(this_path,'gs2Input.in'),gs2_input_file)
+        shutil.copy(os.path.join(this_path,'..','GK_inputs','gs2Input-linear.in'),gs2_input_file)
         replace(gs2_input_file,' gridout_file = "grid.out"',f' gridout_file = "grid_gs2.out"')
         replace(gs2_input_file,' nstep = 150',f' nstep = {nstep}')
         replace(gs2_input_file,' delt = 0.4 ! Time step',f' delt = {dt} ! Time step')

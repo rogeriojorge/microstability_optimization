@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import glob
 import shutil
 import netCDF4
@@ -13,9 +14,9 @@ from os import fdopen, remove
 import matplotlib.pyplot as plt
 from shutil import move, copymode
 from joblib import Parallel, delayed
-from quasilinear_estimate import quasilinear_estimate
+from quasilinear_gs2 import quasilinear_estimate
 from simsopt.mhd import Vmec
-from simsopt.mhd.vmec_diagnostics import to_gs2, vmec_fieldlines
+from simsopt.mhd.vmec_diagnostics import vmec_fieldlines
 import matplotlib
 import warnings
 import matplotlib.cbook
@@ -26,6 +27,8 @@ args = parser.parse_args()
 matplotlib.use('Agg') 
 warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
 this_path = Path(__file__).parent.resolve()
+sys.path.insert(1, os.path.join(this_path, '..', 'util'))
+from to_gs2 import to_gs2 # pylint: disable=import-error
 ######## INPUT PARAMETERS ########
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
@@ -45,18 +48,17 @@ elif args.type == 4:
 
 s_radius = 0.25
 alpha_fieldline = 0
-nphi= 151
-nlambda = 35
-nperiod = 5.0
-nstep = 340
+nphi= 99#141
+nlambda = 37#33
+nperiod = 2.0#5.0
+nstep = 280
 dt = 0.4
-aky_min = 0.3
-aky_max = 4.0
-naky = 10
-s_radius = 0.25
-alpha_fieldline = 0
+aky_min = 0.4
+aky_max = 3.0
+naky = 6
 ngauss = 3
-negrid = 10
+negrid = 8
+vnewk = 0.01
 phi_GS2 = np.linspace(-nperiod*np.pi, nperiod*np.pi, nphi)
 ## Ln, Lt, plotting options
 LN_array = np.linspace(0.5,6,12)
@@ -231,6 +233,7 @@ def run_gs2(ln, lt):
         replace(gs2_input_file,' aky_min = 0.4',f' aky_min = {aky_min}')
         replace(gs2_input_file,' aky_max = 5.0',f' aky_max = {aky_max}')
         replace(gs2_input_file,' naky = 4',f' naky = {naky}')
+        replace(gs2_input_file,' vnewk = 0.01 ! collisionality parameter',f' vnewk = {vnewk} ! collisionality parameter')
         replace(gs2_input_file,' ngauss = 3 ! Number of untrapped pitch-angles moving in one direction along field line.',
         f' ngauss = {ngauss} ! Number of untrapped pitch-angles moving in one direction along field line.')
         replace(gs2_input_file,' negrid = 10 ! Total number of energy grid points',

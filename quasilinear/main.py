@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import os
+import sys
 import glob
 import time
 import shutil
 import netCDF4
-import vmecPlot2
 import subprocess
 import numpy as np
 import pandas as pd
@@ -22,12 +22,14 @@ from simsopt.util import MpiPartition
 from simsopt.solve import least_squares_mpi_solve
 from simsopt.mhd import QuasisymmetryRatioResidual
 from simsopt.objectives import LeastSquaresProblem
-from simsopt.mhd.vmec_diagnostics import to_gs2
+from to_gs2_function import to_gs2
 from quasilinear_estimate import quasilinear_estimate
 from scipy.optimize import dual_annealing
 import argparse
-mpi = MpiPartition()
 this_path = Path(__file__).parent.resolve()
+# sys.path.insert(1, os.path.join(this_path, '..', 'plotting'))
+import vmecPlot2
+mpi = MpiPartition()
 def pprint(*args, **kwargs):
     if MPI.COMM_WORLD.rank == 0:
         print(*args, **kwargs)
@@ -39,13 +41,17 @@ start_time = time.time()
 ## FOR GS2 to work with SIMSOPT's MPI, USE_MPI should be undefined during GS2's compilation
 ## override USE_MPI = 
 #########
+#########
+## To run this file with 4 cores, use the following command:
+## mpirun -n 4 python3 main.py --type 1
+## where type 1 is QH + turbulence, type 2 is QA + turbulence, type 3 is QH, type 4 is QA
 ############################################################################
 #### Input Parameters
 ############################################################################
-# gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
-gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
+gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
+# gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER = 350
-max_modes = [1,2,3]
+max_modes = [1]
 if   args.type == 1 or args.type == 3: QA_or_QH = 'QH'
 elif args.type == 2 or args.type == 4: QA_or_QH = 'QA'
 optimizer = 'least_squares'#'dual_annealing' #'least_squares'
@@ -57,20 +63,20 @@ weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
 s_radius = 0.25
 alpha_fieldline = 0
 
-nphi= 151
-nlambda = 35
-nperiod = 5.0
-nstep = 340
+nphi= 101#151
+nlambda = 27#35
+nperiod = 4#5.0
+nstep = 180#340
 dt = 0.4
 aky_min = 0.3
 aky_max = 3.0
-naky = 10
+naky = 5#10
 LN = 1.0
 LT = 3.0
 s_radius = 0.25
 alpha_fieldline = 0
 ngauss = 3
-negrid = 10
+negrid = 8#10
 phi_GS2 = np.linspace(-nperiod*np.pi, nperiod*np.pi, nphi)
 
 ## MAKE VNEWK LARGER?

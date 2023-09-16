@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import glob
 import shutil
 import netCDF4
@@ -13,15 +14,16 @@ from tempfile import mkstemp
 from os import fdopen, remove
 import matplotlib.pyplot as plt
 from shutil import move, copymode
-from quasilinear_estimate import quasilinear_estimate
+from quasilinear_gs2 import quasilinear_estimate
 from simsopt.mhd import Vmec
-from simsopt.mhd.vmec_diagnostics import to_gs2, vmec_fieldlines
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
 args = parser.parse_args()
 this_path = Path(__file__).parent.resolve()
 matplotlib.use('Agg') 
+sys.path.insert(1, os.path.join(this_path, '..', 'util'))
+from to_gs2 import to_gs2 # pylint: disable=import-error
 ######## INPUT PARAMETERS ########
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
@@ -185,7 +187,7 @@ def create_gs2_inputs(nphi, nperiod, nlambda, nstep, dt, negrid, ngauss):
     to_gs2(gridout_file, vmec, s_radius, alpha_fieldline, phi1d=phi_GS2, nlambda=nlambda)
     gs2_input_name = f"gs2Input_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{LN}_lt{LT}"
     gs2_input_file = os.path.join(OUT_DIR,f'{gs2_input_name}.in')
-    shutil.copy(os.path.join(this_path,'gs2Input.in'),gs2_input_file)
+    shutil.copy(os.path.join(this_path,'..','GK_inputs','gs2Input-linear.in'),gs2_input_file)
     replace(gs2_input_file,' gridout_file = "grid.out"',f' gridout_file = "{gridout_file}"')
     replace(gs2_input_file,' nstep = 150 ! Maximum number of timesteps',f' nstep = {nstep} ! Maximum number of timesteps"')
     replace(gs2_input_file,' fprim = 1.0 ! -1/n (dn/drho)',f' fprim = {LN} ! -1/n (dn/drho)')

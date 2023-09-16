@@ -39,20 +39,20 @@ elif args.type == 2:
 # output_dir = 'test_out_nfp4_QH_test'
 # vmec_file = '/Users/rogeriojorge/local/some_optimizations/GS2_SIMSOPT_ITG/output_MAXITER350_least_squares_nfp2_QA_QA/wout_final.nc'
 # output_dir = 'test_out_nfp2_QA_test'
-nphi= 111#141
-nlambda = 35#33
-nperiod = 3.0#5.0
-nstep = 330
+nphi= 99#141
+nlambda = 37#33
+nperiod = 2.0#5.0
+nstep = 280
 dt = 0.4
 aky_min = 0.4
 aky_max = 3.0
-naky = 8
+naky = 6
 LN = 1.0
 LT = 3.0
 s_radius = 0.25
 alpha_fieldline = 0
 ngauss = 3
-negrid = 9
+negrid = 8
 ########################################
 # Go into the output directory
 OUT_DIR = os.path.join(this_path,f'{output_dir}_ln{LN}_lt{LT}')

@@ -13,7 +13,7 @@ from tempfile import mkstemp
 from os import fdopen, remove
 import matplotlib.pyplot as plt
 from shutil import move, copymode
-from joblib import Parallel, delayed
+from multiprocessing import Pool
 from quasilinear_gs2 import quasilinear_estimate
 from simsopt.mhd import Vmec
 from simsopt.mhd.vmec_diagnostics import vmec_fieldlines
@@ -36,23 +36,36 @@ gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 
 if args.type == 0:
-    vmec_file = os.path.join(this_path, '..', 'vmec_inputs' 'wout_nfp4_QH.nc')
-    output_dir = 'out_map_nfp4_QH_initial'
+    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
+    output_dir = 'out_map_location_nfp4_QH_initial'
 elif args.type == 1:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA_onlyQS/wout_final.nc')
-    output_dir = 'out_map_nfp2_QA_QA_onlyQS'
+    output_dir = 'out_map_location_nfp2_QA_QA_onlyQS'
 elif args.type == 2:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH_onlyQS/wout_final.nc')
-    output_dir = 'out_map_nfp4_QH_QH_onlyQS'
+    output_dir = 'out_map_location_nfp4_QH_QH_onlyQS'
 elif args.type == 3:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA/wout_final.nc')
-    output_dir = 'out_map_nfp2_QA_QA_least_squares'
+    output_dir = 'out_map_location_nfp2_QA_QA_least_squares'
 elif args.type == 4:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH/wout_final.nc')
-    output_dir = 'out_map_nfp4_QH_QH_least_squares'
+    output_dir = 'out_map_location_nfp4_QH_QH_least_squares'
 
 s_radius_array = np.linspace(0.1, 1, 5)
 alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, 5)
+
+# Define the desired values
+desired_s_radius = 0.25
+desired_alpha = 0
+
+# Create arrays without the desired values
+s_radius_array = np.linspace(0.1, 1, 6)
+alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, 6)
+
+# Add the desired values to the arrays
+s_radius_array = np.sort(np.append(s_radius_array, desired_s_radius))
+alpha_fieldline_array = np.sort(np.append(alpha_fieldline_array, desired_alpha))
+
 LN = 1.0
 LT = 3.0
 
@@ -71,13 +84,13 @@ phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
 
 ## Ln, Lt, plotting options
 n_processes_parallel = 8
-plot_extent_fix_gamma = True
+plot_extent_fix_gamma = False
 plot_gamma_min = 0
 if 'QA' in output_dir:
     plot_gamma_max = 0.41
 else:
     plot_gamma_max = 0.46
-plot_extent_fix_weighted_gamma = True
+plot_extent_fix_weighted_gamma = False
 plot_weighted_gamma_min = 0
 if 'QA' in output_dir:
     plot_weighted_gamma_max = 0.54
@@ -154,7 +167,7 @@ def eigenPlot(stellFile):
     return 0
 
 ##### Function to obtain gamma and omega for each ky
-def gammabyky(stellFile, fractionToConsider=0.6, savefig=False):
+def gammabyky(stellFile, fractionToConsider=0.3, savefig=False):
     # Compute growth rate:
     fX = netCDF4.Dataset(stellFile, 'r', mmap=False)
     tX = fX.variables['t'][()]
@@ -220,23 +233,26 @@ def output_to_csv(growth_rate, omega, ky, weighted_growth_rate, ln, lt, s, alpha
 
 # Run GS2
 growth_rate_array = np.zeros((len(s_radius_array), len(alpha_fieldline_array)))
-def run_gs2(ln, lt, alpha, s_radius):
+omega_array = np.zeros((len(s_radius_array), len(alpha_fieldline_array)))
+ky_array = np.zeros((len(s_radius_array), len(alpha_fieldline_array)))
+weighted_growth_rate_array = np.zeros((len(s_radius_array), len(alpha_fieldline_array)))
+def run_gs2(s_radius, alpha):
     start_time_local = time()
     try:
-        grid_file_name = f'grid_gs2_alpha{alpha}_s{s_radius}.out'
+        grid_file_name = f'grid_gs2_s{s_radius:.3f}-alpha{alpha:.3f}.out'
         gridout_file = os.path.join(OUT_DIR, grid_file_name)
         to_gs2(gridout_file, vmec, s_radius, alpha, phi1d=phi_GS2, nlambda=nlambda)
         fl1 = vmec_fieldlines(vmec, s_radius, alpha, phi1d=phi_GS2, plot=True, show=False)
         plt.savefig(f'geometry_profiles_s{s_radius}_alpha{alpha}.png')
         plt.close()
-        gs2_input_name = f"gs2Input-LN{ln:.1f}-LT{lt:.1f}"
+        gs2_input_name = f"gs2Input-s{s_radius:.3f}-alpha{alpha:.3f}"
         gs2_input_file = os.path.join(OUT_DIR, f'{gs2_input_name}.in')
-        shutil.copy(os.path.join(this_path, 'gs2Input.in'), gs2_input_file)
-        replace(gs2_input_file, ' gridout_file = "grid.out"', f' gridout_file = {grid_file_name}')
+        shutil.copy(os.path.join(this_path, '..', 'GK_inputs', 'gs2Input-linear.in'), gs2_input_file)
+        replace(gs2_input_file, ' gridout_file = "grid.out"', f' gridout_file = "{grid_file_name}"')
         replace(gs2_input_file, ' nstep = 150', f' nstep = {nstep}')
         replace(gs2_input_file, ' delt = 0.4 ! Time step', f' delt = {dt} ! Time step')
-        replace(gs2_input_file, ' fprim = 1.0 ! -1/n (dn/drho)', f' fprim = {ln} ! -1/n (dn/drho)')
-        replace(gs2_input_file, ' tprim = 3.0 ! -1/T (dT/drho)', f' tprim = {lt} ! -1/T (dT/drho)')
+        replace(gs2_input_file, ' fprim = 1.0 ! -1/n (dn/drho)', f' fprim = {LN} ! -1/n (dn/drho)')
+        replace(gs2_input_file, ' tprim = 3.0 ! -1/T (dT/drho)', f' tprim = {LT} ! -1/T (dT/drho)')
         replace(gs2_input_file, ' aky_min = 0.4', f' aky_min = {aky_min}')
         replace(gs2_input_file, ' aky_max = 5.0', f' aky_max = {aky_max}')
         replace(gs2_input_file, ' naky = 4', f' naky = {naky}')
@@ -249,7 +265,7 @@ def run_gs2(ln, lt, alpha, s_radius):
         p = subprocess.Popen(bashCommand.split(), stderr=subprocess.STDOUT, stdout=subprocess.DEVNULL)
         p.wait()
         file2read = os.path.join(OUT_DIR, f"{gs2_input_name}.out.nc")
-        if ln == 1 and lt == 3:
+        if s_radius == desired_s_radius and alpha == desired_alpha:
             eigenPlot(file2read)
             growth_rate, omega, ky = getgamma(file2read, savefig=True)
             kyX, growthRateX, realFrequencyX = gammabyky(file2read, savefig=True)
@@ -258,111 +274,143 @@ def run_gs2(ln, lt, alpha, s_radius):
             growth_rate, omega, ky = getgamma(file2read, savefig=False)
             kyX, growthRateX, realFrequencyX = gammabyky(file2read, savefig=False)
             weighted_growth_rate = np.sum(quasilinear_estimate(file2read, show=False, savefig=False)) / naky
-        output_to_csv(growth_rate, omega, ky, weighted_growth_rate, ln, lt, s_radius, alpha)
+        output_to_csv(growth_rate, omega, ky, weighted_growth_rate, LN, LT, s_radius, alpha)
     except Exception as e:
         print(e)
         exit()
     print(f'  alpha={alpha:1f}, s_radius={s_radius:1f}, growth rate={growth_rate:1f}, omega={omega:1f}, ky={ky:1f}, weighted gamma={weighted_growth_rate:1f} took {(time()-start_time_local):1f}s')
     return growth_rate, omega, ky, weighted_growth_rate
 
-print('Starting GS2 scan')
-start_time = time()
-growth_rate_array_temp, omega_array_temp, ky_array_temp, weighted_growth_rate_temp = np.array(Parallel(n_jobs=n_processes_parallel)(delayed(run_gs2)(LN, LT, s, alpha) for s in s_radius_array for alpha in alpha_fieldline_array)).transpose()
-growth_rate_array = np.reshape(growth_rate_array_temp, (len(s_radius_array), len(alpha_fieldline_array)))
-omega_array = np.reshape(omega_array_temp, (len(s_radius_array), len(alpha_fieldline_array)))
-ky_array = np.reshape(ky_array_temp, (len(s_radius_array), len(alpha_fieldline_array)))
-weighted_growth_rate_array = np.reshape(weighted_growth_rate_temp, (len(s_radius_array), len(alpha_fieldline_array)))
-print(f'Running GS2 scan took {time()-start_time}s')
+def parallel_run_gs2(params):
+    s, alpha = params
+    return run_gs2(s, alpha)
 
-print('growth rates:')
-print(growth_rate_array.transpose())
+if __name__ == '__main__':
+    print('Starting GS2 scan')
+    start_time = time()
+    pool = Pool(processes=n_processes_parallel)
+    params_list = [(s, alpha) for s in s_radius_array for alpha in alpha_fieldline_array]
+    results = pool.map(parallel_run_gs2, params_list)
+    pool.close()
+    pool.join()
 
-# Plot
-plotExtent = [0 * min(alpha_fieldline_array), max(alpha_fieldline_array), 0 * min(s_radius_array), max(s_radius_array)]
+    # Unpack the results
+    for i, (growth_rate, omega, ky, weighted_growth_rate) in enumerate(results):
+        s_index = i // len(alpha_fieldline_array)
+        alpha_index = i % len(alpha_fieldline_array)
+        growth_rate_array[s_index, alpha_index] = growth_rate
+        omega_array[s_index, alpha_index] = omega
+        ky_array[s_index, alpha_index] = ky
+        weighted_growth_rate_array[s_index, alpha_index] = weighted_growth_rate
 
-fig = plt.figure()
-ax = plt.subplot(111)
-fig.set_size_inches(4.5, 4.5)
-im = plt.imshow(growth_rate_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im, fraction=0.046, pad=0.04)
-clb.ax.set_title(r'$\gamma$', usetex=True)
-plt.xlabel(r'$s$', fontsize=16)
-plt.ylabel(r'$$', fontsize=16)
-matplotlib.rc('font', size=20)
-if plot_extent_fix_gamma:
-    plt.clim(plot_gamma_min, plot_gamma_max)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14)
-ax.tick_params(axis='y', labelsize=14)
-plt.tight_layout()
-plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_gamma.pdf'), format='pdf', bbox_inches='tight')
+    print(f'Running GS2 scan took {time()-start_time}s')
 
-fig = plt.figure()
-ax = plt.subplot(111)
-fig.set_size_inches(5.5, 5.5)
-im = plt.imshow(omega_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im, fraction=0.046, pad=0.04)
-clb.ax.set_title(r'$\omega$', usetex=True)
-plt.xlabel(r'$s$', fontsize=16)
-plt.ylabel(r'$\alpha$', fontsize=16)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14)
-ax.tick_params(axis='y', labelsize=14)
-plt.tight_layout()
-plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_omega.pdf'), format='pdf', bbox_inches='tight')
+    print('growth rates:')
+    print(growth_rate_array.transpose())
 
-fig = plt.figure()
-ax = plt.subplot(111)
-fig.set_size_inches(5.5, 5.5)
-im = plt.imshow(ky_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im, fraction=0.046, pad=0.04)
-clb.ax.set_title(r'$k_y$', usetex=True)
-plt.xlabel(r'$s$', fontsize=16)
-plt.ylabel(r'$\alpha$', fontsize=16)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14)
-ax.tick_params(axis='y', labelsize=14)
-plt.tight_layout()
-plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_ky.pdf'), format='pdf', bbox_inches='tight')
+    # Plot
+    # plotExtent = [min(alpha_fieldline_array), max(alpha_fieldline_array), min(s_radius_array), max(s_radius_array)]
+    from matplotlib.ticker import StrMethodFormatter
 
-fig = plt.figure()
-ax = plt.subplot(111)
-fig.set_size_inches(5.5, 5.5)
-im = plt.imshow(weighted_growth_rate_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im, fraction=0.046, pad=0.04)
-clb.ax.set_title(r'$\gamma/\langle k_{\perp}^2 \rangle$', usetex=True)
-plt.xlabel(r'$s$', fontsize=16)
-plt.ylabel(r'$\alpha$', fontsize=16)
-matplotlib.rc('font', size=20)
-if plot_extent_fix_weighted_gamma:
-    plt.clim(plot_weighted_gamma_min, plot_weighted_gamma_max)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14)
-ax.tick_params(axis='y', labelsize=14)
-plt.tight_layout()
-plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_weighted_gamma.pdf'), format='pdf', bbox_inches='tight')
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    fig.set_size_inches(4.5, 4.5)
+    im = plt.imshow(growth_rate_array, cmap='jet', origin='lower', interpolation='hermite')
+    plt.xticks(range(len(alpha_fieldline_array)), alpha_fieldline_array)
+    plt.yticks(range(len(s_radius_array)), s_radius_array)
+    clb = plt.colorbar(im, fraction=0.046, pad=0.04)
+    clb.ax.set_title(r'$\gamma$', usetex=True)
+    plt.ylabel(r'$s$', fontsize=16)
+    plt.xlabel(r'$\alpha$', fontsize=16)
+    formatter = StrMethodFormatter(f"{{x:.2f}}")
+    ax.xaxis.set_major_formatter(formatter)
+    matplotlib.rc('font', size=20)
+    if plot_extent_fix_gamma:
+        plt.clim(plot_gamma_min, plot_gamma_max)
+    # plt.gca().set_aspect('equal')
+    ax.tick_params(axis='x', labelsize=14)
+    ax.tick_params(axis='y', labelsize=14)
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_gamma.pdf'), format='pdf', bbox_inches='tight')
+
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    fig.set_size_inches(5.5, 5.5)
+    im = plt.imshow(omega_array, cmap='jet', origin='lower', interpolation='hermite')
+    plt.xticks(range(len(alpha_fieldline_array)), alpha_fieldline_array)
+    plt.yticks(range(len(s_radius_array)), s_radius_array)
+    clb = plt.colorbar(im, fraction=0.046, pad=0.04)
+    clb.ax.set_title(r'$\omega$', usetex=True)
+    plt.ylabel(r'$s$', fontsize=16)
+    plt.xlabel(r'$\alpha$', fontsize=16)
+    formatter = StrMethodFormatter(f"{{x:.2f}}")
+    ax.xaxis.set_major_formatter(formatter)
+    # plt.gca().set_aspect('equal')
+    ax.tick_params(axis='x', labelsize=14)
+    ax.tick_params(axis='y', labelsize=14)
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_omega.pdf'), format='pdf', bbox_inches='tight')
+
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    fig.set_size_inches(5.5, 5.5)
+    im = plt.imshow(ky_array, cmap='jet', origin='lower', interpolation='hermite')
+    plt.xticks(range(len(alpha_fieldline_array)), alpha_fieldline_array)
+    plt.yticks(range(len(s_radius_array)), s_radius_array)
+    clb = plt.colorbar(im, fraction=0.046, pad=0.04)
+    clb.ax.set_title(r'$k_y$', usetex=True)
+    plt.ylabel(r'$s$', fontsize=16)
+    plt.xlabel(r'$\alpha$', fontsize=16)
+    formatter = StrMethodFormatter(f"{{x:.2f}}")
+    ax.xaxis.set_major_formatter(formatter)
+    # plt.gca().set_aspect('equal')
+    ax.tick_params(axis='x', labelsize=14)
+    ax.tick_params(axis='y', labelsize=14)
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_ky.pdf'), format='pdf', bbox_inches='tight')
+
+    fig = plt.figure()
+    ax = plt.subplot(111)
+    fig.set_size_inches(5.5, 5.5)
+    im = plt.imshow(weighted_growth_rate_array, cmap='jet', origin='lower', interpolation='hermite')
+    plt.xticks(range(len(alpha_fieldline_array)), alpha_fieldline_array)
+    plt.yticks(range(len(s_radius_array)), s_radius_array)
+    clb = plt.colorbar(im, fraction=0.046, pad=0.04)
+    clb.ax.set_title(r'$\gamma/\langle k_{\perp}^2 \rangle$', usetex=True)
+    plt.ylabel(r'$s$', fontsize=16)
+    plt.xlabel(r'$\alpha$', fontsize=16)
+    formatter = StrMethodFormatter(f"{{x:.2f}}")
+    ax.xaxis.set_major_formatter(formatter)
+    matplotlib.rc('font', size=20)
+    if plot_extent_fix_weighted_gamma:
+        plt.clim(plot_weighted_gamma_min, plot_weighted_gamma_max)
+    # plt.gca().set_aspect('equal')
+    ax.tick_params(axis='x', labelsize=14)
+    ax.tick_params(axis='y', labelsize=14)
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUT_DIR, 'gs2_scan_weighted_gamma.pdf'), format='pdf', bbox_inches='tight')
 
 
-for f in glob.glob('*.amoments'): remove(f)
-for f in glob.glob('*.eigenfunc'): remove(f)
-for f in glob.glob('*.error'): remove(f)
-for f in glob.glob('*.fields'): remove(f)
-for f in glob.glob('*.g'): remove(f)
-for f in glob.glob('*.lpc'): remove(f)
-for f in glob.glob('*.mom2'): remove(f)
-for f in glob.glob('*.moments'): remove(f)
-for f in glob.glob('*.vres'): remove(f)
-for f in glob.glob('*.vres2'): remove(f)
-for f in glob.glob('*.exit_reason'): remove(f)
-for f in glob.glob('*.optim'): remove(f)
-for f in glob.glob('*.out'): remove(f)
-for f in glob.glob('*.scratch'): remove(f)
-for f in glob.glob('*.used_inputs.in'): remove(f)
-for f in glob.glob('*.vspace_integration_error'): remove(f)
-## THIS SHOULD ONLY REMOVE FILES STARTING WTH .gs2
-for f in glob.glob('.gs2*'): remove(f)
-## REMOVE ALSO INPUT FILES
-for f in glob.glob('*.in'): remove(f)
-## REMOVE ALSO OUTPUT FILES
-for f in glob.glob('*.out.nc'):
-    if f not in 'gs2Input-LN1.0-LT3.0.out.nc': remove(f)
+    for f in glob.glob('*.amoments'): remove(f)
+    for f in glob.glob('*.eigenfunc'): remove(f)
+    for f in glob.glob('*.error'): remove(f)
+    for f in glob.glob('*.fields'): remove(f)
+    for f in glob.glob('*.g'): remove(f)
+    for f in glob.glob('*.lpc'): remove(f)
+    for f in glob.glob('*.mom2'): remove(f)
+    for f in glob.glob('*.moments'): remove(f)
+    for f in glob.glob('*.vres'): remove(f)
+    for f in glob.glob('*.vres2'): remove(f)
+    for f in glob.glob('*.exit_reason'): remove(f)
+    for f in glob.glob('*.optim'): remove(f)
+    for f in glob.glob('*.out'): remove(f)
+    for f in glob.glob('*.scratch'): remove(f)
+    for f in glob.glob('*.used_inputs.in'): remove(f)
+    for f in glob.glob('*.vspace_integration_error'): remove(f)
+    ## THIS SHOULD ONLY REMOVE FILES STARTING WTH .gs2
+    for f in glob.glob('.gs2*'): remove(f)
+    ## REMOVE ALSO INPUT FILES
+    for f in glob.glob('*.in'): remove(f)
+    ## REMOVE ALSO OUTPUT FILES
+    for f in glob.glob('*.out.nc'):
+        if f not in f"gs2Input-s{desired_s_radius:.3f}-alpha{desired_alpha:.3f}.out.nc": remove(f)

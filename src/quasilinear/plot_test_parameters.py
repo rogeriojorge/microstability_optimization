@@ -12,13 +12,14 @@ csv_file = os.path.join(this_path, 'test_out_nfp4_QH_initial_ln1.0_lt3.0', 'test
 df = pd.read_csv(csv_file)
 
 # Define the parameters that are being varied
-varied_parameters = ['nphi', 'nperiod', 'nlambda', 'nstep', 'dt', 'negrid', 'ngauss', 'aky_min', 'aky_max', 'naky']
-parameter_legend  = [r'$n{\phi}$', r'$n_{\mathrm{periods}}$', r'$n_{\lambda}$', r'$n_{\Delta t}$', r'$\Delta t$', r'$n_E$', r'$n_{\mathrm{untrapped}}$', r'$ky_{\mathrm{min}}$', r'$ky_{\mathrm{max}}$', r'$n_{ky}$']
+varied_parameters = ['nphi', 'nperiod', 'nlambda', 'nstep', 'dt', 'negrid', 'ngauss', 'aky_min', 'aky_max', 'naky', 'vnewk']
+parameter_legend  = [r'$n{\phi}$', r'$n_{\mathrm{periods}}$', r'$n_{\lambda}$', r'$n_{\Delta t}$', r'$\Delta t$', r'$n_E$', r'$n_{\mathrm{untrapped}}$', r'$ky_{\mathrm{min}}$', r'$ky_{\mathrm{max}}$', r'$n_{ky}$', r'$v_{\mathrm{newk}}$']
 
 # Create a dictionary to map parameters to their corresponding factor for variation
 parameter_factors = {
     'nphi': 2.0, 'nperiod': 2.0, 'nlambda': 2.0, 'nstep': 2.0,
-    'dt': 0.5, 'negrid': 2.0, 'ngauss': 2.0, 'aky_min': 0.5, 'aky_max': 2.0, 'naky': 2.0
+    'dt': 0.5, 'negrid': 2.0, 'ngauss': 2.0, 'aky_min': 0.5,
+    'aky_max': 2.0, 'naky': 2.0, 'vnewk': 0.5
 }
 
 # Define an extensive list of markers and colors

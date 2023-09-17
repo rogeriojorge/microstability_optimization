@@ -10,6 +10,9 @@ name = 'test_out_nfp4_QH_initial_ln1.0_lt3.0'
 parameters_to_plot = ['growth_rate','weighted_growth_rate']
 label_parameters   = [r'$\gamma$', r'$\gamma/\langle k_{\perp}^2 \rangle$']
 
+##### NEED TO REDO - THIS IS NOT CORRECT #####
+##### ORDER OF SCAN IS ARBITRARY DUE TO ITS PARALLEL NATURE #####
+
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
 figures_directory = 'figures'
@@ -57,6 +60,10 @@ for nn, parameter in enumerate(parameters_to_plot):
         if param == 'aky_min' or param == 'aky_max':
             continue
         factor = parameter_factors[param]
+        print(param)
+        print(df.iloc[i+1][param])
+        print(base_case[param] * factor)
+        print('')
         assert df.iloc[i+1][param] == base_case[param] * factor or df.iloc[i+1][param] == base_case[param] * factor-1
         marker = markers[1]
         color = colors[j-1]

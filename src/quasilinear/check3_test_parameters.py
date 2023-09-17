@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
 import os
-import subprocess
+import sys
+import shutil
 import netCDF4
+import argparse
+import subprocess
 import numpy as np
 import pandas as pd
+from time import time
 from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor
 from simsopt.mhd import Vmec
-import argparse
-from quasilinear_gs2 import quasilinear_estimate
-from to_gs2 import to_gs2
 import matplotlib.pyplot as plt
+from quasilinear_gs2 import quasilinear_estimate
+from concurrent.futures import ProcessPoolExecutor
 
 # Constants and Configurations
 THIS_PATH = Path(__file__).parent.resolve()
+sys.path.insert(1, os.path.join(THIS_PATH, '..', 'util'))
+from to_gs2 import to_gs2 # pylint: disable=import-error
 GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
 CONFIG = {
     1: {
@@ -25,6 +29,8 @@ CONFIG = {
         "output_dir": 'test_out_nfp4_QH_initial'
     }
 }
+
+n_processors_default = 4
 
 PARAMS = {
     'nphi': 99,
@@ -46,6 +52,7 @@ PARAMS = {
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=2)
+parser.add_argument("--nprocessors", type=int, default=n_processors_default, help="Number of processors to use for parallel execution")
 args = parser.parse_args()
 config = CONFIG[args.type]
 OUTPUT_DIR = THIS_PATH / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
@@ -54,58 +61,113 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.chdir(OUTPUT_DIR)
 vmec = Vmec(config['vmec_file'])
 
-
-def plot_data(x, y, xlabel, ylabel, filename, label="", legend_loc=0, legend_fontsize=14, figsize=(7.5, 4.0)):
-    plt.figure(figsize=figsize)
-    plt.plot(x, y, '.', label=label)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
-    plt.legend(loc=legend_loc, fontsize=legend_fontsize)
-    plt.subplots_adjust(left=0.16, bottom=0.19, right=0.98, top=0.97)
-    plt.savefig(filename)
-    plt.close()
-
 def getgamma(stellFile, fractionToConsider=0.3):
-    with netCDF4.Dataset(stellFile, 'r', mmap=False) as f:
-        phi2 = np.log(f.variables['phi2'][()])
-        t = f.variables['t'][()]
-        startIndex = int(len(t) * (1 - fractionToConsider))
-        mask = np.isfinite(phi2)
-        data_x = t[mask]
-        data_y = phi2[mask]
-        fit = np.polyfit(data_x[startIndex:], data_y[startIndex:], 1)
-        GrowthRate = fit[0] / 2
-        omega_avg_array = np.array(f.variables['omega_average'][()])
-        max_index = np.nanargmax(omega_avg_array[-1, :, 0, 1])
-        gamma, omega = omega_avg_array[-1, max_index, 0, 1:3]
-    plot_data(t, phi2, r'$t$', r'$\ln |\hat \phi|^2$', f"{stellFile}_phi2.png", label=r'data - $\gamma_{GS2} = $' + str(gamma))
+    f = netCDF4.Dataset(stellFile,'r',mmap=False)
+    phi2 = np.log(f.variables['phi2'][()])
+    t = f.variables['t'][()]
+    startIndex = int(len(t)*(1-fractionToConsider))
+    mask = np.isfinite(phi2)
+    data_x = t[mask]
+    data_y = phi2[mask]
+    fit = np.polyfit(data_x[startIndex:], data_y[startIndex:], 1)
+    poly = np.poly1d(fit)
+    GrowthRate = fit[0]/2
+    omega_average_array = np.array(f.variables['omega_average'][()])
+    omega_average_array_omega = omega_average_array[-1,:,0,0]
+    omega_average_array_gamma = omega_average_array[-1,:,0,1]
+    max_index = np.nanargmax(omega_average_array_gamma)
+    gamma = omega_average_array_gamma[max_index]
+    omega = omega_average_array_omega[max_index]
+    # gamma  = np.mean(f.variables['omega'][()][startIndex:,0,0,1])
+    # omega  = np.mean(f.variables['omega'][()][startIndex:,0,0,0])
+    #fitRes = np.poly1d(coeffs)
+    # if not os.path.exists(stellFile+'_phi2.pdf'):
+    plt.figure(figsize=(7.5,4.0))
+    ##############
+    plt.plot(t, phi2,'.', label=r'data - $\gamma_{GS2} = $'+str(gamma))
+    plt.plot(t, poly(t),'-', label=r'fit - $\gamma = $'+str(GrowthRate))
+    ##############
+    plt.legend(loc=0,fontsize=14)
+    plt.xlabel(r'$t$');plt.ylabel(r'$\ln |\hat \phi|^2$')
+    plt.subplots_adjust(left=0.16, bottom=0.19, right=0.98, top=0.97)
+    plt.savefig(stellFile+'_phi2.png')
+    plt.close()
     return GrowthRate, abs(omega)
-
+# Save final eigenfunction
 def eigenPlot(stellFile):
-    with netCDF4.Dataset(stellFile, 'r', mmap=False) as f:
-        y = f.variables['phi'][()]
-        x = f.variables['theta'][()]
-        omega_avg_array = np.array(f.variables['omega_average'][()])
-        max_index = np.nanargmax(omega_avg_array[-1, :, 0, 1])
-        phiR0, phiI0 = y[max_index, 0, int((len(x) - 1) / 2 + 1), :2]
-        phi02 = phiR0 ** 2 + phiI0 ** 2
-        phiR = (y[max_index, 0, :, 0] * phiR0 + y[max_index, 0, :, 1] * phiI0) / phi02
-        phiI = (y[max_index, 0, :, 1] * phiR0 - y[max_index, 0, :, 0] * phiI0) / phi02
-    plot_data(x, phiR, r'$\theta$', r'$\hat \phi$', f"{stellFile}_eigenphi.png", label=r'Re($\hat \phi/\hat \phi_0$)')
-    plot_data(x, phiI, r'$\theta$', r'$\hat \phi$', f"{stellFile}_eigenphi.png", label=r'Im($\hat \phi/\hat \phi_0$)')
+    f = netCDF4.Dataset(stellFile,'r',mmap=False)
+    y = f.variables['phi'][()]
+    x = f.variables['theta'][()]
+    plt.figure(figsize=(7.5,4.0))
+    omega_average_array = np.array(f.variables['omega_average'][()])
+    omega_average_array_gamma = omega_average_array[-1,:,0,1]
+    max_index = np.nanargmax(omega_average_array_gamma)
+    phiR0= y[max_index,0,int((len(x)-1)/2+1),0]
+    phiI0= y[max_index,0,int((len(x)-1)/2+1),1]
+    phi02= phiR0**2+phiI0**2
+    phiR = (y[max_index,0,:,0]*phiR0+y[max_index,0,:,1]*phiI0)/phi02
+    phiI = (y[max_index,0,:,1]*phiR0-y[max_index,0,:,0]*phiI0)/phi02
+    ##############
+    plt.plot(x, phiR, label=r'Re($\hat \phi/\hat \phi_0$)')
+    plt.plot(x, phiI, label=r'Im($\hat \phi/\hat \phi_0$)')
+    ##############
+    plt.xlabel(r'$\theta$');plt.ylabel(r'$\hat \phi$')
+    plt.legend(loc="upper right")
+    plt.subplots_adjust(left=0.16, bottom=0.19, right=0.98, top=0.93)
+    plt.savefig(stellFile+'_eigenphi.png')
+    plt.close()
     return 0
+##### Function to obtain gamma and omega for each ky
+def gammabyky(stellFile,fractionToConsider=0.3):
+    # Compute growth rate:
+    fX   = netCDF4.Dataset(stellFile,'r',mmap=False)
+    tX   = fX.variables['t'][()]
+    kyX  = fX.variables['ky'][()]
+    phi2_by_kyX  = fX.variables['phi2_by_ky'][()]
+    omegaX  = fX.variables['omega'][()]
+    startIndexX  = int(len(tX)*(1-fractionToConsider))
+    growthRateX  = []
+    ## assume that kyX=kyNA
+    for i in range(len(kyX)):
+        maskX  = np.isfinite(phi2_by_kyX[:,i])
+        data_xX = tX[maskX]
+        data_yX = phi2_by_kyX[maskX,i]
+        fitX  = np.polyfit(data_xX[startIndexX:], np.log(data_yX[startIndexX:]), 1)
+        thisGrowthRateX  = fitX[0]/2
+        growthRateX.append(thisGrowthRateX)
+    # Compute real frequency:
+    realFreqVsTimeX  = []
+    realFrequencyX   = []
+    for i in range(len(kyX)):
+        realFreqVsTimeX.append(omegaX[:,i,0,0])
+        realFrequencyX.append(np.mean(realFreqVsTimeX[i][startIndexX:]))
+    numRows = 1
+    numCols = 2
 
-def gammabyky(stellFile, fractionToConsider=0.3):
-    with netCDF4.Dataset(stellFile, 'r', mmap=False) as fX:
-        tX = fX.variables['t'][()]
-        kyX = fX.variables['ky'][()]
-        phi2_by_kyX = fX.variables['phi2_by_ky'][()]
-        omegaX = fX.variables['omega'][()]
-        startIndexX = int(len(tX) * (1 - fractionToConsider))
-        growthRateX = [np.polyfit(tX[mask], np.log(phi2[mask]), 1)[0] / 2 for mask, phi2 in zip(np.isfinite(phi2_by_kyX).T, phi2_by_kyX.T)]
-        realFrequencyX = [np.mean(omega[startIndexX:]) for omega in omegaX[:, :, 0, 0]]
-    plot_data(kyX, growthRateX, r'$k_y$', r'$\gamma$', f"{stellFile}_GammaOmegaKy.png")
-    plot_data(kyX, realFrequencyX, r'$k_y$', r'$\omega$', f"{stellFile}_GammaOmegaKy.png")
+    plt.subplot(numRows, numCols, 1)
+    plt.plot(kyX,growthRateX,'.-')
+    plt.xlabel(r'$k_y$')
+    plt.ylabel(r'$\gamma$')
+    plt.xscale('log')
+    plt.rc('font', size=8)
+    plt.rc('axes', labelsize=8)
+    plt.rc('xtick', labelsize=8)
+    # plt.legend(frameon=False,prop=dict(size='xx-small'),loc=0)
+
+    plt.subplot(numRows, numCols, 2)
+    plt.plot(kyX,realFrequencyX,'.-')
+    plt.xlabel(r'$k_y$')
+    plt.ylabel(r'$\omega$')
+    plt.xscale('log')
+    plt.rc('font', size=8)
+    plt.rc('axes', labelsize=8)
+    plt.rc('xtick', labelsize=8)
+    # plt.legend(frameon=False,prop=dict(size=12),loc=0)
+
+    plt.tight_layout()
+    #plt.subplots_adjust(left=0.14, bottom=0.15, right=0.98, top=0.96)
+    plt.savefig(stellFile+"_GammaOmegaKy.png")
+    plt.close()
     return np.array(kyX), np.array(growthRateX), np.array(realFrequencyX)
 
 def replace(file_path, pattern, subst):
@@ -117,11 +179,12 @@ def replace(file_path, pattern, subst):
 
 def create_gs2_inputs(p):
     nphi, nperiod, nlambda, nstep, dt, negrid, ngauss, aky_min, aky_max, naky, vnewk = p
-    gridout_file = OUTPUT_DIR / f'grid_gs2_nphi{nphi}_nperiod{nperiod}.out'
+    nphi=int(nphi); nlambda=int(nlambda); nstep=int(nstep); negrid=int(negrid); ngauss=int(ngauss); naky=int(naky)
+    gridout_file = str(os.path.join(OUTPUT_DIR,f"grid_gs2_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.out"))
     phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
     to_gs2(gridout_file, vmec, PARAMS['s_radius'], PARAMS['alpha_fieldline'], phi1d=phi_GS2, nlambda=nlambda)
     gs2_input_name = f"gs2Input_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
-    gs2_input_file = OUTPUT_DIR / f"{gs2_input_name}.in"
+    gs2_input_file = str(os.path.join(OUTPUT_DIR,f"{gs2_input_name}.in"))
     shutil.copy(THIS_PATH / '..' / 'GK_inputs' / 'gs2Input-linear.in', gs2_input_file)
     replace_dict = {
         ' gridout_file = "grid.out"': f' gridout_file = "{gridout_file}"',
@@ -148,10 +211,14 @@ def output_to_csv(data):
         df.to_csv(OUTPUT_CSV, mode='a', header=False, index=False)
 
 def run_gs2(p):
+    start_time = time()
     nphi, nperiod, nlambda, nstep, dt, negrid, ngauss, aky_min, aky_max, naky, vnewk = p
+    nphi=int(nphi); nlambda=int(nlambda); nstep=int(nstep); negrid=int(negrid); ngauss=int(ngauss); naky=int(naky)
     gs2_input_name = create_gs2_inputs(p)
-    subprocess.run([GS2_EXECUTABLE, f"{gs2_input_name}.in"], stdout=subprocess.DEVNULL)
-    output_file = OUTPUT_DIR / f"{gs2_input_name}.out.nc"
+    # subprocess.run([GS2_EXECUTABLE, f"{gs2_input_name}.in"], stdout=subprocess.DEVNULL)
+    proc = subprocess.Popen(f"{GS2_EXECUTABLE} {gs2_input_name}.in".split(),stderr=subprocess.STDOUT,stdout=subprocess.DEVNULL)
+    proc.wait()
+    output_file = str(OUTPUT_DIR / f"{gs2_input_name}.out.nc")
     eigenPlot(output_file)
     growth_rate, omega = getgamma(output_file)
     _, growthRateX, _ = gammabyky(output_file)
@@ -174,15 +241,13 @@ def run_gs2(p):
         'vnewk': vnewk
     }
     output_to_csv(data)
-    for ext in ['amoments', 'eigenfunc', 'error', 'fields', 'g', 'lpc', 'mom2', 'moments', 'vres', 'vres2', 'exit_reason', 'optim', 'out', 'in', 'gs2Input', 'out.nc']:
-        for f in OUTPUT_DIR.glob(f"*.{ext}"):
-            f.unlink()
+    print(f'nphi={nphi} nperiod={nperiod} nlambda={nlambda} nstep={nstep} dt={dt} negrid={negrid} ngauss={ngauss} aky_min={aky_min} aky_max={aky_max} naky={naky} vnewk={vnewk} growth_rate={growth_rate:1f} sum(gamma/ky)={weighted_growth_rate:1f} took {(time()-start_time):1f}s')
     return growth_rate, weighted_growth_rate
 
 def main():
     param_list = [
         (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
-        (2*PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
+        (2*PARAMS['nphi']-1, PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], 2*PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], PARAMS['nperiod'], 2*PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], 2*PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
@@ -194,11 +259,16 @@ def main():
         (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], 2*PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], 0.5*PARAMS['vnewk']),
     ]
-    with ProcessPoolExecutor() as executor:
+
+    n_processors = min(args.nprocessors, len(param_list))
+    with ProcessPoolExecutor(max_workers=n_processors) as executor:
         results = list(executor.map(run_gs2, param_list))
 
-    for i, (growth_rate, sum_gamma) in enumerate(results):
-        print(f'Run {i + 1}: growth_rate={growth_rate:.1f}, sum(gamma/ky)={sum_gamma:.1f}')
+    for ext in ['amoments', 'eigenfunc', 'error', 'fields', 'g', 'lpc', 'mom2', 'moments', 'vres', 'vres2', 'exit_reason', 'optim', 'out', 'in', 'vspace_integration_error', 'gs2Input', 'out.nc']:
+        for f in OUTPUT_DIR.glob(f"*.{ext}"):
+            f.unlink()
+        for f in OUTPUT_DIR.glob(f".in*"):
+            f.unlink()
 
 if __name__ == "__main__":
     main()

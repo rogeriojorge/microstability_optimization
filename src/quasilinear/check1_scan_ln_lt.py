@@ -32,22 +32,23 @@ from to_gs2 import to_gs2 # pylint: disable=import-error
 ######## INPUT PARAMETERS ########
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
-
+prefix_save = 'scan_ln_lt_'
+results_folder = 'results'
 if args.type == 0:
     vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
-    output_dir = 'out_map_nfp4_QH_initial'
-if args.type == 1:
-    vmec_file = os.path.join(this_path,'output_MAXITER350_least_squares_nfp2_QA_QA_onlyQS/wout_final.nc')
-    output_dir = 'out_map_nfp2_QA_QA_onlyQS'
+    output_dir = 'nfp4_QH_initial'
+elif args.type == 1:
+    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA_onlyQS/wout_final.nc')
+    output_dir = 'nfp2_QA_QA_onlyQS'
 elif args.type == 2:
-    vmec_file = os.path.join(this_path,'output_MAXITER350_least_squares_nfp4_QH_QH_onlyQS/wout_final.nc')
-    output_dir = 'out_map_nfp4_QH_QH_onlyQS'
+    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH_onlyQS/wout_final.nc')
+    output_dir = 'nfp4_QH_QH_onlyQS'
 elif args.type == 3:
-    vmec_file = os.path.join(this_path,'output_MAXITER350_least_squares_nfp2_QA_QA/wout_final.nc')
-    output_dir = 'out_map_nfp2_QA_QA_least_squares'
+    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA/wout_final.nc')
+    output_dir = 'nfp2_QA_QA_least_squares'
 elif args.type == 4:
-    vmec_file = os.path.join(this_path,'output_MAXITER350_least_squares_nfp4_QH_QH/wout_final.nc')
-    output_dir = 'out_map_nfp4_QH_QH_least_squares'
+    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH/wout_final.nc')
+    output_dir = 'nfp4_QH_QH_least_squares'
 
 s_radius = 0.25
 alpha_fieldline = 0
@@ -77,10 +78,10 @@ if 'QA' in output_dir: plot_weighted_gamma_max = 0.54
 else: plot_weighted_gamma_max = 0.42
 ########################################
 # Go into the output directory
-OUT_DIR = os.path.join(this_path,output_dir)
+OUT_DIR = os.path.join(this_path,results_folder,output_dir,f'{prefix_save}_{output_dir}')
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)
-output_csv = os.path.join(OUT_DIR,f'{output_dir}.csv')
+output_csv = os.path.join(OUT_DIR,f'{prefix_save}_{output_dir}.csv')
 vmec = Vmec(vmec_file)
 #### Auxiliary functions
 # Get growth rates

@@ -22,14 +22,15 @@ GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
 CONFIG = {
     1: {
         "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp2_QA.nc',
-        "output_dir": 'test_out_nfp2_QA_initial'
+        "output_dir": 'nfp2_QA_initial'
     },
     2: {
         "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp4_QH.nc',
-        "output_dir": 'test_out_nfp4_QH_initial'
+        "output_dir": 'nfp4_QH_initial'
     }
 }
-
+prefix_save = 'test_convergence_'
+results_folder = 'results'
 n_processors_default = 4
 
 PARAMS = {
@@ -55,8 +56,10 @@ parser.add_argument("--type", type=int, default=2)
 parser.add_argument("--nprocessors", type=int, default=n_processors_default, help="Number of processors to use for parallel execution")
 args = parser.parse_args()
 config = CONFIG[args.type]
-OUTPUT_DIR = THIS_PATH / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
-OUTPUT_CSV = OUTPUT_DIR / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.csv"
+OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}")
+OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{prefix_save}_{config['output_dir']}.csv")
+# OUTPUT_DIR = THIS_PATH / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
+# OUTPUT_CSV = OUTPUT_DIR / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.csv"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.chdir(OUTPUT_DIR)
 vmec = Vmec(config['vmec_file'])

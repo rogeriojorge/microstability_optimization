@@ -276,42 +276,6 @@ print(f'Running GS2 scan took {time()-start_time}s')
 ## Save growth rates to csv file
 print('growth rates:')
 print(growth_rate_array.transpose())
-# Plot
-plotExtent=[0*min(LN_array),max(LN_array),0*min(LT_array),max(LT_array)]
-
-fig=plt.figure();ax=plt.subplot(111);fig.set_size_inches(4.5, 4.5)
-im = plt.imshow(growth_rate_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im,fraction=0.046, pad=0.04);clb.ax.set_title(r'$\gamma$', usetex=True)
-plt.xlabel(r'$a/L_n$', fontsize=16);plt.ylabel(r'$a/L_T$', fontsize=16);matplotlib.rc('font', size=20)
-if plot_extent_fix_gamma: plt.clim(plot_gamma_min,plot_gamma_max)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14);ax.tick_params(axis='y', labelsize=14);plt.tight_layout();
-plt.savefig(os.path.join(OUT_DIR,'gs2_scan_gamma.pdf'), format='pdf', bbox_inches='tight')
-
-fig=plt.figure();ax=plt.subplot(111);fig.set_size_inches(5.5, 5.5)
-im = plt.imshow(omega_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im,fraction=0.046, pad=0.04);clb.ax.set_title(r'$\omega$', usetex=True)
-plt.xlabel(r'$a/L_n$', fontsize=16);plt.ylabel(r'$a/L_T$', fontsize=16);#matplotlib.rc('font', size=20)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14);ax.tick_params(axis='y', labelsize=14);plt.tight_layout();
-plt.savefig(os.path.join(OUT_DIR,'gs2_scan_omega.pdf'), format='pdf', bbox_inches='tight')
-
-fig=plt.figure();ax=plt.subplot(111);fig.set_size_inches(5.5, 5.5)
-im = plt.imshow(ky_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im,fraction=0.046, pad=0.04);clb.ax.set_title(r'$k_y$', usetex=True)
-plt.xlabel(r'$a/L_n$', fontsize=16);plt.ylabel(r'$a/L_T$', fontsize=16);#matplotlib.rc('font', size=20)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14);ax.tick_params(axis='y', labelsize=14);plt.tight_layout();
-plt.savefig(os.path.join(OUT_DIR,'gs2_scan_ky.pdf'), format='pdf', bbox_inches='tight')
-
-fig=plt.figure();ax=plt.subplot(111);fig.set_size_inches(5.5, 5.5)
-im = plt.imshow(weighted_growth_rate_array, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
-clb = plt.colorbar(im,fraction=0.046, pad=0.04);clb.ax.set_title(r'$\gamma/\langle k_{\perp}^2 \rangle$', usetex=True)
-plt.xlabel(r'$a/L_n$', fontsize=16);plt.ylabel(r'$a/L_T$', fontsize=16);#matplotlib.rc('font', size=20)
-if plot_extent_fix_weighted_gamma: plt.clim(plot_weighted_gamma_min,plot_weighted_gamma_max)
-plt.gca().set_aspect('equal')
-ax.tick_params(axis='x', labelsize=14);ax.tick_params(axis='y', labelsize=14);plt.tight_layout();
-plt.savefig(os.path.join(OUT_DIR,'gs2_scan_weighted_gamma.pdf'), format='pdf', bbox_inches='tight')
 
 for f in glob.glob('*.amoments'): remove(f)
 for f in glob.glob('*.eigenfunc'): remove(f)

@@ -299,8 +299,3 @@ naky = int(naky/2)
 vnewk = vnewk/2;start_time = time();growth_rate, sum_gamma_o_ky=run_gs2(nphi, nperiod, nlambda, nstep, dt, negrid, ngauss, aky_min, aky_max, naky, vnewk)
 print(f'nphi={nphi} nperiod={nperiod} nlambda={nlambda} nstep={nstep} dt={dt} negrid={negrid} ngauss={ngauss} aky_min={aky_min} aky_max={aky_max} naky={naky} vnewk={vnewk} growth_rate={growth_rate:1f} sum(gamma/ky)={sum_gamma_o_ky:1f} took {(time()-start_time):1f}s')
 vnewk = vnewk*2
-###
-### Plot result
-###
-df = pd.read_csv(output_csv)
-df.plot(use_index=True, y=['growth_rate'])

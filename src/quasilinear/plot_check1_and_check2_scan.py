@@ -12,8 +12,11 @@ warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarnin
 matplotlib.rc('font', family='serif', serif='cm10')
 matplotlib.rc('text', usetex=True)
 
-name_lnlt_scan = 'scan_ln_lt_nfp4_QH_initial'
-name_salpha_scan = 'scan_s_alpha_nfp4_QH_initial'
+config = 'nfp4_QH_initial'
+
+prefix_scan_ln_lt = 'scan_ln_lt'
+prefix_scan_s_alpha = 'scan_s_alpha'
+results_folder = 'results'
 
 ### Fix some values for plotting several configurations together
 plot_extent_fix_gamma = False
@@ -22,7 +25,7 @@ plot_gamma_min = 0
 plot_overall_gamma_min = 0
 plot_weighted_gamma_min = 0
 plot_overall_weighted_gamma_min = 0
-if 'QA' in name_lnlt_scan:
+if 'QA' in config:
     plot_gamma_max = 0.41
     plot_overall_gamma_max = 0.16
     plot_weighted_gamma_max = 0.33
@@ -35,7 +38,7 @@ else:
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
-figures_directory = 'figures'
+figures_directory = os.path.join(this_path, results_folder, config, 'figures')
 out_dir = os.path.join(this_path, figures_directory)
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
@@ -71,8 +74,9 @@ def plot_and_save(save_name, data, xlabel, ylabel, clb_title, plotExtent=None):
     plt.savefig(os.path.join(out_dir, save_name), format='pdf', bbox_inches='tight')
 
 # Load and process the first CSV
-csv_file = os.path.join(this_path, name_lnlt_scan, f'{name_lnlt_scan}.csv')
-df = pd.read_csv(csv_file)
+OUT_DIR_ln_lt = os.path.join(this_path,results_folder,config,f'{prefix_scan_ln_lt}_{config}')
+csv_file_ln_lt = os.path.join(OUT_DIR_ln_lt,f'{prefix_scan_ln_lt}_{config}.csv')
+df = pd.read_csv(csv_file_ln_lt)
 ln_values = df['ln'].unique()
 lt_values = df['lt'].unique()
 plotExtent = [0 * min(ln_values), max(ln_values), 0 * min(lt_values), max(lt_values)]
@@ -82,8 +86,9 @@ ky_array = df.pivot(index='ln', columns='lt', values='ky').values
 weighted_growth_rate_array = df.pivot(index='ln', columns='lt', values='weighted_growth_rate').values
 
 # Load and process the second CSV
-csv_file = os.path.join(this_path, name_salpha_scan, f'{name_salpha_scan}.csv')
-df_location = pd.read_csv(csv_file)
+OUT_DIR_s_alpha = os.path.join(this_path,results_folder,config,f'{prefix_scan_s_alpha}_{config}')
+csv_file_s_alpha = os.path.join(OUT_DIR_s_alpha,f'{prefix_scan_s_alpha}_{config}.csv')
+df_location = pd.read_csv(csv_file_s_alpha)
 s_values = df_location['s'].unique()
 alpha_values = df_location['alpha'].unique()
 plotExtent_location = [min(s_values), max(s_values), min(alpha_values), max(alpha_values)]
@@ -94,20 +99,20 @@ weighted_growth_rate_location_array = df_location.pivot(index='s', columns='alph
 
 # Plot and save for ln-lt
 print('max gamma =', np.max(growth_rate_array), ', min gamma =', np.min(growth_rate_array))
-plot_and_save(f'{name_lnlt_scan}_gs2_scan_gamma.pdf', growth_rate_array, '$a/L_n$', '$a/L_T$', r'max($\gamma$)', plotExtent=plotExtent)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_ln_lt}_gs2_scan_gamma.pdf'), growth_rate_array, '$a/L_n$', '$a/L_T$', r'max($\gamma$)', plotExtent=plotExtent)
 print('max omega =', np.max(omega_array), ', min omega =', np.min(omega_array))
-plot_and_save(f'{name_lnlt_scan}_gs2_scan_omega.pdf', omega_array, '$a/L_n$', '$a/L_T$', r'$\omega$', plotExtent=plotExtent)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_ln_lt}_gs2_scan_omega.pdf'), omega_array, '$a/L_n$', '$a/L_T$', r'$\omega$', plotExtent=plotExtent)
 print('max ky =', np.max(ky_array), ', min ky =', np.min(ky_array))
-plot_and_save(f'{name_lnlt_scan}_gs2_scan_ky.pdf', ky_array, '$a/L_n$', '$a/L_T$', r'$k_y$', plotExtent=plotExtent)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_ln_lt}_gs2_scan_ky.pdf'), ky_array, '$a/L_n$', '$a/L_T$', r'$k_y$', plotExtent=plotExtent)
 print('max weighted gamma =', np.max(weighted_growth_rate_array), ', min weighted gamma =', np.min(weighted_growth_rate_array))
-plot_and_save(f'{name_lnlt_scan}_gs2_scan_weighted_gamma.pdf', weighted_growth_rate_array, '$a/L_n$', '$a/L_T$', r'$\sum\gamma/\langle k_{\perp}^2 \rangle$', plotExtent=plotExtent)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_ln_lt}_gs2_scan_weighted_gamma.pdf'), weighted_growth_rate_array, '$a/L_n$', '$a/L_T$', r'$\sum\gamma/\langle k_{\perp}^2 \rangle$', plotExtent=plotExtent)
 
 # Plot and save for s-alpha
 print('max overall gamma =', np.max(growth_rate_location_array), ', min overall gamma =', np.min(growth_rate_location_array))
-plot_and_save(f'{name_salpha_scan}_gs2_scan_gamma.pdf', growth_rate_location_array, r'$s$', r'$\alpha$', r'max($\gamma$)', plotExtent=plotExtent_location)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_s_alpha}_gs2_scan_gamma.pdf'), growth_rate_location_array, r'$s$', r'$\alpha$', r'max($\gamma$)', plotExtent=plotExtent_location)
 print('max overall omega =', np.max(omega_location_array), ', min overall omega =', np.min(omega_location_array))
-plot_and_save(f'{name_salpha_scan}_gs2_scan_omega.pdf', omega_location_array, r'$s$', r'$\alpha$', r'$\omega$', plotExtent=plotExtent_location)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_s_alpha}_gs2_scan_omega.pdf'), omega_location_array, r'$s$', r'$\alpha$', r'$\omega$', plotExtent=plotExtent_location)
 print('max overall ky =', np.max(ky_location_array), ', min overall ky =', np.min(ky_location_array))
-plot_and_save(f'{name_salpha_scan}_gs2_scan_ky.pdf', ky_location_array, r'$s$', r'$\alpha$', r'$k_y$', plotExtent=plotExtent_location)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_s_alpha}_gs2_scan_ky.pdf'), ky_location_array, r'$s$', r'$\alpha$', r'$k_y$', plotExtent=plotExtent_location)
 print('max overall weighted gamma =', np.max(weighted_growth_rate_location_array), ', min overall weighted gamma =', np.min(weighted_growth_rate_location_array))
-plot_and_save(f'{name_salpha_scan}_gs2_scan_weighted_gamma.pdf', weighted_growth_rate_location_array, r'$s$', r'$\alpha$', r'$\sum\gamma/\langle k_{\perp}^2 \rangle$', plotExtent=plotExtent_location)
+plot_and_save(os.path.join(figures_directory,f'{config}_{prefix_scan_s_alpha}_gs2_scan_weighted_gamma.pdf'), weighted_growth_rate_location_array, r'$s$', r'$\alpha$', r'$\sum\gamma/\langle k_{\perp}^2 \rangle$', plotExtent=plotExtent_location)

@@ -16,23 +16,24 @@ args = parser.parse_args()
 matplotlib.use('Agg') 
 warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
 this_path = Path(__file__).parent.resolve()
-prefix_save = 'geometry_'
+prefix_save = 'geometry'
 results_folder = 'results'
+figures_directory = 'figures'
 if args.type == 0:
     vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
-    output_dir = 'nfp4_QH_initial'
+    config = 'nfp4_QH_initial'
 elif args.type == 1:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA_onlyQS/wout_final.nc')
-    output_dir = 'nfp2_QA_QA_onlyQS'
+    config = 'nfp2_QA_QA_onlyQS'
 elif args.type == 2:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH_onlyQS/wout_final.nc')
-    output_dir = 'nfp4_QH_QH_onlyQS'
+    config = 'nfp4_QH_QH_onlyQS'
 elif args.type == 3:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA/wout_final.nc')
-    output_dir = 'nfp2_QA_QA_least_squares'
+    config = 'nfp2_QA_QA_least_squares'
 elif args.type == 4:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH/wout_final.nc')
-    output_dir = 'nfp4_QH_QH_least_squares'
+    config = 'nfp4_QH_QH_least_squares'
 
 s_radius = 0.25
 alpha_fieldline = 0
@@ -51,19 +52,14 @@ phi_GS2 = np.linspace(-nperiod*np.pi, nperiod*np.pi, nphi)
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
-figures_directory = 'figures'
-out_dir = os.path.join(this_path, figures_directory)
-if not os.path.exists(out_dir):
-    os.makedirs(out_dir)
-
-OUT_DIR = os.path.join(this_path,results_folder,output_dir,f'{prefix_save}_{output_dir}')
+OUT_DIR = os.path.join(this_path,results_folder,config,figures_directory)
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)
 
 # START
 vmec = Vmec(vmec_file)
 fl1 = vmec_fieldlines(vmec, s_radius, alpha_fieldline, phi1d=phi_GS2, plot=True, show=False)
-plt.savefig(os.path.join(out_dir,f'{output_dir}_geometry_profiles_s{s_radius}_alpha{alpha_fieldline}.pdf'))
+plt.savefig(os.path.join(OUT_DIR,f'{config}_geometry_profiles_s{s_radius}_alpha{alpha_fieldline}.pdf'))
 plt.close()
 
 matplotlib.rc('font', family='serif', serif='cm10')
@@ -83,5 +79,5 @@ for parameter, d, save_name in zip(parameters, data, save_names):
     ax.xaxis.set_major_locator(ticker.MultipleLocator(base=np.pi))
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda val, pos: '{:.0g}$\pi$'.format(val/np.pi) if val != 0 else '0'))
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir,f'{output_dir}_{save_name}_s{s_radius}_alpha{alpha_fieldline}.pdf'))
+    plt.savefig(os.path.join(OUT_DIR,f'{config}_{save_name}_s{s_radius}_alpha{alpha_fieldline}.pdf'))
     plt.close()

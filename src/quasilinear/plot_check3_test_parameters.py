@@ -11,20 +11,26 @@ warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarnin
 matplotlib.rc('font', family='serif', serif='cm10')
 matplotlib.rc('text', usetex=True)
 
-name = 'test_convergence_nfp4_QH_initial_ln1.0_lt3.0'
+config = 'nfp4_QH_initial'
+
+ln = 1.0
+lt = 3.0
+folder_name = 'test_convergence'
+results_directory = 'results'
+figures_directory = 'figures'
 
 parameters_to_plot = ['growth_rate','weighted_growth_rate']
 label_parameters   = [r'max($\gamma$)', r'$\sum \gamma/\langle k_{\perp}^2 \rangle$']
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
-figures_directory = 'figures'
-out_dir = os.path.join(this_path, figures_directory)
+main_dir = os.path.join(this_path, results_directory, config)
+out_dir = os.path.join(this_path, main_dir, figures_directory)
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
 # Read the CSV file into a DataFrame
-csv_file = os.path.join(this_path, name, f'{name}.csv')
+csv_file = os.path.join(main_dir, f'{folder_name}_{config}', f'{folder_name}_{config}.csv')
 df = pd.read_csv(csv_file)
 
 # Define the parameters that are being varied
@@ -111,5 +117,5 @@ for nn, parameter in enumerate(parameters_to_plot):
 
     # Save the plot as an image
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, f'{name}_test_{parameter}.pdf'), format='pdf', bbox_inches='tight')
+    plt.savefig(os.path.join(out_dir, f'{config}_test_{parameter}.pdf'), format='pdf', bbox_inches='tight')
     plt.close()

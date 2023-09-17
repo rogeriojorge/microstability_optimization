@@ -32,7 +32,7 @@ from to_gs2 import to_gs2 # pylint: disable=import-error
 ######## INPUT PARAMETERS ########
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
-prefix_save = 'scan_ln_lt_'
+prefix_save = 'scan_ln_lt'
 results_folder = 'results'
 if args.type == 0:
     vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')

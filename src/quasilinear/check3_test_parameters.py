@@ -29,7 +29,7 @@ CONFIG = {
         "output_dir": 'nfp4_QH_initial'
     }
 }
-prefix_save = 'test_convergence_'
+prefix_save = 'test_convergence'
 results_folder = 'results'
 n_processors_default = 4
 
@@ -208,7 +208,7 @@ def create_gs2_inputs(p):
 
 def output_to_csv(data):
     df = pd.DataFrame(data=[data])
-    if not OUTPUT_CSV.exists():
+    if not Path(OUTPUT_CSV).exists():
         df.to_csv(OUTPUT_CSV, index=False)
     else:
         df.to_csv(OUTPUT_CSV, mode='a', header=False, index=False)
@@ -221,7 +221,7 @@ def run_gs2(p):
     # subprocess.run([GS2_EXECUTABLE, f"{gs2_input_name}.in"], stdout=subprocess.DEVNULL)
     proc = subprocess.Popen(f"{GS2_EXECUTABLE} {gs2_input_name}.in".split(),stderr=subprocess.STDOUT,stdout=subprocess.DEVNULL)
     proc.wait()
-    output_file = str(OUTPUT_DIR / f"{gs2_input_name}.out.nc")
+    output_file = os.path.join(OUTPUT_DIR,f"{gs2_input_name}.out.nc")
     eigenPlot(output_file)
     growth_rate, omega = getgamma(output_file)
     _, growthRateX, _ = gammabyky(output_file)
@@ -268,9 +268,9 @@ def main():
         results = list(executor.map(run_gs2, param_list))
 
     for ext in ['amoments', 'eigenfunc', 'error', 'fields', 'g', 'lpc', 'mom2', 'moments', 'vres', 'vres2', 'exit_reason', 'optim', 'out', 'in', 'vspace_integration_error', 'gs2Input', 'out.nc']:
-        for f in OUTPUT_DIR.glob(f"*.{ext}"):
+        for f in Path(OUTPUT_DIR).glob(f"*.{ext}"):
             f.unlink()
-        for f in OUTPUT_DIR.glob(f".*"):
+        for f in Path(OUTPUT_DIR).glob(f".*"):
             f.unlink()
 
 if __name__ == "__main__":

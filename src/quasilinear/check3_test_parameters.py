@@ -267,7 +267,7 @@ def main():
     for ext in ['amoments', 'eigenfunc', 'error', 'fields', 'g', 'lpc', 'mom2', 'moments', 'vres', 'vres2', 'exit_reason', 'optim', 'out', 'in', 'vspace_integration_error', 'gs2Input', 'out.nc']:
         for f in OUTPUT_DIR.glob(f"*.{ext}"):
             f.unlink()
-        for f in OUTPUT_DIR.glob(f".in*"):
+        for f in OUTPUT_DIR.glob(f".*"):
             f.unlink()
 
 if __name__ == "__main__":

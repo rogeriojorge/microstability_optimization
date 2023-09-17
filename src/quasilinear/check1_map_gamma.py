@@ -269,13 +269,8 @@ growth_rate_array = np.reshape(growth_rate_array_temp, (len(LT_array),len(LN_arr
 omega_array = np.reshape(omega_array_temp, (len(LT_array),len(LN_array)))
 ky_array = np.reshape(ky_array_temp, (len(LT_array),len(LN_array)))
 weighted_growth_rate_array = np.reshape(weighted_growth_rate_temp, (len(LT_array),len(LN_array)))
-# for i, ln in enumerate(LN_array):
-#     for j, lt in enumerate(LT_array):
-#         growth_rate_array[i,j]=run_gs2(ln, lt)
+
 print(f'Running GS2 scan took {time()-start_time}s')
-## Save growth rates to csv file
-print('growth rates:')
-print(growth_rate_array.transpose())
 
 for f in glob.glob('*.amoments'): remove(f)
 for f in glob.glob('*.eigenfunc'): remove(f)

@@ -239,9 +239,9 @@ def run_gs2(s_radius, alpha):
         grid_file_name = f'grid_gs2_s{s_radius:.3f}-alpha{alpha:.3f}.out'
         gridout_file = os.path.join(OUT_DIR, grid_file_name)
         to_gs2(gridout_file, vmec, s_radius, alpha, phi1d=phi_GS2, nlambda=nlambda)
-        fl1 = vmec_fieldlines(vmec, s_radius, alpha, phi1d=phi_GS2, plot=True, show=False)
-        plt.savefig(f'geometry_profiles_s{s_radius}_alpha{alpha}.png')
-        plt.close()
+        fl1 = vmec_fieldlines(vmec, s_radius, alpha, phi1d=phi_GS2, plot=False, show=False)
+        # plt.savefig(f'geometry_profiles_s{s_radius}_alpha{alpha}.png')
+        # plt.close()
         gs2_input_name = f"gs2Input-s{s_radius:.3f}-alpha{alpha:.3f}"
         gs2_input_file = os.path.join(OUT_DIR, f'{gs2_input_name}.in')
         shutil.copy(os.path.join(this_path, '..', 'GK_inputs', 'gs2Input-linear.in'), gs2_input_file)
@@ -301,9 +301,6 @@ if __name__ == '__main__':
         weighted_growth_rate_array[s_index, alpha_index] = weighted_growth_rate
 
     print(f'Running GS2 scan took {time()-start_time}s')
-
-    print('growth rates:')
-    print(growth_rate_array.transpose())
     
     for f in glob.glob('*.amoments'): remove(f)
     for f in glob.glob('*.eigenfunc'): remove(f)

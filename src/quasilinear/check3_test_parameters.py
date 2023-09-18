@@ -20,42 +20,41 @@ sys.path.insert(1, os.path.join(THIS_PATH, '..', 'util'))
 from to_gs2 import to_gs2 # pylint: disable=import-error
 GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
 CONFIG = {
-    1: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp2_QA.nc',
-        "output_dir": 'nfp2_QA_initial'
+    -3: {
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp1_QI.nc',
+        "output_dir": 'nfp1_QI_initial',
+        "params": { 'nphi': 69,'nlambda': 21,'nperiod': 2.0,'nstep': 220,'dt': 0.5,
+                    'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
     },
-    2: {
+    -2: {
         "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp4_QH.nc',
-        "output_dir": 'nfp4_QH_initial'
+        "output_dir": 'nfp4_QH_initial',
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
+                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+    },
+    -1: {
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp2_QA.nc',
+        "output_dir": 'nfp2_QA_initial',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
     }
 }
 prefix_save = 'test_convergence'
 results_folder = 'results'
 n_processors_default = 4
 
-PARAMS = {
-    'nphi': 99,
-    'nlambda': 37,
-    'nperiod': 2.0,
-    'nstep': 280,
-    'dt': 0.4,
-    'aky_min': 0.4,
-    'aky_max': 3.0,
-    'naky': 6,
-    'LN': 1.0,
-    'LT': 3.0,
-    's_radius': 0.25,
-    'alpha_fieldline': 0,
-    'ngauss': 3,
-    'negrid': 8,
-    'vnewk': 0.01
-}
-
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=2)
+parser.add_argument("--type", type=int, default=-2)
 parser.add_argument("--nprocessors", type=int, default=n_processors_default, help="Number of processors to use for parallel execution")
 args = parser.parse_args()
 config = CONFIG[args.type]
+PARAMS = config['params']
 OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}")
 OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{prefix_save}_{config['output_dir']}.csv")
 # OUTPUT_DIR = THIS_PATH / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
@@ -183,10 +182,10 @@ def replace(file_path, pattern, subst):
 def create_gs2_inputs(p):
     nphi, nperiod, nlambda, nstep, dt, negrid, ngauss, aky_min, aky_max, naky, vnewk = p
     nphi=int(nphi); nlambda=int(nlambda); nstep=int(nstep); negrid=int(negrid); ngauss=int(ngauss); naky=int(naky)
-    gridout_file = str(os.path.join(OUTPUT_DIR,f"grid_gs2_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.out"))
+    gridout_file = str(os.path.join(OUTPUT_DIR,f"grid_gs2_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}vnewk{vnewk}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.out"))
     phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
     to_gs2(gridout_file, vmec, PARAMS['s_radius'], PARAMS['alpha_fieldline'], phi1d=phi_GS2, nlambda=nlambda)
-    gs2_input_name = f"gs2Input_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
+    gs2_input_name = f"gs2Input_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}vnewk{vnewk}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
     gs2_input_file = str(os.path.join(OUTPUT_DIR,f"{gs2_input_name}.in"))
     shutil.copy(THIS_PATH / '..' / 'GK_inputs' / 'gs2Input-linear.in', gs2_input_file)
     replace_dict = {
@@ -249,7 +248,7 @@ def run_gs2(p):
 
 def main():
     param_list = [
-        (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
+        # (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (2*PARAMS['nphi']-1, PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], 2*PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], PARAMS['nperiod'], 2*PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
@@ -262,6 +261,9 @@ def main():
         (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], 2*PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], 0.5*PARAMS['vnewk']),
     ]
+
+    ## RUN BASE CASE
+    run_gs2((((PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']))))
 
     n_processors = min(args.nprocessors, len(param_list))
     with ProcessPoolExecutor(max_workers=n_processors) as executor:

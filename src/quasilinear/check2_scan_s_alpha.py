@@ -23,7 +23,7 @@ import matplotlib.cbook
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=0)
+parser.add_argument("--type", type=int, default=-2)
 args = parser.parse_args()
 matplotlib.use('Agg')
 warnings.filterwarnings("ignore", category=matplotlib.MatplotlibDeprecationWarning)
@@ -35,9 +35,15 @@ gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 prefix_save = 'scan_s_alpha'
 results_folder = 'results'
-if args.type == 0:
+if args.type == -3:
+    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp1_QI.nc')
+    output_dir = 'nfp1_QI_initial'
+elif args.type == -2:
     vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
     output_dir = 'nfp4_QH_initial'
+elif args.type == -1:
+    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp2_QA.nc')
+    output_dir = 'nfp2_QA_initial'
 elif args.type == 1:
     vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA_onlyQS/wout_final.nc')
     output_dir = 'nfp2_QA_QA_onlyQS'

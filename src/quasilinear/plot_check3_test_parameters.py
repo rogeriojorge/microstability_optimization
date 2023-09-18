@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,7 +12,12 @@ warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarnin
 matplotlib.rc('font', family='serif', serif='cm10')
 matplotlib.rc('text', usetex=True)
 
-config = 'nfp4_QH_initial'
+CONFIG = {
+    -3: {"name": 'nfp1_QI_initial', 'label_factor': 0.10},
+    -2: {"name": 'nfp4_QH_initial', 'label_factor': 0.10},
+    -1: {"name": 'nfp2_QA_initial', 'label_factor': 0.10}
+}
+same_max_gamma_gamma_overallgamma = False
 
 ln = 1.0
 lt = 3.0
@@ -21,6 +27,11 @@ figures_directory = 'figures'
 
 parameters_to_plot = ['growth_rate','weighted_growth_rate']
 label_parameters   = [r'max($\gamma$)', r'$\sum \gamma/\langle k_{\perp}^2 \rangle$']
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--type", type=int, default=-2)
+args = parser.parse_args()
+config = CONFIG[args.type]['name']
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
@@ -54,8 +65,8 @@ base_case = df.iloc[0]
 
 # Calculate max_gamma_plot using the filtered data
 filtered_df_mode = df[(df['aky_min'] == df['aky_min'].mode().iloc[0]) & (df['aky_max'] == df['aky_max'].mode().iloc[0])]
-max_gamma_plot = max(max(max(filtered_df_mode['growth_rate'].max(), filtered_df_mode['weighted_growth_rate'].max()), base_case['growth_rate']*1.11), base_case['weighted_growth_rate']*1.11)
-min_gamma_plot = min(min(min(filtered_df_mode['growth_rate'].min(), filtered_df_mode['weighted_growth_rate'].min()), base_case['growth_rate']*0.89), base_case['weighted_growth_rate']*0.89)
+max_gamma_plot = max(max(max(filtered_df_mode['growth_rate'].max(), filtered_df_mode['weighted_growth_rate'].max()), base_case['growth_rate']*1.15), base_case['weighted_growth_rate']*1.15)
+min_gamma_plot = min(min(min(filtered_df_mode['growth_rate'].min(), filtered_df_mode['weighted_growth_rate'].min()), base_case['growth_rate']*0.85), base_case['weighted_growth_rate']*0.85)
 
 
 for nn, parameter in enumerate(parameters_to_plot):
@@ -74,15 +85,15 @@ for nn, parameter in enumerate(parameters_to_plot):
             continue
         factor = parameter_factors[param]
         if param == 'nphi':
-            index = df[df[param] == df[param].shift() * factor - 1].index.to_list()[0]
+            index = df[df[param] == base_case[param] * factor - 1].index.to_list()[0]
             # print('i=',i,'j=',j,'factor=',factor,'index=',index,'param=',param,'df.iloc[index][param]=',df.iloc[index][param],'base_case[param]=',base_case[param],'base_case[param]*factor-1=',base_case[param]*factor-1)
         else:
-            index = df[df[param] == df[param].shift() * factor].index.to_list()[0]
+            index = df[df[param] == base_case[param] * factor].index.to_list()[0]
             # print('i=',i,'j=',j,'factor=',factor,'index=',index,'param=',param,'df.iloc[index][param]=',df.iloc[index][param],'base_case[param]=',base_case[param],'base_case[param]*factor=',base_case[param]*factor)
         assert df.iloc[index][param] == base_case[param] * factor or df.iloc[index][param] == base_case[param] * factor-1
         marker = markers[1]
         color = colors[j-1]
-        label = f'{"half " if factor < 1 else "double "} {parameter_legend[index-1]}'
+        label = f'{"half " if factor < 1 else "double "} {parameter_legend[i]}'
         x_labels.append(label)
         ax.scatter(j, df.iloc[index][parameter], marker=marker, s=250, color=color, label=label)
         j += 1
@@ -98,8 +109,8 @@ for nn, parameter in enumerate(parameters_to_plot):
     ax.tick_params(axis='y', labelsize=14)
 
     # Add horizontal dotted lines for +/- 10% from the base case
-    ax.axhline(base_case[parameter]*1.1, linestyle='--', color='gray', label='+10% from Base Case')
-    ax.axhline(base_case[parameter]*0.9, linestyle='--', color='gray', label='-10% from Base Case')
+    ax.axhline(base_case[parameter]*(1+CONFIG[args.type]['label_factor']), linestyle='--', color='gray', label='+10% from Base Case')
+    ax.axhline(base_case[parameter]*(1-CONFIG[args.type]['label_factor']), linestyle='--', color='gray', label='-10% from Base Case')
     ax.axhline(base_case[parameter]*1.0, linestyle='--', color='gray', label='Base Case')
 
     # Add text labels for the lines
@@ -112,7 +123,7 @@ for nn, parameter in enumerate(parameters_to_plot):
     for i, label in enumerate(xticklabels):
         label.set_color(colors[i])
 
-    if parameter == 'growth_rate' or parameter == 'weighted_growth_rate':
+    if (parameter == 'growth_rate' or parameter == 'weighted_growth_rate') and same_max_gamma_gamma_overallgamma:
         ax.set_ylim(min_gamma_plot, max_gamma_plot)
 
     # Save the plot as an image

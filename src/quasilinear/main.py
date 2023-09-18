@@ -35,6 +35,7 @@ def pprint(*args, **kwargs):
         print(*args, **kwargs)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
+parser.add_argument("--wfQ", type=int, default=30)
 args = parser.parse_args()
 start_time = time.time()
 #########
@@ -51,57 +52,63 @@ start_time = time.time()
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER = 350
-max_modes = [1]
-if   args.type == 1 or args.type == 3: QA_or_QH = 'QH'
-elif args.type == 2 or args.type == 4: QA_or_QH = 'QA'
-optimizer = 'least_squares'#'dual_annealing' #'least_squares'
-opt_quasisymmetry = True
-if   args.type == 1 or args.type == 2: opt_turbulence = True
-elif args.type == 3 or args.type == 4: opt_turbulence = False
+max_modes = [1, 1, 2, 2, 3, 3]
+maxmodes_mpol_mapping = {1: 3, 2: 4, 3: 6, 4: 7, 5: 7}
+prefix_save = 'optimization'
+CONFIG = {
+    3: {
+        "input_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
+        "output_dir": 'nfp1_QI',
+        "params": { 'nphi': 69,'nlambda': 21,'nperiod': 2.0,'nstep': 220,'dt': 0.5,
+                    'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+        "aspect_ratio_target": 6,
+        "nfp": 1,
+    },
+    2: {
+        "input_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
+        "output_dir": 'nfp4_QH',
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
+                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+        "aspect_ratio_target": 8,
+        "nfp": 4,
+    },
+    1: {
+        "input_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
+        "output_dir": 'nfp2_QA',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+        "aspect_ratio_target": 6,
+        "nfp": 2,
+    }
+}
+results_folder = 'results'
+config = CONFIG[args.type]
+PARAMS = config['params']
+opt_quasisymmetry = True if config['output_dir'][-2:] == 'QA' or 'QH' else False
 weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
 
 s_radius = 0.25
 alpha_fieldline = 0
-
-nphi= 101#151
-nlambda = 27#35
-nperiod = 4#5.0
-nstep = 180#340
-dt = 0.4
-aky_min = 0.3
-aky_max = 3.0
-naky = 5#10
-LN = 1.0
-LT = 3.0
-s_radius = 0.25
-alpha_fieldline = 0
-ngauss = 3
-negrid = 8#10
-phi_GS2 = np.linspace(-nperiod*np.pi, nperiod*np.pi, nphi)
-
-## MAKE VNEWK LARGER?
-
-if QA_or_QH=='QA':
-    aspect_ratio_target = 6
-    nfp = 2
-else:
-    aspect_ratio_target = 8
-    nfp = 4
-
-initial_config = f'input.nfp{nfp}_{QA_or_QH}'
+phi_GS2 = np.linspace(-PARAMS['nperiod']*np.pi, PARAMS['nperiod']*np.pi, PARAMS['nphi'])
 
 plot_result = True
 use_previous_results_if_available = False
 
 weight_mirror = 10
-weight_optTurbulence = 30
+weight_optTurbulence = args.wfQ#30
+optimizer = 'least_squares'
 #diff_rel_step = 1e-1 ## diff_rel_step = 0.1/max_mode
 #diff_abs_step = 1e-2 ## diff_abs_step = (max_mode/2)*10**(-max_mode)
 MAXITER_LOCAL = 3
 MAXFUN_LOCAL = 30
 ftol=1e-6
 no_local_search = False
-output_path_parameters=f'output_{optimizer}.csv'
 HEATFLUX_THRESHOLD = 1e18
 GROWTHRATE_THRESHOLD = 10
 aspect_ratio_weight = 3e+0
@@ -110,11 +117,10 @@ local_optimization_method = 'lm' # 'trf'
 perform_extra_solve = True
 ######################################
 ######################################
-OUT_DIR_APPENDIX=f'output_MAXITER{MAXITER}_{optimizer}_{initial_config[6:]}'
-if opt_quasisymmetry: OUT_DIR_APPENDIX+=f'_{initial_config[-2:]}'
-if not opt_turbulence:  OUT_DIR_APPENDIX+=f'_onlyQS'
-# else: OUT_DIR_APPENDIX+=f'_qlweight{weight_optTurbulence:.3f}'
-OUT_DIR = os.path.join(this_path, OUT_DIR_APPENDIX)
+OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
+OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
 os.makedirs(OUT_DIR, exist_ok=True)
 shutil.copyfile(os.path.join(this_path,'main.py'),os.path.join(OUT_DIR,'main.py'))
 ######################################
@@ -130,7 +136,7 @@ if use_previous_results_if_available and (os.path.isfile(os.path.join(OUT_DIR,'i
         time.sleep(0.2)
     filename = os.path.join(dest, 'input.final')
 else:
-    filename = os.path.join(this_path, '..', 'vmec_inputs', initial_config)
+    filename = config['input_file']
 os.chdir(OUT_DIR)
 vmec = Vmec(filename, verbose=False, mpi=mpi)
 vmec.keep_all_files = True
@@ -166,18 +172,18 @@ def CalculateGrowthRate(v: Vmec):
         shutil.copy(os.path.join(this_path,'..','GK_inputs','gs2Input-linear.in'),gs2_input_file)
         gridout_file = os.path.join(OUT_DIR,f'grid_{gs2_input_name}.out')
         replace(gs2_input_file,' gridout_file = "grid.out"',f' gridout_file = "grid_{gs2_input_name}.out"')
-        replace(gs2_input_file,' nstep = 150',f' nstep = {nstep}')
-        replace(gs2_input_file,' delt = 0.4 ! Time step',f' delt = {dt} ! Time step')
-        replace(gs2_input_file,' fprim = 1.0 ! -1/n (dn/drho)',f' fprim = {LN} ! -1/n (dn/drho)')
-        replace(gs2_input_file,' tprim = 3.0 ! -1/T (dT/drho)',f' tprim = {LT} ! -1/T (dT/drho)')
-        replace(gs2_input_file,' aky_min = 0.4',f' aky_min = {aky_min}')
-        replace(gs2_input_file,' aky_max = 5.0',f' aky_max = {aky_max}')
-        replace(gs2_input_file,' naky = 4',f' naky = {naky}')
+        replace(gs2_input_file,' nstep = 150',f' nstep = {PARAMS["nstep"]}')
+        replace(gs2_input_file,' delt = 0.4 ! Time step',f' delt = {PARAMS["dt"]} ! Time step')
+        replace(gs2_input_file,' fprim = 1.0 ! -1/n (dn/drho)',f' fprim = {PARAMS["LN"]} ! -1/n (dn/drho)')
+        replace(gs2_input_file,' tprim = 3.0 ! -1/T (dT/drho)',f' tprim = {PARAMS["LT"]} ! -1/T (dT/drho)')
+        replace(gs2_input_file,' aky_min = 0.4',f' aky_min = {PARAMS["aky_min"]}')
+        replace(gs2_input_file,' aky_max = 5.0',f' aky_max = {PARAMS["aky_max"]}')
+        replace(gs2_input_file,' naky = 4',f' naky = {PARAMS["naky"]}')
         replace(gs2_input_file,' ngauss = 3 ! Number of untrapped pitch-angles moving in one direction along field line.',
-        f' ngauss = {ngauss} ! Number of untrapped pitch-angles moving in one direction along field line.')
+        f' ngauss = {PARAMS["ngauss"]} ! Number of untrapped pitch-angles moving in one direction along field line.')
         replace(gs2_input_file,' negrid = 10 ! Total number of energy grid points',
-        f' negrid = {negrid} ! Total number of energy grid points')
-        to_gs2(gridout_file, v, s_radius, alpha_fieldline, phi1d=phi_GS2, nlambda=nlambda)
+        f' negrid = {PARAMS["negrid"]} ! Total number of energy grid points')
+        to_gs2(gridout_file, v, s_radius, alpha_fieldline, phi1d=phi_GS2, nlambda=PARAMS["nlambda"])
         bashCommand = f"{gs2_executable} {gs2_input_file}"
         # f_log = os.path.join(OUT_DIR,f"{gs2_input_name}.log")
         # with open(f_log, 'w') as fp:
@@ -211,7 +217,7 @@ def CalculateGrowthRate(v: Vmec):
             fitX  = np.polyfit(data_xX[startIndexX:], np.log(data_yX[startIndexX:]), 1)
             thisGrowthRateX  = fitX[0]/2
             growthRateX.append(thisGrowthRateX)
-        weighted_growth_rate = np.sum(quasilinear_estimate(os.path.join(OUT_DIR,f"{gs2_input_name}.out.nc")))/naky
+        weighted_growth_rate = np.sum(quasilinear_estimate(os.path.join(OUT_DIR,f"{gs2_input_name}.out.nc")))/PARAMS["naky"]
 
         if not np.isfinite(qavg): qavg = HEATFLUX_THRESHOLD
         if not np.isfinite(growth_rate): growth_rate = HEATFLUX_THRESHOLD
@@ -251,12 +257,25 @@ def TurbulenceCostFunction(v: Vmec):
         growth_rate = CalculateGrowthRate(v)
     except Exception as e:
         growth_rate = GROWTHRATE_THRESHOLD
-    if initial_config[-2:] == 'QA': qs = QuasisymmetryRatioResidual(v, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
-    else: qs = QuasisymmetryRatioResidual(v, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)
+    if "QA" in config["output_dir"]:
+        qs = QuasisymmetryRatioResidual(v, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
+    else:
+        qs = QuasisymmetryRatioResidual(v, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)
     quasisymmetry_total = qs.total()
     if np.isnan(quasisymmetry_total) or quasisymmetry_total>1e18: return GROWTHRATE_THRESHOLD
-    mirror_ratio = MirrorRatioPen(v)
-    print(f'{datetime.now().strftime("%H:%M:%S")} - Growth rate = {growth_rate:1f}, quasisymmetry = {quasisymmetry_total:1f}, mirror = {mirror_ratio:1f} with aspect ratio={v.aspect():1f} took {(time.time()-start_time):1f}s')
+    str = f'{datetime.now().strftime("%H:%M:%S")} - '
+    if weighted_growth_rate:
+        str += f'sum(gamma/ky) = {growth_rate:1f}, '
+    else:
+        str += f'peak(gamma) = {growth_rate:1f}, '
+    if opt_quasisymmetry:
+        str += f'quasisymmetry = {quasisymmetry_total:1f}, '
+        mirror_ratio = 0
+    else:
+        mirror_ratio = MirrorRatioPen(v)
+        str += f'mirror = {mirror_ratio:1f}, '
+    str +=  f'with aspect ratio={v.aspect():1f} took {(time.time()-start_time):1f}s'
+    print(str)
     output_dofs_to_csv(v.x,v.mean_iota(),v.aspect(),growth_rate,quasisymmetry_total,mirror_ratio)
     return growth_rate
 optTurbulence = make_optimizable(TurbulenceCostFunction, vmec)
@@ -324,19 +343,25 @@ def fun(dofss):
     return objective
 for max_mode in max_modes:
     output_path_parameters=f'output_{optimizer}_maxmode{max_mode}.csv'
+    vmec.indata.mpol = maxmodes_mpol_mapping[max_mode]
+    vmec.indata.ntor = maxmodes_mpol_mapping[max_mode]
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")
     initial_dofs=np.copy(surf.x)
     dofs=surf.x
     ######################################  
-    opt_tuple = [(vmec.aspect, aspect_ratio_target, aspect_ratio_weight)]
-    if opt_turbulence: opt_tuple.append((optTurbulence.J, 0, weight_optTurbulence))
-    if initial_config[-2:] == 'QA': qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
-    else: qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)    
-    if opt_quasisymmetry: opt_tuple.append((qs.residuals, 0, 1))
-    if initial_config[-2:] == 'QA': opt_tuple.append((vmec.mean_iota, 0.42, 1))
-    if not opt_quasisymmetry: opt_tuple.append((optMirror.J,0,weight_mirror)) # reduce mirror ratio for non-quasisymmetric configurations
+    opt_tuple = [(vmec.aspect, config["aspect_ratio_target"], aspect_ratio_weight)]
+    opt_tuple.append((optTurbulence.J, 0, weight_optTurbulence))
+    if "QA" in config["output_dir"]:
+        qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
+        opt_tuple.append((vmec.mean_iota, 0.42, 1))
+    else:
+        qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)    
+    if opt_quasisymmetry:
+        opt_tuple.append((qs.residuals, 0, 1))
+    else:
+        opt_tuple.append((optMirror.J,0,weight_mirror)) # reduce mirror ratio for non-quasisymmetric configurations
     prob = LeastSquaresProblem.from_tuples(opt_tuple)
     #pprint('## Now calculating total objective function ##')
     #if MPI.COMM_WORLD.rank == 0: pprint("Total objective before optimization:", prob.objective())

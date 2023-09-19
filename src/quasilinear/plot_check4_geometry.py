@@ -51,7 +51,6 @@ vnewk = 0.01
 phi_GS2 = np.linspace(-nperiod*np.pi, nperiod*np.pi, nphi)
 
 # Define output directories and create them if they don't exist
-this_path = Path(__file__).parent.resolve()
 OUT_DIR = os.path.join(this_path,results_folder,config,figures_directory)
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)

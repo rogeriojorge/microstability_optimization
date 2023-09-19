@@ -51,7 +51,7 @@ start_time = time.time()
 ############################################################################
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
-MAXITER =30
+MAXITER =50
 max_modes = [1, 2, 3]
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 7, 5: 7}
 prefix_save = 'optimization'
@@ -101,10 +101,10 @@ plot_result = True
 use_previous_results_if_available = False
 
 weight_mirror = 10
-weight_iota = 1e1
+weight_iota = 1e0
 weight_optTurbulence = args.wfQ#30
 optimizer = 'least_squares'
-rel_step_factor_1 = 3e-2#1e-1
+rel_step_factor_1 = 5e-2#1e-1
 max_rel_step_factor_2 = 1e-2
 #diff_rel_step = 1e-1 ## diff_rel_step = 0.1/max_mode
 #diff_abs_step = 1e-2 ## diff_abs_step = (max_mode/2)*10**(-max_mode)

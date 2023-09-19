@@ -35,7 +35,7 @@ def pprint(*args, **kwargs):
         print(*args, **kwargs)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
-parser.add_argument("--wfQ", type=int, default=30)
+parser.add_argument("--wfQ", type=float, default=30)
 args = parser.parse_args()
 start_time = time.time()
 #########
@@ -51,9 +51,9 @@ start_time = time.time()
 ############################################################################
 gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
-MAXITER = 350
-max_modes = [1, 1, 2, 2, 3, 3]
-maxmodes_mpol_mapping = {1: 3, 2: 4, 3: 6, 4: 7, 5: 7}
+MAXITER =30
+max_modes = [1, 2, 3]
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 7, 5: 7}
 prefix_save = 'optimization'
 CONFIG = {
     3: {
@@ -101,8 +101,10 @@ plot_result = True
 use_previous_results_if_available = False
 
 weight_mirror = 10
+weight_iota = 1e2
 weight_optTurbulence = args.wfQ#30
 optimizer = 'least_squares'
+rel_step_factor_1 = 1e-1#1e-1
 #diff_rel_step = 1e-1 ## diff_rel_step = 0.1/max_mode
 #diff_abs_step = 1e-2 ## diff_abs_step = (max_mode/2)*10**(-max_mode)
 MAXITER_LOCAL = 3
@@ -265,16 +267,16 @@ def TurbulenceCostFunction(v: Vmec):
     if np.isnan(quasisymmetry_total) or quasisymmetry_total>1e18: return GROWTHRATE_THRESHOLD
     str = f'{datetime.now().strftime("%H:%M:%S")} - '
     if weighted_growth_rate:
-        str += f'sum(gamma/ky) = {growth_rate:1f}, '
+        str += f'sum(gamma/ky) = {growth_rate:.2f}, '
     else:
-        str += f'peak(gamma) = {growth_rate:1f}, '
+        str += f'peak(gamma) = {growth_rate:.2f}, '
     if opt_quasisymmetry:
-        str += f'quasisymmetry = {quasisymmetry_total:1f}, '
+        str += f'quasisymmetry = {quasisymmetry_total:.3f}, '
         mirror_ratio = 0
     else:
         mirror_ratio = MirrorRatioPen(v)
         str += f'mirror = {mirror_ratio:1f}, '
-    str +=  f'with aspect ratio={v.aspect():1f} took {(time.time()-start_time):1f}s'
+    str +=  f'with aspect ratio={v.aspect():.2f} and iota={v.mean_iota():.2f} took {(time.time()-start_time):.3f}s'
     print(str)
     output_dofs_to_csv(v.x,v.mean_iota(),v.aspect(),growth_rate,quasisymmetry_total,mirror_ratio)
     return growth_rate
@@ -355,7 +357,7 @@ for max_mode in max_modes:
     opt_tuple.append((optTurbulence.J, 0, weight_optTurbulence))
     if "QA" in config["output_dir"]:
         qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
-        opt_tuple.append((vmec.mean_iota, 0.42, 1))
+        opt_tuple.append((vmec.mean_iota, 0.42, weight_iota))
     else:
         qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)    
     if opt_quasisymmetry:
@@ -375,10 +377,10 @@ for max_mode in max_modes:
         minimizer_kwargs = {"method": "Nelder-Mead", "bounds": bounds, "options": {'maxiter': MAXITER_LOCAL, 'maxfev': MAXFUN_LOCAL, 'disp': True}}
         if MPI.COMM_WORLD.rank == 0: res = dual_annealing(fun, bounds=bounds, maxiter=MAXITER, initial_temp=initial_temp,visit=visit, no_local_search=no_local_search, x0=dofs, minimizer_kwargs=minimizer_kwargs)
     elif optimizer == 'least_squares':
-        diff_rel_step = (1e-1)/max_mode
+        diff_rel_step = rel_step_factor_1/max_mode
         diff_abs_step = min(1e-2,(max_mode/4)*10**(-max_mode))
-        least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol, diff_method=diff_method, method=local_optimization_method)
-        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol, diff_method=diff_method, method=local_optimization_method)
+        least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
+        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
     else: print('Optimizer not available')
     ######################################
     try: 
@@ -387,6 +389,7 @@ for max_mode in max_modes:
         pprint("Final magnetic well:", vmec.vacuum_well())
         pprint("Final quasisymmetry:", qs.total())
         #if MPI.COMM_WORLD.rank == 0: pprint("Final growth rate:", CalculateGrowthRate(vmec))
+        if MPI.COMM_WORLD.rank == 0: vmec.write_input(os.path.join(OUT_DIR, f'input.max_mode{max_mode}'))
     except Exception as e: pprint(e)
     ######################################
 if MPI.COMM_WORLD.rank == 0: vmec.write_input(os.path.join(OUT_DIR, f'input.final'))
@@ -412,7 +415,7 @@ if plot_result and MPI.COMM_WORLD.rank==0:
     b1.register(booz_surfaces)
     pprint('Running BOOZ_XFORM')
     b1.run()
-    b1.bx.write_boozmn(os.path.join(OUT_DIR,"boozmn_single_stage.nc"))
+    # b1.bx.write_boozmn(os.path.join(OUT_DIR,"boozmn_single_stage.nc"))
     pprint("Plot BOOZ_XFORM")
     fig = plt.figure(); bx.surfplot(b1.bx, js=1,  fill=False, ncontours=35)
     plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_1_single_stage.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()

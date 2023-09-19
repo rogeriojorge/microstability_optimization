@@ -101,10 +101,11 @@ plot_result = True
 use_previous_results_if_available = False
 
 weight_mirror = 10
-weight_iota = 1e2
+weight_iota = 1e1
 weight_optTurbulence = args.wfQ#30
 optimizer = 'least_squares'
-rel_step_factor_1 = 1e-1#1e-1
+rel_step_factor_1 = 3e-2#1e-1
+max_rel_step_factor_2 = 1e-2
 #diff_rel_step = 1e-1 ## diff_rel_step = 0.1/max_mode
 #diff_abs_step = 1e-2 ## diff_abs_step = (max_mode/2)*10**(-max_mode)
 MAXITER_LOCAL = 3
@@ -378,7 +379,7 @@ for max_mode in max_modes:
         if MPI.COMM_WORLD.rank == 0: res = dual_annealing(fun, bounds=bounds, maxiter=MAXITER, initial_temp=initial_temp,visit=visit, no_local_search=no_local_search, x0=dofs, minimizer_kwargs=minimizer_kwargs)
     elif optimizer == 'least_squares':
         diff_rel_step = rel_step_factor_1/max_mode
-        diff_abs_step = min(1e-2,(max_mode/4)*10**(-max_mode))
+        diff_abs_step = min(max_rel_step_factor_2,(max_mode/4)*10**(-max_mode))
         least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
         if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
     else: print('Optimizer not available')

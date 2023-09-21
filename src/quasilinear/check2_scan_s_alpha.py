@@ -24,6 +24,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=-2)
+parser.add_argument("--wfQ", type=float, default=0.0)
 args = parser.parse_args()
 matplotlib.use('Agg')
 warnings.filterwarnings("ignore", category=matplotlib.MatplotlibDeprecationWarning)
@@ -45,17 +46,11 @@ elif args.type == -1:
     vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp2_QA.nc')
     output_dir = 'nfp2_QA_initial'
 elif args.type == 1:
-    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA_onlyQS/wout_final.nc')
-    output_dir = 'nfp2_QA_QA_onlyQS'
+    vmec_file = os.path.join(this_path, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
+    output_dir = 'nfp2_QA'
 elif args.type == 2:
-    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH_onlyQS/wout_final.nc')
-    output_dir = 'nfp4_QH_QH_onlyQS'
-elif args.type == 3:
-    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp2_QA_QA/wout_final.nc')
-    output_dir = 'nfp2_QA_QA_least_squares'
-elif args.type == 4:
-    vmec_file = os.path.join(this_path, 'output_MAXITER350_least_squares_nfp4_QH_QH/wout_final.nc')
-    output_dir = 'nfp4_QH_QH_least_squares'
+    vmec_file = os.path.join(this_path, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
+    output_dir = 'nfp4_QH'
 
 # Define the desired values
 desired_s_radius = 0.25
@@ -102,7 +97,7 @@ else:
 
 ########################################
 # Go into the output directory
-OUT_DIR = os.path.join(this_path,results_folder,output_dir,f'{prefix_save}_{output_dir}')
+OUT_DIR = os.path.join(this_path,results_folder,output_dir,f'{prefix_save}_{output_dir}_wFQ{args.wfQ:.3f}')
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)
 output_csv = os.path.join(OUT_DIR, f'{prefix_save}_{output_dir}.csv')

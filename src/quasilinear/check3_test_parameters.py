@@ -13,12 +13,24 @@ from simsopt.mhd import Vmec
 import matplotlib.pyplot as plt
 from quasilinear_gs2 import quasilinear_estimate
 from concurrent.futures import ProcessPoolExecutor
-
+n_processors_default = 4
+import matplotlib
+import warnings
+matplotlib.use('Agg') 
+warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
+matplotlib.rc('font', family='serif', serif='cm10')
+matplotlib.rc('text', usetex=True)
 # Constants and Configurations
 THIS_PATH = Path(__file__).parent.resolve()
 sys.path.insert(1, os.path.join(THIS_PATH, '..', 'util'))
 from to_gs2 import to_gs2 # pylint: disable=import-error
 GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
+parser = argparse.ArgumentParser()
+parser.add_argument("--type", type=int, default=-2)
+parser.add_argument("--wfQ", type=float, default=0.0)
+parser.add_argument("--nprocessors", type=int, default=n_processors_default, help="Number of processors to use for parallel execution")
+args = parser.parse_args()
+results_folder = 'results'
 CONFIG = {
     -3: {
         "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp1_QI.nc',
@@ -43,22 +55,32 @@ CONFIG = {
                     'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
+    },
+    1: {
+        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc'),
+        "output_dir": 'nfp2_QA',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+    },
+    2: {
+        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc'),
+        "output_dir": 'nfp2_QH',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
     }
 }
 prefix_save = 'test_convergence'
 results_folder = 'results'
 n_processors_default = 4
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=-2)
-parser.add_argument("--nprocessors", type=int, default=n_processors_default, help="Number of processors to use for parallel execution")
-args = parser.parse_args()
 config = CONFIG[args.type]
 PARAMS = config['params']
-OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}")
+OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}_wFQ{args.wfQ:.3f}")
 OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{prefix_save}_{config['output_dir']}.csv")
-# OUTPUT_DIR = THIS_PATH / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
-# OUTPUT_CSV = OUTPUT_DIR / f"{config['output_dir']}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.csv"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.chdir(OUTPUT_DIR)
 vmec = Vmec(config['vmec_file'])

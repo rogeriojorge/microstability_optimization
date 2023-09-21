@@ -33,8 +33,11 @@ from simsopt.mhd import QuasisymmetryRatioResidual
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=-2)
+parser.add_argument("--wfQ", type=float, default=0.0)
+parser.add_argument("--npoints", type=int, default=4)
 args = parser.parse_args()
 GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
+results_folder = 'results'
 CONFIG = {
     -3: {
         "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
@@ -45,7 +48,7 @@ CONFIG = {
                   },
     },
     -2: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH.nc',
         "output_dir": 'nfp4_QH_initial',
         "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
@@ -53,8 +56,24 @@ CONFIG = {
                   },
     },
     -1: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA.nc',
         "output_dir": 'nfp2_QA_initial',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+    },
+    1: {
+        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
+        "output_dir": 'nfp2_QA',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+    },
+    2: {
+        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
+        "output_dir": 'nfp2_QH',
         "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
                     'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
@@ -63,15 +82,14 @@ CONFIG = {
 }
 prefix_save = 'rbc_variation'
 results_folder = 'results'
-n_processors_default = 4
 config = CONFIG[args.type]
 PARAMS = config['params']
-OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}")
+OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}_wFQ{args.wfQ:.3f}")
 OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{prefix_save}_{config['output_dir']}.csv")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.chdir(OUTPUT_DIR)
 weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
-npoints_scan = 4
+npoints_scan = args.npoints
 min_bound = -0.15
 max_bound = 0.20
 run_scan = True

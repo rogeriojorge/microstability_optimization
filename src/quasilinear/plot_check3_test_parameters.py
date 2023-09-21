@@ -15,7 +15,9 @@ matplotlib.rc('text', usetex=True)
 CONFIG = {
     -3: {"name": 'nfp1_QI_initial', 'label_factor': 0.10},
     -2: {"name": 'nfp4_QH_initial', 'label_factor': 0.10},
-    -1: {"name": 'nfp2_QA_initial', 'label_factor': 0.10}
+    -1: {"name": 'nfp2_QA_initial', 'label_factor': 0.10},
+     1: {"name": 'nfp2_QA', 'label_factor': 0.10},
+     2: {"name": 'nfp4_QH', 'label_factor': 0.10}
 }
 same_max_gamma_gamma_overallgamma = False
 
@@ -23,25 +25,25 @@ ln = 1.0
 lt = 3.0
 folder_name = 'test_convergence'
 results_directory = 'results'
-figures_directory = 'figures'
 
 parameters_to_plot = ['growth_rate','weighted_growth_rate']
 label_parameters   = [r'max($\gamma$)', r'$\sum \gamma/\langle k_{\perp}^2 \rangle$']
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=-2)
+parser.add_argument("--wfQ", type=float, default=0.0)
 args = parser.parse_args()
 config = CONFIG[args.type]['name']
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
 main_dir = os.path.join(this_path, results_directory, config)
-out_dir = os.path.join(this_path, main_dir, figures_directory)
+out_dir = os.path.join(main_dir, f'{config}_wFQ{args.wfQ:.3f}_figures')
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
 # Read the CSV file into a DataFrame
-csv_file = os.path.join(main_dir, f'{folder_name}_{config}', f'{folder_name}_{config}.csv')
+csv_file = os.path.join(main_dir, f'{folder_name}_{config}_wFQ{args.wfQ:.3f}', f'{folder_name}_{config}.csv')
 df = pd.read_csv(csv_file)
 
 # Define the parameters that are being varied

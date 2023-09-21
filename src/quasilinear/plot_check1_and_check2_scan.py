@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -7,16 +8,37 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import matplotlib
 import warnings
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--type", type=int, default=-2)
+parser.add_argument("--wfQ", type=float, default=0.0)
+args = parser.parse_args()
 matplotlib.use('Agg') 
 warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
 matplotlib.rc('font', family='serif', serif='cm10')
 matplotlib.rc('text', usetex=True)
-
-config = 'nfp4_QH_initial'
-
+this_path = Path(__file__).parent.resolve()
 prefix_scan_ln_lt = 'scan_ln_lt'
 prefix_scan_s_alpha = 'scan_s_alpha'
 results_folder = 'results'
+
+if args.type == -3:
+    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp1_QI.nc')
+    output_dir = 'nfp1_QI_initial'
+elif args.type == -2:
+    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
+    output_dir = 'nfp4_QH_initial'
+elif args.type == -1:
+    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp2_QA.nc')
+    output_dir = 'nfp2_QA_initial'
+elif args.type == 1:
+    vmec_file = os.path.join(this_path, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
+    output_dir = 'nfp2_QA'
+elif args.type == 2:
+    vmec_file = os.path.join(this_path, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
+    output_dir = 'nfp4_QH'
+
+config = f'{output_dir}_wFQ{args.wfQ:.3f}'
 
 ### Fix some values for plotting several configurations together
 plot_extent_fix_gamma = False
@@ -38,8 +60,8 @@ else:
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
-figures_directory = os.path.join(this_path, results_folder, config, 'figures')
-out_dir = os.path.join(this_path, figures_directory)
+figures_directory = os.path.join(this_path, results_folder, output_dir, f'{config}_figures')
+out_dir = figures_directory
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
@@ -74,28 +96,28 @@ def plot_and_save(save_name, data, xlabel, ylabel, clb_title, plotExtent=None):
     plt.savefig(os.path.join(out_dir, save_name), format='pdf', bbox_inches='tight')
 
 # Load and process the first CSV
-OUT_DIR_ln_lt = os.path.join(this_path,results_folder,config,f'{prefix_scan_ln_lt}_{config}')
-csv_file_ln_lt = os.path.join(OUT_DIR_ln_lt,f'{prefix_scan_ln_lt}_{config}.csv')
+OUT_DIR_ln_lt = os.path.join(this_path,results_folder,output_dir,f'{prefix_scan_ln_lt}_{config}')
+csv_file_ln_lt = os.path.join(OUT_DIR_ln_lt,f'{prefix_scan_ln_lt}_{output_dir}.csv')
 df = pd.read_csv(csv_file_ln_lt)
 ln_values = df['ln'].unique()
 lt_values = df['lt'].unique()
 plotExtent = [0 * min(ln_values), max(ln_values), 0 * min(lt_values), max(lt_values)]
-growth_rate_array = df.pivot(index='ln', columns='lt', values='growth_rate').values
-omega_array = df.pivot(index='ln', columns='lt', values='omega').values
-ky_array = df.pivot(index='ln', columns='lt', values='ky').values
-weighted_growth_rate_array = df.pivot(index='ln', columns='lt', values='weighted_growth_rate').values
+growth_rate_array = df.pivot_table(index='ln', columns='lt', values='growth_rate').values
+omega_array = df.pivot_table(index='ln', columns='lt', values='omega').values
+ky_array = df.pivot_table(index='ln', columns='lt', values='ky').values
+weighted_growth_rate_array = df.pivot_table(index='ln', columns='lt', values='weighted_growth_rate').values
 
 # Load and process the second CSV
-OUT_DIR_s_alpha = os.path.join(this_path,results_folder,config,f'{prefix_scan_s_alpha}_{config}')
-csv_file_s_alpha = os.path.join(OUT_DIR_s_alpha,f'{prefix_scan_s_alpha}_{config}.csv')
+OUT_DIR_s_alpha = os.path.join(this_path,results_folder,output_dir,f'{prefix_scan_s_alpha}_{config}')
+csv_file_s_alpha = os.path.join(OUT_DIR_s_alpha,f'{prefix_scan_s_alpha}_{output_dir}.csv')
 df_location = pd.read_csv(csv_file_s_alpha)
 s_values = df_location['s'].unique()
 alpha_values = df_location['alpha'].unique()
 plotExtent_location = [min(s_values), max(s_values), min(alpha_values), max(alpha_values)]
-growth_rate_location_array = df_location.pivot(index='s', columns='alpha', values='growth_rate').values
-omega_location_array = df_location.pivot(index='s', columns='alpha', values='omega').values
-ky_location_array = df_location.pivot(index='s', columns='alpha', values='ky').values
-weighted_growth_rate_location_array = df_location.pivot(index='s', columns='alpha', values='weighted_growth_rate').values
+growth_rate_location_array = df_location.pivot_table(index='s', columns='alpha', values='growth_rate').values
+omega_location_array = df_location.pivot_table(index='s', columns='alpha', values='omega').values
+ky_location_array = df_location.pivot_table(index='s', columns='alpha', values='ky').values
+weighted_growth_rate_location_array = df_location.pivot_table(index='s', columns='alpha', values='weighted_growth_rate').values
 
 # Plot and save for ln-lt
 print('max gamma =', np.max(growth_rate_array), ', min gamma =', np.min(growth_rate_array))

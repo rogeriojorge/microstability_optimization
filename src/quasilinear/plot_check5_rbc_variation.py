@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import argparse
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -9,13 +8,17 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import matplotlib
 import warnings
+import argparse
 matplotlib.use('Agg') 
 warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
 this_path = Path(__file__).parent.resolve()
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=-2)
+parser.add_argument("--wfQ", type=float, default=0.0)
+parser.add_argument("--npoints", type=int, default=4)
 args = parser.parse_args()
 GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
+results_folder = 'results'
 CONFIG = {
     -3: {
         "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
@@ -26,7 +29,7 @@ CONFIG = {
                   },
     },
     -2: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH.nc',
         "output_dir": 'nfp4_QH_initial',
         "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
@@ -34,8 +37,24 @@ CONFIG = {
                   },
     },
     -1: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA.nc',
         "output_dir": 'nfp2_QA_initial',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+    },
+    1: {
+        "vmec_file": os.path.join(this_path, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
+        "output_dir": 'nfp2_QA',
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+    },
+    2: {
+        "vmec_file": os.path.join(this_path, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
+        "output_dir": 'nfp4_QH',
         "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
                     'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
@@ -43,16 +62,15 @@ CONFIG = {
     }
 }
 prefix_save = 'rbc_variation'
-results_folder = 'results'
 figures_directory = 'figures'
 config = CONFIG[args.type]
 PARAMS = config['params']
-OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],figures_directory)
+OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}_wFQ{args.wfQ:.3f}")
+FIGURES_DIR = os.path.join(this_path,results_folder,config['output_dir'],f"{config['output_dir']}_wFQ{args.wfQ:.3f}_figures")
 
-OUTPUT_DIR_CSV = os.path.join(this_path,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}")
-output_path_parameters_opt = os.path.join(OUTPUT_DIR_CSV,f'opt_dofs_loss_{prefix_save}_{config["output_dir"]}.csv')
-output_path_parameters_scan = os.path.join(OUTPUT_DIR_CSV,f'scan_dofs_{prefix_save}_{config["output_dir"]}.csv')
-output_path_parameters_min = os.path.join(OUTPUT_DIR_CSV,f'min_dofs_{prefix_save}_{config["output_dir"]}.csv')
+output_path_parameters_opt = os.path.join(OUT_DIR,f'opt_dofs_loss_{prefix_save}_{config["output_dir"]}.csv')
+output_path_parameters_scan = os.path.join(OUT_DIR,f'scan_dofs_{prefix_save}_{config["output_dir"]}.csv')
+output_path_parameters_min = os.path.join(OUT_DIR,f'min_dofs_{prefix_save}_{config["output_dir"]}.csv')
 
 vmec = Vmec(config['vmec_file'], verbose=False)
 surf = vmec.boundary
@@ -83,9 +101,9 @@ zbs_std = df_scan[zbs_columns].std()
 changing_rbc_columns = rbc_std[rbc_std != 0].index.tolist()
 changing_zbs_columns = zbs_std[zbs_std != 0].index.tolist()
 if changing_rbc_columns:
-    parameter_changing = changing_rbc_columns
+    parameter_changing = changing_rbc_columns[0]
 else:
-    parameter_changing = changing_zbs_columns
+    parameter_changing = changing_zbs_columns[0]
 
 df_scan = df_scan.sort_values(by=parameter_changing)
 min_bound = np.min(df_scan[parameter_changing])
@@ -93,15 +111,15 @@ max_bound = np.max(df_scan[parameter_changing])
 
 points_scan = np.linspace(min_bound,max_bound,len(df_scan[parameter_changing]))
 fig = plt.figure();plt.plot(df_scan[parameter_changing], df_scan['growth_rate'], label='Scan')
-plt.ylabel('Microstability Cost Function');plt.xlabel(parameter_changing);plt.legend();plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_growth_rate_scan.pdf'))
+plt.ylabel('Microstability Cost Function');plt.xlabel(parameter_changing);plt.legend();plt.savefig(os.path.join(FIGURES_DIR,f'{prefix_save}_{config["output_dir"]}_growth_rate_scan.pdf'))
 fig = plt.figure();plt.plot(points_scan, df_scan['aspect'], label='Aspect ratio')
-plt.ylabel('Aspect ratio');plt.xlabel(parameter_changing);plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_aspect_ratio_scan.pdf'))
+plt.ylabel('Aspect ratio');plt.xlabel(parameter_changing);plt.savefig(os.path.join(FIGURES_DIR,f'{prefix_save}_{config["output_dir"]}_aspect_ratio_scan.pdf'))
 fig = plt.figure();plt.plot(points_scan, df_scan['mean_iota'], label='Rotational Transform (1/q)')
-plt.ylabel('Rotational Transform (1/q)');plt.xlabel(parameter_changing);plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_iota_scan.pdf'))
+plt.ylabel('Rotational Transform (1/q)');plt.xlabel(parameter_changing);plt.savefig(os.path.join(FIGURES_DIR,f'{prefix_save}_{config["output_dir"]}_iota_scan.pdf'))
 fig = plt.figure();plt.plot(points_scan, df_scan['quasisymmetry'], label='Quasisymmetry cost function')
-plt.ylabel('Quasisymmetry cost function');plt.xlabel(parameter_changing);plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_quasisymmetry_scan.pdf'))
+plt.ylabel('Quasisymmetry cost function');plt.xlabel(parameter_changing);plt.savefig(os.path.join(FIGURES_DIR,f'{prefix_save}_{config["output_dir"]}_quasisymmetry_scan.pdf'))
 fig = plt.figure();plt.plot(points_scan, df_scan['well'], label='Magnetic well')
-plt.ylabel('Magnetic well');plt.xlabel(parameter_changing);plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_magnetic_well_scan.pdf'))
+plt.ylabel('Magnetic well');plt.xlabel(parameter_changing);plt.savefig(os.path.join(FIGURES_DIR,f'{prefix_save}_{config["output_dir"]}_magnetic_well_scan.pdf'))
 # fig = plt.figure();plt.plot(points_scan, df_scan['effective_1o_time'], label='Effective 1/time')
 # plt.ylabel('Effective time');plt.xlabel(parameter_changing);plt.savefig('effective_1o_time_scan.pdf')
 
@@ -125,7 +143,7 @@ ax2.set_xlim((min_bound,max_bound))
 ax2.autoscale(enable=None, axis="y", tight=False)
 plt.legend(handles=[line1, line2], prop={'size': 15})
 plt.tight_layout()
-plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_quasisymmetry_vs_growthrate.pdf'))
+plt.savefig(os.path.join(FIGURES_DIR,f'{prefix_save}_{config["output_dir"]}_quasisymmetry_vs_growthrate.pdf'))
 
 # try:
 #     df_opt = pd.read_csv(output_path_parameters_opt)
@@ -151,5 +169,5 @@ plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_quasisym
 #     plt.plot(df_opt[parameter_changing], df_opt['growth_rate'], 'ro', markersize=1, label='Optimizer')
 #     plt.plot(df_scan[parameter_changing], df_scan['growth_rate'], label='Scan')
 #     plt.ylabel('Microstability Cost Function');plt.xlabel(parameter_changing);plt.legend()
-#     plt.savefig(os.path.join(OUT_DIR,f'{prefix_save}_{config["output_dir"]}_growth_rate_over_opt_scan.pdf'))
+#     plt.savefig(os.path.join(FIGURES_DIR,f'{prefix_save}_{config["output_dir"]}_growth_rate_over_opt_scan.pdf'))
 # except Exception as e: print(e)

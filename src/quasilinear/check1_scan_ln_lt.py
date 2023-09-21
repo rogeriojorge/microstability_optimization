@@ -50,24 +50,24 @@ elif args.type == 1:
 elif args.type == 2:
     vmec_file = os.path.join(this_path, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
     output_dir = 'nfp4_QH'
-
+n_points = 8
 s_radius = 0.25
 alpha_fieldline = 0
-nphi= 99#141
-nlambda = 37#33
-nperiod = 2.0#5.0
-nstep = 280
+nphi= 121#141
+nlambda = 25#33
+nperiod = 3.0#5.0
+nstep = 350
 dt = 0.4
-aky_min = 0.4
+aky_min = 0.3
 aky_max = 3.0
 naky = 6
 ngauss = 3
 negrid = 8
 vnewk = 0.01
-phi_GS2 = np.linspace(-nperiod*np.pi, nperiod*np.pi, nphi)
+phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
 ## Ln, Lt, plotting options
-LN_array = np.linspace(0.5,6,12)
-LT_array = np.linspace(0.5,6,12)
+LN_array = np.linspace(0.5,6,n_points)
+LT_array = np.linspace(0.5,6,n_points)
 n_processes_parallel = 8
 plot_extent_fix_gamma = True
 plot_gamma_min = 0

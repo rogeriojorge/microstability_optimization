@@ -39,18 +39,18 @@ elif args.type == 2:
 
 s_radius = 0.25
 alpha_fieldline = 0
-nphi= 99#141
-nlambda = 37#33
-nperiod = 2.0#5.0
-nstep = 280
+nphi= 121#141
+nlambda = 25#33
+nperiod = 3.0#5.0
+nstep = 350
 dt = 0.4
-aky_min = 0.4
+aky_min = 0.3
 aky_max = 3.0
 naky = 6
 ngauss = 3
 negrid = 8
 vnewk = 0.01
-phi_GS2 = np.linspace(-nperiod*np.pi, nperiod*np.pi, nphi)
+phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
 
 # Define output directories and create them if they don't exist
 OUT_DIR = os.path.join(this_path,results_folder,config,f"{config}_wFQ{args.wfQ:.3f}_figures")

@@ -51,14 +51,15 @@ elif args.type == 1:
 elif args.type == 2:
     vmec_file = os.path.join(this_path, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
     output_dir = 'nfp4_QH'
+n_points = 8
 
 # Define the desired values
 desired_s_radius = 0.25
 desired_alpha = 0
 
 # Create arrays without the desired values
-s_radius_array = np.linspace(0.1, 1, 12)
-alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, 12)
+s_radius_array = np.linspace(0.1, 1, n_points)
+alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, n_points)
 
 # Add the desired values to the arrays
 s_radius_array = np.sort(np.append(s_radius_array, desired_s_radius))
@@ -66,13 +67,12 @@ alpha_fieldline_array = np.sort(np.append(alpha_fieldline_array, desired_alpha))
 
 LN = 1.0
 LT = 3.0
-
-nphi= 99#141
-nlambda = 37#33
-nperiod = 2.0#5.0
-nstep = 280
+nphi= 121#141
+nlambda = 25#33
+nperiod = 3.0#5.0
+nstep = 350
 dt = 0.4
-aky_min = 0.4
+aky_min = 0.3
 aky_max = 3.0
 naky = 6
 ngauss = 3

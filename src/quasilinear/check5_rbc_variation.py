@@ -42,23 +42,23 @@ CONFIG = {
     -3: {
         "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
         "output_dir": 'nfp1_QI_initial',
-        "params": { 'nphi': 69,'nlambda': 21,'nperiod': 2.0,'nstep': 220,'dt': 0.5,
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.5,
                     'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
     },
     -2: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH.nc',
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
         "output_dir": 'nfp4_QH_initial',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
     },
     -1: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA.nc',
+        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
         "output_dir": 'nfp2_QA_initial',
-        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
@@ -66,16 +66,16 @@ CONFIG = {
     1: {
         "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
         "output_dir": 'nfp2_QA',
-        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
     },
     2: {
         "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
-        "output_dir": 'nfp2_QH',
-        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
-                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+        "output_dir": 'nfp4_QH',
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
+                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
     }

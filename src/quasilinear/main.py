@@ -27,6 +27,7 @@ from scipy.optimize import dual_annealing
 import argparse
 this_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(1, os.path.join(this_path, '..', 'util'))
+home_directory = os.path.expanduser("~")
 from to_gs2 import to_gs2 # pylint: disable=import-error
 import vmecPlot2 # pylint: disable=import-error
 mpi = MpiPartition()
@@ -34,7 +35,7 @@ def pprint(*args, **kwargs):
     if MPI.COMM_WORLD.rank == 0:
         print(*args, **kwargs)
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=1)
+parser.add_argument("--type", type=int, default=2)
 parser.add_argument("--wfQ", type=float, default=30)
 args = parser.parse_args()
 start_time = time.time()
@@ -45,19 +46,39 @@ start_time = time.time()
 #########
 ## To run this file with 4 cores, use the following command:
 ## mpirun -n 4 python3 main.py --type 1
-## where type 1 is QH + turbulence, type 2 is QA + turbulence, type 3 is QH, type 4 is QA
+## where type 1 is QA nfp2, type 2 is QH nfp4, type 3 is QI nfp1, type 4 is QA nfp3, type 5 is QH nfp3
 ############################################################################
 #### Input Parameters
 ############################################################################
-gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
+gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER =150
 max_modes = [1, 2, 3]
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 7, 5: 7}
 prefix_save = 'optimization'
 CONFIG = {
+    5: {
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QA',
+        "output_dir": 'nfp3_QH',
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
+                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+        "aspect_ratio_target": 7,
+        "nfp": 3,
+    },
+    4: {
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QH',
+        "output_dir": 'nfp3_QA',
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
+                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+        "aspect_ratio_target": 7,
+        "nfp": 3,
+    },
     3: {
-        "input_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
         "output_dir": 'nfp1_QI',
         "params": { 'nphi': 69,'nlambda': 21,'nperiod': 2.0,'nstep': 220,'dt': 0.5,
                     'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
@@ -67,7 +88,7 @@ CONFIG = {
         "nfp": 1,
     },
     2: {
-        "input_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
         "output_dir": 'nfp4_QH',
         "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
@@ -77,7 +98,7 @@ CONFIG = {
         "nfp": 4,
     },
     1: {
-        "input_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
         "output_dir": 'nfp2_QA',
         "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
                     'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,

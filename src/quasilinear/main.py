@@ -35,7 +35,7 @@ def pprint(*args, **kwargs):
     if MPI.COMM_WORLD.rank == 0:
         print(*args, **kwargs)
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=2)
+parser.add_argument("--type", type=int, default=5)
 parser.add_argument("--wfQ", type=float, default=30)
 args = parser.parse_args()
 start_time = time.time()
@@ -54,11 +54,11 @@ gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER =150
 max_modes = [1, 2, 3]
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 7, 5: 7}
+maxmodes_mpol_mapping = {1: 3, 2: 3, 3: 5, 4: 7, 5: 7}
 prefix_save = 'optimization'
 CONFIG = {
     5: {
-        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QA',
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QH',
         "output_dir": 'nfp3_QH',
         "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
@@ -68,7 +68,7 @@ CONFIG = {
         "nfp": 3,
     },
     4: {
-        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QH',
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QA',
         "output_dir": 'nfp3_QA',
         "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,

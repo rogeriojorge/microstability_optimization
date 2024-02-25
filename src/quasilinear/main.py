@@ -36,7 +36,7 @@ def pprint(*args, **kwargs):
         print(*args, **kwargs)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=5)
-parser.add_argument("--wfQ", type=float, default=30)
+parser.add_argument("--wfQ", type=float, default=10)
 args = parser.parse_args()
 start_time = time.time()
 #########
@@ -53,8 +53,8 @@ start_time = time.time()
 gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER =150
-max_modes = [1, 2, 3]
-maxmodes_mpol_mapping = {1: 3, 2: 3, 3: 5, 4: 7, 5: 7}
+max_modes = [1, 2, 3, 4, 5]
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 7}
 prefix_save = 'optimization'
 CONFIG = {
     5: {
@@ -122,7 +122,9 @@ plot_result = True
 use_previous_results_if_available = False
 
 weight_mirror = 10
-weight_iota = 1e0
+weight_iota = 5e0
+iota_QH=-0.8
+weight_iota_QH=1e-3
 weight_optTurbulence = args.wfQ#30
 optimizer = 'least_squares'
 rel_step_factor_1 = 3e-2#1e-1
@@ -381,7 +383,8 @@ for max_mode in max_modes:
         qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
         opt_tuple.append((vmec.mean_iota, 0.42, weight_iota))
     else:
-        qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)    
+        qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)
+        opt_tuple.append((vmec.mean_iota, iota_QH, weight_iota_QH)) 
     if opt_quasisymmetry:
         opt_tuple.append((qs.residuals, 0, 1))
     else:
@@ -400,7 +403,7 @@ for max_mode in max_modes:
         if MPI.COMM_WORLD.rank == 0: res = dual_annealing(fun, bounds=bounds, maxiter=MAXITER, initial_temp=initial_temp,visit=visit, no_local_search=no_local_search, x0=dofs, minimizer_kwargs=minimizer_kwargs)
     elif optimizer == 'least_squares':
         diff_rel_step = rel_step_factor_1/max_mode
-        diff_abs_step = min(max_rel_step_factor_2,(max_mode/4)*10**(-max_mode))
+        diff_abs_step = min(max_rel_step_factor_2,(max_mode/5)*10**(-max_mode))
         least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
         if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
     else: print('Optimizer not available')

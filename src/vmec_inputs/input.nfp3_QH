@@ -8,11 +8,11 @@
 !----- Grid Parameters -----
   LASYM = F
   NFP = 0003
-  MPOL = 3
-  NTOR = 3
-  NS_ARRAY    =  5        16    31
-  NITER_ARRAY =  500     500  2500 
-  FTOL_ARRAY  =  1e-11 1e-11 1e-14
+  MPOL = 5
+  NTOR = 5
+  NS_ARRAY    =  5 16 31
+  NITER_ARRAY =  1000 2000 7000 
+  FTOL_ARRAY  =  1e-12 1e-12 1e-13
   PHIEDGE =    0.083
 !----- Free Boundary Parameters -----
   LFREEB = F

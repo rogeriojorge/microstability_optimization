@@ -3,9 +3,9 @@
   DELT =   9.00E-01
   NSTEP =  200
   TCON0 =   2.00E+00
-  NS_ARRAY    =      31
-  NITER_ARRAY =    2000
-  FTOL_ARRAY  = 1.0E-13
+  NS_ARRAY    =  5 16 31
+  NITER_ARRAY =  1000 2000 7000 
+  FTOL_ARRAY  =  1e-12 1e-12 1e-13
   PRECON_TYPE = 'none'
   PREC2D_THRESHOLD =   1.000000E-19
 !----- Grid Parameters -----

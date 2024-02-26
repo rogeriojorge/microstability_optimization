@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from mpi4py import MPI
 import booz_xform as bx
+from pathlib import Path
 from tempfile import mkstemp
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -79,11 +80,11 @@ CONFIG = {
     3: {
         "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
         "output_dir": 'nfp1_QI',
-        "params": { 'nphi': 89,'nlambda': 23,'nperiod': 2.0,'nstep': 280,'dt': 0.5,
+        "params": { 'nphi': 69,'nlambda': 21,'nperiod': 2.0,'nstep': 220,'dt': 0.5,
                     'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
-        "aspect_ratio_target": 7,
+        "aspect_ratio_target": 6,
         "nfp": 1,
     },
     2: {
@@ -93,24 +94,24 @@ CONFIG = {
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
-        "aspect_ratio_target": 7,
+        "aspect_ratio_target": 8,
         "nfp": 4,
     },
     1: {
         "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
         "output_dir": 'nfp2_QA',
-        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 280,'dt': 0.4,
+        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 270,'dt': 0.4,
                     'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
-        "aspect_ratio_target": 7,
+        "aspect_ratio_target": 6,
         "nfp": 2,
     }
 }
 results_folder = 'results'
 config = CONFIG[args.type]
 PARAMS = config['params']
-opt_quasisymmetry = True if (config['output_dir'][-2:] == 'QA' or config['output_dir'][-2:] == 'QH') else False
+opt_quasisymmetry = True if config['output_dir'][-2:] == 'QA' or 'QH' else False
 weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
 
 s_radius = 0.25
@@ -121,12 +122,9 @@ plot_result = True
 use_previous_results_if_available = False
 
 weight_mirror = 10
-iota_QA = 0.42
-weight_iota_QA = 5e0
+weight_iota = 5e0
 iota_QH=-0.8
 weight_iota_QH=1e-4
-iota_QI=0.615
-weight_iota_QI=1e-0
 weight_optTurbulence = args.wfQ#30
 optimizer = 'least_squares'
 rel_step_factor_1 = 3e-2#1e-1
@@ -383,7 +381,7 @@ for max_mode in max_modes:
     if weight_optTurbulence>0.01: opt_tuple.append((optTurbulence.J, 0, weight_optTurbulence))
     if "QA" in config["output_dir"]:
         qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
-        opt_tuple.append((vmec.mean_iota, iota_QA, weight_iota_QA))
+        opt_tuple.append((vmec.mean_iota, 0.42, weight_iota))
     else:
         qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)
         opt_tuple.append((vmec.mean_iota, iota_QH, weight_iota_QH)) 
@@ -391,7 +389,6 @@ for max_mode in max_modes:
         opt_tuple.append((qs.residuals, 0, 1))
     else:
         opt_tuple.append((optMirror.J,0,weight_mirror)) # reduce mirror ratio for non-quasisymmetric configurations
-        opt_tuple.append((vmec.mean_iota, iota_QI, weight_iota_QI))
     prob = LeastSquaresProblem.from_tuples(opt_tuple)
     #pprint('## Now calculating total objective function ##')
     #if MPI.COMM_WORLD.rank == 0: pprint("Total objective before optimization:", prob.objective())

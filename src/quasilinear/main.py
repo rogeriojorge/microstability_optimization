@@ -431,7 +431,7 @@ if MPI.COMM_WORLD.rank == 0: vmec.write_input(os.path.join(OUT_DIR, f'input.fina
 if plot_result and MPI.COMM_WORLD.rank==0:
     vmec_final = Vmec(os.path.join(OUT_DIR, f'input.final'), mpi=mpi)
     vmec_final.indata.ns_array[:3]    = [  16,    51,    101]#,   151,   201]
-    vmec_final.indata.niter_array[:3] = [ 4000, 10000,  4000]#,  5000, 10000]
+    vmec_final.indata.niter_array[:3] = [ 4000, 10000, 40000]#,  5000, 10000]
     vmec_final.indata.ftol_array[:3]  = [1e-12, 1e-13, 1e-14]#, 1e-15, 1e-15]
     vmec_final.run()
     shutil.move(os.path.join(OUT_DIR, f"wout_final_000_000000.nc"), os.path.join(OUT_DIR, f"wout_final.nc"))

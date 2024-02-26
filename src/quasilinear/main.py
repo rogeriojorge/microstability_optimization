@@ -52,7 +52,7 @@ start_time = time.time()
 gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER =150
-max_modes = [4]
+max_modes = [1, 2, 3, 4]
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 7}
 prefix_save = 'optimization'
 CONFIG = {
@@ -79,7 +79,7 @@ CONFIG = {
     3: {
         "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
         "output_dir": 'nfp1_QI',
-        "params": { 'nphi': 89,'nlambda': 23,'nperiod': 2.0,'nstep': 280,'dt': 0.5,
+        "params": { 'nphi': 101,'nlambda': 23,'nperiod': 2.0,'nstep': 300,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
                   },
@@ -146,7 +146,7 @@ perform_extra_solve = True
 ######################################
 ######################################
 OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
-OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.3f}'
+OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
 output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
 OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
 os.makedirs(OUT_DIR, exist_ok=True)

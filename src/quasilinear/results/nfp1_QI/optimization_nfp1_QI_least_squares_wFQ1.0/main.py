@@ -5,16 +5,18 @@ import glob
 import time
 import shutil
 import netCDF4
+import argparse
 import subprocess
 import numpy as np
 import pandas as pd
 from mpi4py import MPI
 import booz_xform as bx
 from tempfile import mkstemp
+from functools import partial
 from datetime import datetime
+from os import fdopen, remove
 import matplotlib.pyplot as plt
 from shutil import move, copymode
-from os import fdopen, remove
 from simsopt import make_optimizable
 from simsopt.mhd import Vmec, Boozer
 from simsopt.util import MpiPartition
@@ -23,12 +25,13 @@ from simsopt.mhd import QuasisymmetryRatioResidual
 from simsopt.objectives import LeastSquaresProblem
 from quasilinear_gs2 import quasilinear_estimate
 from scipy.optimize import dual_annealing
-import argparse
+from configurations import CONFIG
 this_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(1, os.path.join(this_path, '..', 'util'))
 home_directory = os.path.expanduser("~")
 from to_gs2 import to_gs2 # pylint: disable=import-error
 import vmecPlot2 # pylint: disable=import-error
+from qi_functions import QuasiIsodynamicResidual, MaxElongationPen, MirrorRatioPen  # pylint: disable=import-error
 mpi = MpiPartition()
 def pprint(*args, **kwargs):
     if MPI.COMM_WORLD.rank == 0:
@@ -45,7 +48,7 @@ start_time = time.time()
 #########
 ## To run this file with 4 cores, use the following command:
 ## mpirun -n 4 python3 main.py --type 1
-## where type 1 is QA nfp2, type 2 is QH nfp4, type 3 is QI nfp1, type 4 is QA nfp3, type 5 is QH nfp3
+## where type 1 is QA nfp2, type 2 is QH nfp4, type 3 is QI nfp1, type 4 is QA nfp3, type 5 is QH nfp3, type 6 is QI nfp2, type 7 is QI nfp3
 ############################################################################
 #### Input Parameters
 ############################################################################
@@ -53,60 +56,8 @@ gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER =150
 max_modes = [2, 3, 4]
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 7}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 7}
 prefix_save = 'optimization'
-CONFIG = {
-    5: {
-        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QH',
-        "output_dir": 'nfp3_QH',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-        "aspect_ratio_target": 7,
-        "nfp": 3,
-    },
-    4: {
-        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QA',
-        "output_dir": 'nfp3_QA',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-        "aspect_ratio_target": 7,
-        "nfp": 3,
-    },
-    3: {
-        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
-        "output_dir": 'nfp1_QI',
-        "params": { 'nphi': 101,'nlambda': 23,'nperiod': 2.0,'nstep': 300,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-        "aspect_ratio_target": 7,
-        "nfp": 1,
-    },
-    2: {
-        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
-        "output_dir": 'nfp4_QH',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-        "aspect_ratio_target": 7,
-        "nfp": 4,
-    },
-    1: {
-        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
-        "output_dir": 'nfp2_QA',
-        "params": { 'nphi': 89,'nlambda': 25,'nperiod': 3.0,'nstep': 280,'dt': 0.4,
-                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-        "aspect_ratio_target": 7,
-        "nfp": 2,
-    }
-}
 results_folder = 'results'
 config = CONFIG[args.type]
 PARAMS = config['params']
@@ -126,7 +77,9 @@ weight_iota_QA = 5e0
 iota_QH=-0.8
 weight_iota_QH=1e-4
 iota_QI=0.615
-weight_iota_QI=1e+1
+weight_iota_QI=1e-4
+elongation_weight = 1e2
+mirror_weight = 1e2
 weight_optTurbulence = args.wfQ#30
 optimizer = 'least_squares'
 rel_step_factor_1 = 3e-2#1e-1
@@ -140,7 +93,7 @@ no_local_search = False
 HEATFLUX_THRESHOLD = 1e18
 GROWTHRATE_THRESHOLD = 10
 aspect_ratio_weight = 3e+0
-diff_method = 'centered'
+diff_method = 'forward'
 local_optimization_method = 'lm' # 'trf'
 perform_extra_solve = True
 ######################################
@@ -177,6 +130,25 @@ def output_dofs_to_csv(dofs,mean_iota,aspect,growth_rate,quasisymmetry_total,mir
     df = pd.DataFrame(data=[dictionary])
     if not os.path.exists(output_path_parameters): pd.DataFrame(columns=df.columns).to_csv(output_path_parameters, index=False)
     df.to_csv(output_path_parameters, mode='a', header=False, index=False)
+######################################
+##### QI FUNCTIONS #####
+######################################
+snorms = [1/16, 5/16, 9/16, 13/16] # Flux surfaces at which the penalty will be calculated
+nphi_QI=141 # Number of points along measured along each well
+nalpha_QI=27 # Number of wells measured
+nBj_QI=51 # Number of bounce points measured
+mpol_QI=18 # Poloidal modes in Boozer transformation
+ntor_QI=18 # Toroidal modes in Boozer transformation
+nphi_out_QI=2000 # size of return array if arr_out_QI = True
+arr_out_QI=True # If True, returns (nphi_out*nalpha) values, each of which is the difference
+maximum_elongation = 6 # Defines the maximum elongation allowed in the QI elongation objective function
+maximum_mirror = 0.19 # Defines the maximum mirror ratio of |B| allowed in the QI elongation objective function
+optQI = partial(QuasiIsodynamicResidual,snorms=snorms, nphi=nphi_QI, nalpha=nalpha_QI, nBj=nBj_QI, mpol=mpol_QI, ntor=ntor_QI, nphi_out=nphi_out_QI, arr_out=arr_out_QI)
+qi = make_optimizable(optQI, vmec)
+partial_MaxElongationPen = partial(MaxElongationPen,t=maximum_elongation)
+optElongation = make_optimizable(partial_MaxElongationPen, vmec)
+partial_MirrorRatioPen = partial(MirrorRatioPen,t=maximum_mirror)
+optMirror = make_optimizable(partial_MirrorRatioPen, vmec)
 ########################################
 ########################################
 ##### CALCULATE GROWTH RATE HERE #######
@@ -307,38 +279,6 @@ def TurbulenceCostFunction(v: Vmec):
     output_dofs_to_csv(v.x,v.mean_iota(),v.aspect(),growth_rate,quasisymmetry_total,mirror_ratio)
     return growth_rate
 optTurbulence = make_optimizable(TurbulenceCostFunction, vmec)
-# Penalize the configuration's mirror ratio
-def MirrorRatioPen(v, mirror_threshold=0.20, output_mirror=False):
-    """
-    Return (Δ - t) if Δ > t, else return zero.
-    vmec        -   VMEC object
-    t           -   Threshold mirror ratio, above which the penalty is nonzero
-    """
-    try: v.run()
-    except Exception as e: return GROWTHRATE_THRESHOLD
-    xm_nyq = v.wout.xm_nyq
-    xn_nyq = v.wout.xn_nyq
-    bmnc = v.wout.bmnc.T
-    bmns = 0*bmnc
-    nfp = v.wout.nfp
-    
-    Ntheta = 80
-    Nphi = 80
-    thetas = np.linspace(0,2*np.pi,Ntheta)
-    phis = np.linspace(0,2*np.pi/nfp,Nphi)
-    phis2D,thetas2D=np.meshgrid(phis,thetas)
-    b = np.zeros([Ntheta,Nphi])
-    for imode in range(len(xn_nyq)):
-        angles = xm_nyq[imode]*thetas2D - xn_nyq[imode]*phis2D
-        b += bmnc[1,imode]*np.cos(angles) + bmns[1,imode]*np.sin(angles)
-    Bmax = np.max(b)
-    Bmin = np.min(b)
-    m = (Bmax-Bmin)/(Bmax+Bmin)
-    # print("Mirror =",m)
-    pen = np.max([0,m-mirror_threshold])
-    if output_mirror: return m
-    else: return pen
-optMirror = make_optimizable(MirrorRatioPen, vmec)
 ######################################
 try:
     pprint("Initial aspect ratio:", vmec.aspect())
@@ -370,13 +310,11 @@ def fun(dofss):
 
     return objective
 for max_mode in max_modes:
+    if (not opt_quasisymmetry) and (max_mode==1):
+        continue
     output_path_parameters=f'output_{optimizer}_maxmode{max_mode}.csv'
-    # if opt_quasisymmetry:
-    #     extra_ntor = 0
-    # else:
-    #     extra_ntor = 2
     vmec.indata.mpol = maxmodes_mpol_mapping[max_mode]
-    vmec.indata.ntor = maxmodes_mpol_mapping[max_mode]# + extra_ntor
+    vmec.indata.ntor = maxmodes_mpol_mapping[max_mode]
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")
@@ -385,17 +323,19 @@ for max_mode in max_modes:
     ######################################  
     opt_tuple = [(vmec.aspect, config["aspect_ratio_target"], aspect_ratio_weight)]
     if weight_optTurbulence>0.01: opt_tuple.append((optTurbulence.J, 0, weight_optTurbulence))
+    qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)
     if "QA" in config["output_dir"]:
         qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
         opt_tuple.append((vmec.mean_iota, iota_QA, weight_iota_QA))
-    else:
-        qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)
-        opt_tuple.append((vmec.mean_iota, iota_QH, weight_iota_QH)) 
+    elif "QH" in config["output_dir"]:
+        opt_tuple.append((vmec.mean_iota, iota_QH, weight_iota_QH))
     if opt_quasisymmetry:
         opt_tuple.append((qs.residuals, 0, 1))
     else:
-        opt_tuple.append((optMirror.J,0,weight_mirror)) # reduce mirror ratio for non-quasisymmetric configurations
         opt_tuple.append((vmec.mean_iota, iota_QI, weight_iota_QI))
+        opt_tuple.append((qi.J, 0, 1))
+        opt_tuple.append((optElongation.J, 0, elongation_weight))
+        opt_tuple.append((optMirror.J, 0, mirror_weight))
     prob = LeastSquaresProblem.from_tuples(opt_tuple)
     #pprint('## Now calculating total objective function ##')
     #if MPI.COMM_WORLD.rank == 0: pprint("Total objective before optimization:", prob.objective())
@@ -409,7 +349,7 @@ for max_mode in max_modes:
         minimizer_kwargs = {"method": "Nelder-Mead", "bounds": bounds, "options": {'maxiter': MAXITER_LOCAL, 'maxfev': MAXFUN_LOCAL, 'disp': True}}
         if MPI.COMM_WORLD.rank == 0: res = dual_annealing(fun, bounds=bounds, maxiter=MAXITER, initial_temp=initial_temp,visit=visit, no_local_search=no_local_search, x0=dofs, minimizer_kwargs=minimizer_kwargs)
     elif optimizer == 'least_squares':
-        diff_rel_step = rel_step_factor_1/max_mode
+        diff_rel_step = rel_step_factor_1/max_mode/2
         diff_abs_step = min(max_rel_step_factor_2,(max_mode/5)*10**(-max_mode))
         least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
         if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
@@ -420,6 +360,7 @@ for max_mode in max_modes:
         pprint("Final mean iota:", vmec.mean_iota())
         pprint("Final magnetic well:", vmec.vacuum_well())
         pprint("Final quasisymmetry:", qs.total())
+        pprint("Final quasi-isodynamic:", np.sum(qi.J()))
         #if MPI.COMM_WORLD.rank == 0: pprint("Final growth rate:", CalculateGrowthRate(vmec))
         if MPI.COMM_WORLD.rank == 0: vmec.write_input(os.path.join(OUT_DIR, f'input.max_mode{max_mode}'))
     except Exception as e: pprint(e)
@@ -436,57 +377,38 @@ if plot_result and MPI.COMM_WORLD.rank==0:
     vmec_final.run()
     shutil.move(os.path.join(OUT_DIR, f"wout_final_000_000000.nc"), os.path.join(OUT_DIR, f"wout_final.nc"))
     os.remove(os.path.join(OUT_DIR, f'input.final_000_000000'))
+    pprint('Creating vmec plots for vmec_final')
     try: vmecPlot2.main(file=os.path.join(OUT_DIR, f"wout_final.nc"), name='EP_opt', figures_folder=OUT_DIR)
     except Exception as e: print(e)
-    pprint('Creating Boozer class for vmec_final')
+    pprint('Creating Boozer plots for vmec_final')
     b1 = Boozer(vmec_final, mpol=64, ntor=64)
     boozxform_nsurfaces=10
-    pprint('Defining surfaces where to compute Boozer coordinates')
+    print('Defining surfaces where to compute Boozer coordinates')
     booz_surfaces = np.linspace(0,1,boozxform_nsurfaces,endpoint=False)
-    pprint(f' booz_surfaces={booz_surfaces}')
+    print(f' booz_surfaces={booz_surfaces}')
     b1.register(booz_surfaces)
-    pprint('Running BOOZ_XFORM')
+    print('Running BOOZ_XFORM')
     b1.run()
-    # b1.bx.write_boozmn(os.path.join(OUT_DIR,"boozmn_single_stage.nc"))
-    pprint("Plot BOOZ_XFORM")
+    # b1.bx.write_boozmn(os.path.join(OUT_DIR,"boozmn.nc"))
+    print("Plot BOOZ_XFORM")
     fig = plt.figure(); bx.surfplot(b1.bx, js=1,  fill=False, ncontours=35)
-    plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_1_single_stage.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
+    plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_1.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
     fig = plt.figure(); bx.surfplot(b1.bx, js=int(boozxform_nsurfaces/2), fill=False, ncontours=35)
-    plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_2_single_stage.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
+    plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_2.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
     fig = plt.figure(); bx.surfplot(b1.bx, js=boozxform_nsurfaces-1, fill=False, ncontours=35)
-    plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_3_single_stage.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
+    plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_3.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
     fig = plt.figure(); bx.symplot(b1.bx, helical_detail = True, sqrts=True)
-    plt.savefig(os.path.join(OUT_DIR, "Boozxform_symplot_single_stage.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
+    plt.savefig(os.path.join(OUT_DIR, "Boozxform_symplot.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
     fig = plt.figure(); bx.modeplot(b1.bx, sqrts=True); plt.xlabel(r'$s=\psi/\psi_b$')
-    plt.savefig(os.path.join(OUT_DIR, "Boozxform_modeplot_single_stage.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
+    plt.savefig(os.path.join(OUT_DIR, "Boozxform_modeplot.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()
 ##############################################################################
 ##############################################################################
 pprint(f'Whole optimization took {(time.time()-start_time):1f}s')
-
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"objective_*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"residuals_*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"jac_*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"wout_nfp*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"input.nfp*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"jxbout_nfp*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"mercier.nfp*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"threed*")): os.remove(objective_file)
-except Exception as e: pass
-try:
-    for objective_file in glob.glob(os.path.join(OUT_DIR,f"parvmecinfo*")): os.remove(objective_file)
-except Exception as e: pass
+### Remove unnecessary files
+patterns = ["objective_*", "residuals_*", "jac_*", "wout_nfp*", "input.nfp*", "jxbout_nfp*", "mercier.nfp*", "threed*", "parvmecinfo*"]
+for pattern in patterns:
+    try:
+        for objective_file in glob.glob(os.path.join(OUT_DIR, pattern)):
+            os.remove(objective_file)
+    except Exception as e:
+        pass

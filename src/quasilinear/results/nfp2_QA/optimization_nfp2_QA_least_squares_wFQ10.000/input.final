@@ -10,12 +10,12 @@ MPOL = 6
 NTOR = 6
 NTHETA = 16
 NZETA = 14
-NS_ARRAY    =      5     16     31
+NS_ARRAY    =      5     16    101
 NITER_ARRAY =   1000   2000   7000
-FTOL_ARRAY  =  1e-12  1e-12  1e-13
+FTOL_ARRAY  =  1e-12  1e-12  1e-14
 
 ! ---- Boundary toroidal flux ----
-PHIEDGE = 0.08385727554
+PHIEDGE = 0.0448
 
 ! ---- Pressure profile specification ----
 PMASS_TYPE = "power_series"

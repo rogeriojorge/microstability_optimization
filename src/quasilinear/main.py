@@ -31,7 +31,6 @@ sys.path.insert(1, os.path.join(this_path, '..', 'util'))
 home_directory = os.path.expanduser("~")
 from to_gs2 import to_gs2 # pylint: disable=import-error
 import vmecPlot2 # pylint: disable=import-error
-import booz_plot # pylint: disable=import-error
 from qi_functions import QuasiIsodynamicResidual, MaxElongationPen, MirrorRatioPen  # pylint: disable=import-error
 mpi = MpiPartition()
 def pprint(*args, **kwargs):
@@ -55,8 +54,8 @@ start_time = time.time()
 ############################################################################
 gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
-MAXITER =10#150
-max_modes = [2, 3, 4]
+MAXITER =150
+max_modes = [1, 2, 3, 4]
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 7}
 prefix_save = 'optimization'
 results_folder = 'results'
@@ -97,6 +96,7 @@ aspect_ratio_weight = 3e+0
 diff_method = 'forward'
 local_optimization_method = 'lm' # 'trf'
 perform_extra_solve = True
+perform_extra_extra_solve = False
 ######################################
 ######################################
 OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
@@ -350,10 +350,12 @@ for max_mode in max_modes:
         minimizer_kwargs = {"method": "Nelder-Mead", "bounds": bounds, "options": {'maxiter': MAXITER_LOCAL, 'maxfev': MAXFUN_LOCAL, 'disp': True}}
         if MPI.COMM_WORLD.rank == 0: res = dual_annealing(fun, bounds=bounds, maxiter=MAXITER, initial_temp=initial_temp,visit=visit, no_local_search=no_local_search, x0=dofs, minimizer_kwargs=minimizer_kwargs)
     elif optimizer == 'least_squares':
-        diff_rel_step = rel_step_factor_1/max_mode
+        diff_rel_step = rel_step_factor_1/max_mode/2
         diff_abs_step = min(max_rel_step_factor_2,(max_mode/5)*10**(-max_mode))
-        least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
-        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
+        try: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
+        except Exception as e: pprint(e)
+        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)
+        if perform_extra_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/300, abs_step=diff_abs_step/300, max_nfev=MAXITER, ftol=ftol)
     else: print('Optimizer not available')
     ######################################
     try: 

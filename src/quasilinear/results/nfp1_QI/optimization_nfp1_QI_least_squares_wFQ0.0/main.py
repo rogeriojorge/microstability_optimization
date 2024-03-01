@@ -55,8 +55,8 @@ start_time = time.time()
 gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 MAXITER =150
-max_modes = [4]
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 7}
+max_modes = [1, 2, 3, 4]
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 7}
 prefix_save = 'optimization'
 results_folder = 'results'
 config = CONFIG[args.type]
@@ -75,9 +75,9 @@ weight_mirror = 10
 iota_QA = 0.42
 weight_iota_QA = 5e0
 iota_QH=-0.8
-weight_iota_QH=1e-4
+weight_iota_QH=1e-5
 iota_QI=0.615
-weight_iota_QI=1e-4
+weight_iota_QI=1e-6
 elongation_weight = 1e2
 mirror_weight = 1e2
 weight_optTurbulence = args.wfQ#30
@@ -89,6 +89,7 @@ max_rel_step_factor_2 = 3e-3
 MAXITER_LOCAL = 3
 MAXFUN_LOCAL = 30
 ftol=1e-6
+xtol=1e-6
 no_local_search = False
 HEATFLUX_THRESHOLD = 1e18
 GROWTHRATE_THRESHOLD = 10
@@ -96,6 +97,7 @@ aspect_ratio_weight = 3e+0
 diff_method = 'forward'
 local_optimization_method = 'lm' # 'trf'
 perform_extra_solve = True
+perform_extra_extra_solve = True
 ######################################
 ######################################
 OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
@@ -269,7 +271,7 @@ def TurbulenceCostFunction(v: Vmec):
     else:
         str += f'peak(gamma) = {growth_rate:.2f}, '
     if opt_quasisymmetry:
-        str += f'quasisymmetry = {quasisymmetry_total:.3f}, '
+        str += f'qs = {quasisymmetry_total:.2e}, '
         mirror_ratio = 0
     else:
         mirror_ratio = MirrorRatioPen(v)
@@ -312,7 +314,7 @@ def fun(dofss):
 for max_mode in max_modes:
     if (not opt_quasisymmetry) and (max_mode==1):
         continue
-    output_path_parameters=f'output_{optimizer}_maxmode{max_mode}.csv'
+    output_path_parameters=f'{OUT_DIR_APPENDIX}_maxmode{max_mode}.csv'
     vmec.indata.mpol = maxmodes_mpol_mapping[max_mode]
     vmec.indata.ntor = maxmodes_mpol_mapping[max_mode]
     surf.fix_all()
@@ -351,16 +353,18 @@ for max_mode in max_modes:
     elif optimizer == 'least_squares':
         diff_rel_step = rel_step_factor_1/max_mode/2
         diff_abs_step = min(max_rel_step_factor_2,(max_mode/5)*10**(-max_mode))
-        least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
-        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
+        try: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol, xtol=xtol)#, diff_method=diff_method, method=local_optimization_method)
+        except Exception as e: pprint(e)
+        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol, xtol=xtol)
+        if perform_extra_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/300, abs_step=diff_abs_step/300, max_nfev=MAXITER, ftol=ftol, xtol=xtol/10)
     else: print('Optimizer not available')
     ######################################
     try: 
         pprint("Final aspect ratio:", vmec.aspect())
         pprint("Final mean iota:", vmec.mean_iota())
         pprint("Final magnetic well:", vmec.vacuum_well())
-        pprint("Final quasisymmetry:", qs.total())
-        pprint("Final quasi-isodynamic:", np.sum(qi.J()))
+        if opt_quasisymmetry: pprint("Final quasisymmetry:", qs.total())
+        else: pprint("Final quasi-isodynamic:", np.sum(qi.J()))
         #if MPI.COMM_WORLD.rank == 0: pprint("Final growth rate:", CalculateGrowthRate(vmec))
         if MPI.COMM_WORLD.rank == 0: vmec.write_input(os.path.join(OUT_DIR, f'input.max_mode{max_mode}'))
     except Exception as e: pprint(e)

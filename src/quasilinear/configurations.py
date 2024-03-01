@@ -1,6 +1,16 @@
 import os
 home_directory = os.path.expanduser("~")
 CONFIG = {
+    8: {
+        "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp4_QI',
+        "output_dir": 'nfp4_QI',
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.5,'nstep': 350,'dt': 0.4,
+                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+        "aspect_ratio_target": 7,
+        "nfp": 4,
+    },
     7: {
         "input_file": f'{home_directory}/local/microstability_optimization/src/vmec_inputs/input.nfp3_QI',
         "output_dir": 'nfp3_QI',

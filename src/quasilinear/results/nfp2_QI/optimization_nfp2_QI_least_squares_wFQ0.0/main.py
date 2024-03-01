@@ -77,7 +77,7 @@ weight_iota_QA = 5e0
 iota_QH=-0.8
 weight_iota_QH=1e-4
 iota_QI=0.615
-weight_iota_QI=1e-4
+weight_iota_QI=1e-6
 elongation_weight = 1e2
 mirror_weight = 1e2
 weight_optTurbulence = args.wfQ#30
@@ -89,6 +89,7 @@ max_rel_step_factor_2 = 3e-3
 MAXITER_LOCAL = 3
 MAXFUN_LOCAL = 30
 ftol=1e-6
+xtol=1e-6
 no_local_search = False
 HEATFLUX_THRESHOLD = 1e18
 GROWTHRATE_THRESHOLD = 10
@@ -96,6 +97,7 @@ aspect_ratio_weight = 3e+0
 diff_method = 'forward'
 local_optimization_method = 'lm' # 'trf'
 perform_extra_solve = True
+perform_extra_extra_solve = True
 ######################################
 ######################################
 OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
@@ -269,7 +271,7 @@ def TurbulenceCostFunction(v: Vmec):
     else:
         str += f'peak(gamma) = {growth_rate:.2f}, '
     if opt_quasisymmetry:
-        str += f'quasisymmetry = {quasisymmetry_total:.3f}, '
+        str += f'qs = {quasisymmetry_total:.2e}, '
         mirror_ratio = 0
     else:
         mirror_ratio = MirrorRatioPen(v)
@@ -349,18 +351,20 @@ for max_mode in max_modes:
         minimizer_kwargs = {"method": "Nelder-Mead", "bounds": bounds, "options": {'maxiter': MAXITER_LOCAL, 'maxfev': MAXFUN_LOCAL, 'disp': True}}
         if MPI.COMM_WORLD.rank == 0: res = dual_annealing(fun, bounds=bounds, maxiter=MAXITER, initial_temp=initial_temp,visit=visit, no_local_search=no_local_search, x0=dofs, minimizer_kwargs=minimizer_kwargs)
     elif optimizer == 'least_squares':
-        diff_rel_step = rel_step_factor_1/max_mode
+        diff_rel_step = rel_step_factor_1/max_mode/2
         diff_abs_step = min(max_rel_step_factor_2,(max_mode/5)*10**(-max_mode))
-        least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
-        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol)#, diff_method=diff_method, method=local_optimization_method)
+        try: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step, abs_step=diff_abs_step, max_nfev=MAXITER, ftol=ftol, xtol=xtol)#, diff_method=diff_method, method=local_optimization_method)
+        except Exception as e: pprint(e)
+        if perform_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/10, abs_step=diff_abs_step/10, max_nfev=MAXITER, ftol=ftol, xtol=xtol)
+        if perform_extra_extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, rel_step=diff_rel_step/300, abs_step=diff_abs_step/300, max_nfev=MAXITER, ftol=ftol, xtol=xtol/10)
     else: print('Optimizer not available')
     ######################################
     try: 
         pprint("Final aspect ratio:", vmec.aspect())
         pprint("Final mean iota:", vmec.mean_iota())
         pprint("Final magnetic well:", vmec.vacuum_well())
-        pprint("Final quasisymmetry:", qs.total())
-        pprint("Final quasi-isodynamic:", np.sum(qi.J()))
+        if opt_quasisymmetry: pprint("Final quasisymmetry:", qs.total())
+        else: pprint("Final quasi-isodynamic:", np.sum(qi.J()))
         #if MPI.COMM_WORLD.rank == 0: pprint("Final growth rate:", CalculateGrowthRate(vmec))
         if MPI.COMM_WORLD.rank == 0: vmec.write_input(os.path.join(OUT_DIR, f'input.max_mode{max_mode}'))
     except Exception as e: pprint(e)

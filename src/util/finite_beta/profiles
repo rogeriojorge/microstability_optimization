@@ -1,0 +1,40 @@
+# This file is an example 'profiles' file appropriate for profilesScheme=1 and 2 species.
+# Any lines that begin with # or ! or % are comments (ignored).
+# The first line which is not a comment must be just a single integer: 0, 1, 2, or 3,
+# giving the radial coordinate which will be used in this file, using the same convention
+# as inputRadialCoordinate:
+# 0 = psiHat
+# 1 = psiN
+# 2 = rHat
+# 3 = rN
+1
+# This radial coordinate need not be the same as inputRadialCoordinate in the input.namelist file.
+#
+# Next comes a whitespace-delimited array of data with 2*Nspecies+3 columns.
+# The order of the columns is:
+#
+# NErs   generalEr_min   generalEr_max   nHat(species 1)   THat(species 1)   nHat(species 2)   THat(species 2) ...
+#
+# The generalEr_min and generalEr_max quantities specify the range of the generalized Er variable 
+# (dPhiHatdpsiHat, dPhiHatdrpsiN, dPhiHatdrHat, dPhiHatdrN, or Er)
+# which is selected by inputRadialCoordinateForGradients in the input.namelist file.
+# (If inputRadialCoordinateForGradients is unspecified, the default generalized Er variable is Er.)
+# These quantities and NErs matter only for scanType=5 (a scan of Er at each radius), and they correspond
+# to the sfincsScan !ss parameters of the same name.
+# For scanType=4 (a scan over radius with no scan of Er), NErs, generalEr_min, and generalEr_max are ignored.
+# The density and temperature values are all normalized to nBar and TBar, just as in the input.namelist file.
+#
+# The rows correspond to coefficients of a polynomial, beginning
+# with the constant term, e.g.
+# nHat = a_0 + a_1 * x + a_2 * x^2 + a_3 * x^3
+# where x is whichever radial coordinate you selected.  Regularity at x=0 requires that all the odd polynomial
+# coefficients vanish when rHat or rN is used as the radial coordinate in this file, but this requirement is not enforced.
+# You can include as many rows as you like, i.e. the polynomial order can be as high as you like.
+#
+# NErs  generalEr_min   generalEr_max   nHat(species 1)   THat(species 1)   nHat(species 2)   THat(species 2)
+   4.0 -4.06059698307892 -1.9172445293501  4.13              12.0              4.13              12.0
+   0.0 -9.44824214637575 -4.54905346343309  0.0             -12.0               0.0             -12.0
+   0.0  42.5598555263661  22.9168452834279  0.0               0.0               0.0               0.0
+   0.0 -82.7669720918879 -44.5668311264012  0.0               0.0               0.0               0.0
+   0.0  0.0               0.0               0.0               0.0               0.0               0.0
+   0.0  0.0               0.0             -4.13               0.0             -4.13               0.0

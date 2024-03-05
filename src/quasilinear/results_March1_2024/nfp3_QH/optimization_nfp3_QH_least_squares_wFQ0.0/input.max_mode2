@@ -1,0 +1,50 @@
+&INDATA
+! This file created by simsopt on February 29 2024, 02:07:46
+
+! ---- Geometric parameters ----
+NFP = 3
+LASYM = F
+
+! ---- Resolution parameters ----
+MPOL = 5
+NTOR = 5
+NTHETA = 16
+NZETA = 14
+NS_ARRAY    =      5     16     31
+NITER_ARRAY =   1000   2000   7000
+FTOL_ARRAY  =  1e-12  1e-12  1e-13
+
+! ---- Boundary toroidal flux ----
+PHIEDGE = 0.056
+
+! ---- Pressure profile specification ----
+PMASS_TYPE = "power_series"
+AM = 0.0 
+PRES_SCALE = 1.0
+
+! ---- Profile specification of iota or current ----
+NCURR = 1
+CURTOR = 0.0
+PCURR_TYPE = "power_series"
+AC = 0.0 
+
+! ---- Other numerical parameters ----
+DELT = 0.9
+NSTEP = 200
+
+! ---- Boundary shape. Array index order is (n, m) ----
+RBC(   0,   0) =  1.000000000000000e+00,    ZBS(   0,   0) =  0.000000000000000e+00
+RBC(   1,   0) =  1.964324340065552e-01,    ZBS(   1,   0) =  9.300572273592191e-02
+RBC(   2,   0) =  1.269478900173462e-02,    ZBS(   2,   0) =  8.252722716113315e-03
+RBC(  -2,   1) = -1.995622542138987e-02,    ZBS(  -2,   1) =  1.770672191347384e-02
+RBC(  -1,   1) = -1.451575118004145e-01,    ZBS(  -1,   1) =  1.184686391802736e-01
+RBC(   0,   1) =  1.569955088840483e-01,    ZBS(   0,   1) =  2.176871349148494e-01
+RBC(   1,   1) =  4.281670242032716e-02,    ZBS(   1,   1) =  4.696898654351103e-02
+RBC(   2,   1) =  8.243249823243605e-03,    ZBS(   2,   1) =  6.868328562152801e-03
+RBC(  -2,   2) =  1.081314092697524e-02,    ZBS(  -2,   2) = -1.708177390954969e-02
+RBC(  -1,   2) =  2.677779294936323e-02,    ZBS(  -1,   2) =  1.529688419626376e-02
+RBC(   0,   2) =  2.936403007237512e-02,    ZBS(   0,   2) =  1.745714451822198e-02
+RBC(   1,   2) =  1.366969974703258e-03,    ZBS(   1,   2) = -1.094598164182009e-03
+RBC(   2,   2) =  3.319073779218364e-04,    ZBS(   2,   2) =  3.234657375587805e-04
+/
+

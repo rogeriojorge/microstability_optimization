@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import cm
 import numpy as np
-from scipy.io import netcdf
+from scipy.io import netcdf_file
 import os
 import math
 import sys
@@ -12,7 +12,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
 
     filename = file
     if name=='': name=os.path.basename(filename)[5:-3]
-    f = netcdf.netcdf_file(filename,'r',mmap=False)
+    f = netcdf_file(filename,'r',mmap=False)
     phi = f.variables['phi'][()]
     iotaf = f.variables['iotaf'][()]
     presf = f.variables['presf'][()]

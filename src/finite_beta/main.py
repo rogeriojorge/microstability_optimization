@@ -40,7 +40,7 @@ beta = 2.5 #%
 diff_method = 'forward'
 abs_step = 1.0e-7
 rel_step = 1.0e-5
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 6, 5: 7}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 6, 5: 6}
 ftol = 1e-6
 xtol = 1e-6
 aspect_ratio = 6.5
@@ -51,7 +51,7 @@ iota_min_QA = 0.42
 iota_min_QH = 1.05
 iota_Weight = 1e2
 well_Weight = 1e5
-DMerc_Weight = 1e9
+DMerc_Weight = 1e10
 opt_method = 'trf'#'lm'
 DMerc_fraction = 0.70 # The starting radius of the Mercier criterion minimum find (0<...<1)
 

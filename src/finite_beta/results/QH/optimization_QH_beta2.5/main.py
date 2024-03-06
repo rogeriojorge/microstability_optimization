@@ -29,25 +29,31 @@ parser.add_argument("--type", type=int, default=1)
 args = parser.parse_args()
 
 QA_or_QH = 'QH' if args.type == 1 else 'QA'
-MAXITER = 30
+MAXITER = 15
 optimize_well = True
 optimize_DMerc = True
-extra_solve = False
+optimize_shear = True
 plot_result = True
-max_modes = [1, 2, 2]
+max_modes = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5]
 
+beta = 2.5 #%
 diff_method = 'forward'
 abs_step = 1.0e-7
-rel_step = 1.0e-4
-maxmodes_mpol_mapping = {1: 3, 2: 3, 3: 5, 4: 6, 5: 7}
+rel_step = 1.0e-5
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6}
 ftol = 1e-6
 xtol = 1e-6
 aspect_ratio = 6.5
-use_previous_results_if_available = False
+shear_min_QA = 0.15
+shear_min_QH = 0.20
+shear_weight = 1e-2
 iota_min_QA = 0.42
 iota_min_QH = 1.05
-well_Weight = 1e1
-DMerc_Weight = 1e5
+iota_Weight = 1e2
+well_Weight = 1e5
+DMerc_Weight = 1e4
+opt_method = 'trf'#'lm'
+DMerc_fraction = 0.75 # The starting radius of the Mercier criterion minimum find (0<...<1)
 
 # Set up Vmec object
 home_directory = os.path.expanduser("~")
@@ -55,10 +61,8 @@ vmec_folder = f'{home_directory}/local/microstability_optimization/src/vmec_inpu
 filename = os.path.join(vmec_folder,"input.nfp4_QH_finitebeta") if QA_or_QH == 'QH' else os.path.join(vmec_folder,"input.nfp2_QA_finitebeta")
 mpi = MpiPartition()
 
-beta = 2.5 #%
 ne0 = 3e20 * (beta/100/0.05)**(1/3)
 Te0 = 15e3 * (beta/100/0.05)**(2/3)
-print
 ne = ProfilePolynomial(ne0 * np.array([1, 0, 0, 0, 0, -1.0]))
 Te = ProfilePolynomial(Te0 * np.array([1, -1.0]))
 
@@ -78,18 +82,6 @@ output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
 OUT_DIR = os.path.join(this_path,results_folder,QA_or_QH,OUT_DIR_APPENDIX)
 os.makedirs(OUT_DIR, exist_ok=True)
 shutil.copyfile(os.path.join(this_path,'main.py'),os.path.join(OUT_DIR,'main.py'))
-######################################
-dest = os.path.join(OUT_DIR,OUT_DIR_APPENDIX+'_previous')
-if use_previous_results_if_available and (os.path.isfile(os.path.join(OUT_DIR,'input.final')) or os.path.isfile(os.path.join(dest,'input.final'))):
-    if mpi.proc0_world:
-        os.makedirs(dest, exist_ok=True)
-        if os.path.isfile(os.path.join(OUT_DIR, 'input.final')) and not os.path.isfile(os.path.join(dest, 'input.final')):
-            files = os.listdir(OUT_DIR)
-            for f in files:
-                shutil.move(os.path.join(OUT_DIR, f), dest)
-    else:
-        time.sleep(0.2)
-    filename = os.path.join(dest, 'input.final')
 os.chdir(OUT_DIR)
 ######################################
 vmec = Vmec(filename, mpi=mpi, verbose=False)
@@ -106,15 +98,17 @@ vmec.n_current = 50
 # Define objectives for minor radius and <B>
 def minor_radius_objective(vmec): return vmec.wout.Aminor_p
 def volavgB_objective(vmec): return vmec.wout.volavgB
-def DMerc_min_objective(vmec): return np.min(vmec.wout.DMerc[4:])
-def magnetic_well_objective(vmec): return vmec.vacuum_well()
-def iota_min_objective(vmec): return np.min(np.abs(vmec.wout.iotaf))
+def DMerc_min_objective(vmec): return np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction):]),0))
+def magnetic_well_objective(vmec): return np.min((vmec.vacuum_well(),0))
+def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH=='QA' else iota_min_QH),0))
+def shear_objective(vmec): return np.min((np.abs(vmec.mean_shear())-(shear_min_QA if QA_or_QH=='QA' else shear_min_QH),0))
 
-minor_radius_optimizable = make_optimizable(minor_radius_objective, vmec)
-volavgB_optimizable = make_optimizable(volavgB_objective, vmec)
-penalty_DMerc=QuadraticPenalty(make_optimizable(DMerc_min_objective, vmec), 0.0, "min")
-penalty_magnetic_well=QuadraticPenalty(make_optimizable(magnetic_well_objective, vmec), 0.0, "min")
-penalty_iota=QuadraticPenalty(make_optimizable(iota_min_objective, vmec), iota_min_QA if QA_or_QH=='QA' else iota_min_QH, "min")
+minor_radius_optimizable =  make_optimizable(minor_radius_objective, vmec)
+volavgB_optimizable      =  make_optimizable(volavgB_objective, vmec)
+DMerc_optimizable        =  make_optimizable(DMerc_min_objective, vmec)
+magnetic_well_optimizable = make_optimizable(magnetic_well_objective, vmec)
+iota_min_optimizable    =   make_optimizable(iota_min_objective, vmec)
+shear_optimizable       =   make_optimizable(shear_objective, vmec)
 
 # Define quasisymmetry objective:
 helicity_n = -1 if QA_or_QH == 'QH' else 0
@@ -134,19 +128,22 @@ volavgB_ARIES = 5.86461221551616
 if mpi.proc0_world:
     try:
         print("Initial aspect ratio:", vmec.aspect())
-        print("Initial min iota:", iota_min_objective(vmec))
+        print("Initial min iota:", np.min(np.abs(vmec.wout.iotaf)))
+        print("Initial mean iota:", vmec.mean_iota())
+        print("Initial mean shear:", vmec.mean_shear())
         print("Initial magnetic well:", vmec.vacuum_well())
         print("Initial quasisymmetry:", qs.total())
-        print("Initial volavgB", vmec.wout.volavgB)
-        print("Initial min DMerc", np.min(vmec.wout.DMerc[4:]))
-        print("Initial Aminor", vmec.wout.Aminor_p)
-        print("Initial betatotal", vmec.wout.betatotal)
+        print("Initial volavgB:", vmec.wout.volavgB)
+        print("Initial min DMerc from mid radius:", DMerc_optimizable.J())
+        print("Initial Aminor:", vmec.wout.Aminor_p)
+        print("Initial betatotal:", vmec.wout.betatotal)
     except Exception as e: print(e)
 
 # Fourier modes of the boundary with m <= max_mode and |n| <= max_mode
 # will be varied in the optimization. A larger range of modes are
 # included in the VMEC and booz_xform calculations.
 for step, max_mode in enumerate(max_modes):
+    if mpi.proc0_world: print(f'Optimizing with max_mode={max_mode}')
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, 
                      nmin=-max_mode, nmax=max_mode, fixed=False)
@@ -205,9 +202,10 @@ for step, max_mode in enumerate(max_modes):
                  (volavgB_optimizable.J, volavgB_ARIES, 1),
                  (bootstrap_mismatch.residuals, 0, 1),
                  (qs.residuals, 0, 1),
-                 (penalty_iota.J, 0, 1)]
-    if optimize_well: opt_tuple.append((penalty_magnetic_well.J, 0.0, well_Weight))
-    if optimize_DMerc: opt_tuple.append((penalty_DMerc.J, 0.0, DMerc_Weight))
+                 (iota_min_optimizable.J, 0, iota_Weight)]
+    if optimize_well:  opt_tuple.append((magnetic_well_optimizable.J, 0.0, well_Weight))
+    if optimize_DMerc: opt_tuple.append((DMerc_optimizable.J, 0.0, DMerc_Weight))
+    if optimize_shear: opt_tuple.append((shear_optimizable.J, 0.0, shear_weight))
 
     prob = LeastSquaresProblem.from_tuples(opt_tuple)
 
@@ -215,10 +213,7 @@ for step, max_mode in enumerate(max_modes):
 
     least_squares_mpi_solve(prob, mpi, grad=True, ftol=ftol, xtol=xtol,
                             abs_step=abs_step, rel_step=rel_step,
-                            diff_method=diff_method, max_nfev=MAXITER)
-    if extra_solve: least_squares_mpi_solve(prob, mpi, grad=True, ftol=ftol, xtol=xtol,
-                                            abs_step=abs_step/10, rel_step=rel_step/10,
-                                            diff_method=diff_method, max_nfev=MAXITER)
+                            diff_method=diff_method, max_nfev=MAXITER, method=opt_method)
 
     # Preserve last output file from this step:
     # vmec.files_to_delete = []
@@ -235,11 +230,13 @@ for step, max_mode in enumerate(max_modes):
     if mpi.proc0_world:
         try:
             print("Final aspect ratio:", vmec.aspect())
-            print("Final min iota:", iota_min_objective(vmec))
+            print("Final min iota:", np.min(np.abs(vmec.wout.iotaf)))
+            print("Final mean iota:", vmec.mean_iota())
+            print("Final mean shear:", vmec.mean_shear())
             print("Final magnetic well:", vmec.vacuum_well())
             print("Final quasisymmetry:", qs.total())
             print("Final volavgB", vmec.wout.volavgB)
-            print("Final min DMerc", np.min(vmec.wout.DMerc[4:]))
+            print("Final min DMerc from mid radius:", DMerc_optimizable.J())
             print("Final Aminor", vmec.wout.Aminor_p)
             print("Final betatotal", vmec.wout.betatotal)
             vmec.write_input(os.path.join(OUT_DIR, f'input.max_mode{max_mode}'))
@@ -288,8 +285,6 @@ if mpi.proc0_world:
     patterns = ["objective_*", "residuals_*", "jac_*", "wout_nfp*", "input.nfp*", "jxbout_nfp*", "mercier.nfp*", "threed*", "parvmecinfo*"]
     for pattern in patterns:
         try:
-            for objective_file in glob.glob(os.path.join(OUT_DIR, pattern)):
-                os.remove(objective_file)
-        except Exception as e:
-            pass
+            for objective_file in glob.glob(os.path.join(OUT_DIR, pattern)): os.remove(objective_file)
+        except Exception as e: pass
     ##############################################################################

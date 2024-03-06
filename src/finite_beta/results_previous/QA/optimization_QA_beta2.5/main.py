@@ -29,29 +29,25 @@ parser.add_argument("--type", type=int, default=1)
 args = parser.parse_args()
 
 QA_or_QH = 'QH' if args.type == 1 else 'QA'
-MAXITER = 15
+MAXITER = 50
 optimize_well = True
 optimize_DMerc = True
-optimize_shear = True
 plot_result = True
-max_modes = [1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5]
+max_modes = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
 
 beta = 2.5 #%
 diff_method = 'forward'
 abs_step = 1.0e-7
 rel_step = 1.0e-5
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 7}
 ftol = 1e-6
 xtol = 1e-6
 aspect_ratio = 6.5
-shear_min_QA = 0.15
-shear_min_QH = 0.20
-shear_weight = 1e-2
 iota_min_QA = 0.42
 iota_min_QH = 1.05
 iota_Weight = 1e2
 well_Weight = 1e5
-DMerc_Weight = 1e4
+DMerc_Weight = 1e3
 opt_method = 'trf'#'lm'
 DMerc_fraction = 0.75 # The starting radius of the Mercier criterion minimum find (0<...<1)
 
@@ -101,14 +97,12 @@ def volavgB_objective(vmec): return vmec.wout.volavgB
 def DMerc_min_objective(vmec): return np.min((np.min(vmec.wout.DMerc[int(len(vmec.wout.DMerc) * DMerc_fraction):]),0))
 def magnetic_well_objective(vmec): return np.min((vmec.vacuum_well(),0))
 def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH=='QA' else iota_min_QH),0))
-def shear_objective(vmec): return np.min((np.abs(vmec.mean_shear())-(shear_min_QA if QA_or_QH=='QA' else shear_min_QH),0))
 
-minor_radius_optimizable =  make_optimizable(minor_radius_objective, vmec)
-volavgB_optimizable      =  make_optimizable(volavgB_objective, vmec)
-DMerc_optimizable        =  make_optimizable(DMerc_min_objective, vmec)
+minor_radius_optimizable = make_optimizable(minor_radius_objective, vmec)
+volavgB_optimizable = make_optimizable(volavgB_objective, vmec)
+DMerc_optimizable = make_optimizable(DMerc_min_objective, vmec)
 magnetic_well_optimizable = make_optimizable(magnetic_well_objective, vmec)
-iota_min_optimizable    =   make_optimizable(iota_min_objective, vmec)
-shear_optimizable       =   make_optimizable(shear_objective, vmec)
+iota_min_optimizable = make_optimizable(iota_min_objective,vmec)
 
 # Define quasisymmetry objective:
 helicity_n = -1 if QA_or_QH == 'QH' else 0
@@ -130,7 +124,6 @@ if mpi.proc0_world:
         print("Initial aspect ratio:", vmec.aspect())
         print("Initial min iota:", np.min(np.abs(vmec.wout.iotaf)))
         print("Initial mean iota:", vmec.mean_iota())
-        print("Initial mean shear:", vmec.mean_shear())
         print("Initial magnetic well:", vmec.vacuum_well())
         print("Initial quasisymmetry:", qs.total())
         print("Initial volavgB:", vmec.wout.volavgB)
@@ -173,7 +166,7 @@ for step, max_mode in enumerate(max_modes):
     
     # Define bootstrap objective:
     booz = Boozer(vmec, mpol=12, ntor=12)
-    ns = 50
+    ns = 31
     s_full = np.linspace(0, 1, ns)
     ds = s_full[1] - s_full[0]
     s_half = s_full[1:] - 0.5 * ds
@@ -203,9 +196,8 @@ for step, max_mode in enumerate(max_modes):
                  (bootstrap_mismatch.residuals, 0, 1),
                  (qs.residuals, 0, 1),
                  (iota_min_optimizable.J, 0, iota_Weight)]
-    if optimize_well:  opt_tuple.append((magnetic_well_optimizable.J, 0.0, well_Weight))
+    if optimize_well: opt_tuple.append((magnetic_well_optimizable.J, 0.0, well_Weight))
     if optimize_DMerc: opt_tuple.append((DMerc_optimizable.J, 0.0, DMerc_Weight))
-    if optimize_shear: opt_tuple.append((shear_optimizable.J, 0.0, shear_weight))
 
     prob = LeastSquaresProblem.from_tuples(opt_tuple)
 
@@ -232,7 +224,6 @@ for step, max_mode in enumerate(max_modes):
             print("Final aspect ratio:", vmec.aspect())
             print("Final min iota:", np.min(np.abs(vmec.wout.iotaf)))
             print("Final mean iota:", vmec.mean_iota())
-            print("Final mean shear:", vmec.mean_shear())
             print("Final magnetic well:", vmec.vacuum_well())
             print("Final quasisymmetry:", qs.total())
             print("Final volavgB", vmec.wout.volavgB)

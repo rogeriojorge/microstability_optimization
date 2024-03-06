@@ -40,7 +40,7 @@ beta = 2.5 #%
 diff_method = 'forward'
 abs_step = 1.0e-7
 rel_step = 1.0e-5
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 6, 5: 7}
 ftol = 1e-6
 xtol = 1e-6
 aspect_ratio = 6.5
@@ -51,9 +51,9 @@ iota_min_QA = 0.42
 iota_min_QH = 1.05
 iota_Weight = 1e2
 well_Weight = 1e5
-DMerc_Weight = 1e13
+DMerc_Weight = 1e9
 opt_method = 'trf'#'lm'
-DMerc_fraction = 0.75 # The starting radius of the Mercier criterion minimum find (0<...<1)
+DMerc_fraction = 0.70 # The starting radius of the Mercier criterion minimum find (0<...<1)
 
 # Set up Vmec object
 home_directory = os.path.expanduser("~")
@@ -149,7 +149,7 @@ for step, max_mode in enumerate(max_modes):
                      nmin=-max_mode, nmax=max_mode, fixed=False)
     #surf.fix("rc(0,0)") # Major radius
 
-    n_spline = step * 2 + 5
+    n_spline = np.min((step * 2 + 5, 15))
     s_spline = np.linspace(0, 1, n_spline)
     if step == 0: current = ProfileSpline(s_spline, s_spline * (1 - s_spline) * 4)
     else: current = current.resample(s_spline)

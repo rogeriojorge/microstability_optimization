@@ -12,6 +12,7 @@ from simsopt.mhd.vmec import Vmec
 from simsopt import make_optimizable
 from simsopt.mhd.boozer import Boozer
 from simsopt.util.mpi import MpiPartition, log
+from simsopt.objectives import QuadraticPenalty
 from simsopt.solve import least_squares_mpi_solve
 from simsopt.objectives import LeastSquaresProblem
 from simsopt.mhd.vmec_diagnostics import QuasisymmetryRatioResidual
@@ -28,7 +29,7 @@ parser.add_argument("--type", type=int, default=1)
 args = parser.parse_args()
 
 QA_or_QH = 'QH' if args.type == 1 else 'QA'
-MAXITER = 10
+MAXITER = 150
 optimize_well = True
 optimize_DMerc = True
 optimize_shear = True
@@ -36,12 +37,12 @@ plot_result = True
 max_modes = [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5]
 
 beta = 2.5 #%
-diff_method = 'forward'
-abs_step = 2.0e-5
-rel_step = 2.0e-3
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 7, 5: 7}
+diff_method = 'centered'
+abs_step = 1.0e-7
+rel_step = 1.0e-5
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 6, 5: 6}
 ftol = 1e-6
-xtol = 1e-7
+xtol = 1e-6
 aspect_ratio = 6.5
 shear_min_QA = 0.10
 shear_min_QH = 0.10
@@ -75,7 +76,9 @@ pressure_Pa = ProfileScaled(pressure, ELEMENTARY_CHARGE)
 ######################################
 prefix_save = 'optimization'
 results_folder = 'results'
-OUT_DIR_APPENDIX=f"{prefix_save}_{QA_or_QH}_beta{beta:.1f}"
+OUT_DIR_APPENDIX=f"{prefix_save}_{QA_or_QH}"
+OUT_DIR_APPENDIX+=f'_beta{beta:.1f}'
+output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
 OUT_DIR = os.path.join(this_path,results_folder,QA_or_QH,OUT_DIR_APPENDIX)
 os.makedirs(OUT_DIR, exist_ok=True)
 shutil.copyfile(os.path.join(this_path,'main.py'),os.path.join(OUT_DIR,'main.py'))
@@ -139,11 +142,8 @@ if mpi.proc0_world:
 # Fourier modes of the boundary with m <= max_mode and |n| <= max_mode
 # will be varied in the optimization. A larger range of modes are
 # included in the VMEC and booz_xform calculations.
-max_mode_old = max_modes[0]
-step_max_mode_factor = -1
 for step, max_mode in enumerate(max_modes):
     if mpi.proc0_world: print(f'Optimizing with max_mode={max_mode}')
-    if max_mode == max_mode_old: step_max_mode_factor+=1
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, 
                      nmin=-max_mode, nmax=max_mode, fixed=False)
@@ -194,7 +194,7 @@ for step, max_mode in enumerate(max_modes):
     # redl_geom = RedlGeomVmec(vmec, redl_s[1:-1])  # Drop s=0 and s=1 to avoid problems with epsilon=0 and p=0
     
     logfile = None
-    if mpi.proc0_world: logfile = f'jdotB_log_max_mode{max_mode}_step{step}'
+    if mpi.proc0_world: logfile = f'jdotB_log_max_mode{max_mode}'
     bootstrap_mismatch = VmecRedlBootstrapMismatch(redl_geom, ne, Te, Ti, Zeff, helicity_n, logfile=logfile)
 
     opt_tuple = [(vmec.aspect, aspect_ratio, 1),
@@ -211,8 +211,9 @@ for step, max_mode in enumerate(max_modes):
 
     assert len(prob.x) == ndofs
 
-    least_squares_mpi_solve(prob, mpi, grad=True, ftol=ftol, xtol=xtol, abs_step=abs_step/(10**step_max_mode_factor),
-                            rel_step=rel_step/(10**step_max_mode_factor), diff_method=diff_method, max_nfev=MAXITER, method=opt_method)
+    least_squares_mpi_solve(prob, mpi, grad=True, ftol=ftol, xtol=xtol,
+                            abs_step=abs_step, rel_step=rel_step,
+                            diff_method=diff_method, max_nfev=MAXITER, method=opt_method)
 
     # Preserve last output file from this step:
     # vmec.files_to_delete = []
@@ -240,7 +241,6 @@ for step, max_mode in enumerate(max_modes):
             print("Final betatotal", vmec.wout.betatotal)
             vmec.write_input(os.path.join(OUT_DIR, f'input.max_mode{max_mode}'))
         except Exception as e: print(e)
-    max_mode_old = max_mode
     ######################################
 if mpi.proc0_world: vmec.write_input(os.path.join(OUT_DIR, f'input.final'))
 ######################################

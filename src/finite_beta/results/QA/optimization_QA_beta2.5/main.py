@@ -51,7 +51,7 @@ iota_min_QA = 0.42
 iota_min_QH = 1.05
 iota_Weight = 1e2
 well_Weight = 1e5
-DMerc_Weight = 1e4
+DMerc_Weight = 1e7
 opt_method = 'trf'#'lm'
 DMerc_fraction = 0.75 # The starting radius of the Mercier criterion minimum find (0<...<1)
 

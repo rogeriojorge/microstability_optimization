@@ -6,7 +6,7 @@ from simsopt import save, load
 from scipy.optimize import minimize
 from simsopt.mhd import VirtualCasing, Vmec
 from simsopt.objectives import QuadraticPenalty, SquaredFlux, Weight
-from simsopt.field import BiotSavart, Current, coils_via_symmetries
+from simsopt.field import BiotSavart, Current, coils_via_symmetries, coils_to_focus, coils_to_makegrid
 from simsopt.geo import (CurveLength, curves_to_vtk, create_equally_spaced_curves,
                          SurfaceRZFourier, CurveLength, CurveCurveDistance, ArclengthVariation,
                          MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance, LinkingNumber)
@@ -15,7 +15,7 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 QA_or_QH = "QH"
 beta = 2.5
 filename = 'wout_final.nc'
-results_folder = 'results_finally_DMerc'
+results_folder = 'results'
 
 ncoils = 6
 R0 = 11.3
@@ -25,36 +25,42 @@ MAXITER = 1000
 
 start_from_sratch = False # True if starting from circular coils, False if starting from a previous optimization
 
+MSC_THRESHOLD = 1.
 if start_from_sratch:
     max_length_per_coil = 30
     CC_THRESHOLD = 0.5
     CS_THRESHOLD = 0.6
     CURVATURE_THRESHOLD = 1.5
     ALS_THRESHOLD = 0.1
-    MSC_THRESHOLD = 1.
 else:
     # # copy bs.json file from coils folder to this_path
     # # First run
-    # max_length_per_coil = 36
+    # max_length_per_coil = 33
     # CC_THRESHOLD = 0.8
     # CS_THRESHOLD = 1.1
     # CURVATURE_THRESHOLD = 1.2
     # ALS_THRESHOLD = 1.0
-    MSC_THRESHOLD = 1.
     # # copy again bs.json file from coils folder to this_path
     # # Second run
-    # max_length_per_coil = 40
+    # max_length_per_coil = 36
     # CC_THRESHOLD = 0.9
     # CS_THRESHOLD = 1.3
     # CURVATURE_THRESHOLD = 1.1
-    # ALS_THRESHOLD = 0.9
+    # ALS_THRESHOLD = 0.8
+    # # copy again bs.json file from coils folder to this_path
+    # # Third run
+    # max_length_per_coil = 39
+    # CC_THRESHOLD = 0.9
+    # CS_THRESHOLD = 1.4
+    # CURVATURE_THRESHOLD = 1.1
+    # ALS_THRESHOLD = 0.6
     # copy again bs.json file from coils folder to this_path
-    # Third run
-    max_length_per_coil = 42
-    CC_THRESHOLD = 1.0
-    CS_THRESHOLD = 1.5
-    CURVATURE_THRESHOLD = 1.0
-    ALS_THRESHOLD = 0.8
+    # fourth run
+    max_length_per_coil = 41
+    CC_THRESHOLD = 0.90
+    CS_THRESHOLD = 1.4
+    CURVATURE_THRESHOLD = 1.1
+    ALS_THRESHOLD = 0.3
 
 LENGTH_WEIGHT = 1.
 CC_WEIGHT = 1.
@@ -204,3 +210,5 @@ s_full.x = s.x
 s_full.to_vtk(out_dir / "surf_opt")
 
 save(bs, out_dir / f"biot_savart_nfp{s.nfp}_{QA_or_QH}_ncoils{ncoils}_order{order}.json")
+coils_to_makegrid(os.path.join(out_dir,"coils_makegrid_format.txt"),base_curves,base_currents,nfp=s.nfp, stellsym=True)
+coils_to_focus(os.path.join(out_dir,"coils_focus_format.txt"),curves=[coil._curve for coil in coils],currents=[coil._current for coil in coils],nfp=s.nfp,stellsym=True)

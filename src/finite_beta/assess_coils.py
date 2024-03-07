@@ -15,7 +15,7 @@ QA_or_QH = "QH"
 beta = 2.5
 filename_wout = 'wout_final.nc'
 filename_input = 'input.final'
-results_folder = 'results_finally_DMerc'
+results_folder = 'results'
 ncoils = 6
 order = 12
 

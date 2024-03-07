@@ -194,7 +194,7 @@ for step, max_mode in enumerate(max_modes):
     # redl_geom = RedlGeomVmec(vmec, redl_s[1:-1])  # Drop s=0 and s=1 to avoid problems with epsilon=0 and p=0
     
     logfile = None
-    if mpi.proc0_world: logfile = f'jdotB_log_max_mode{max_mode}_step{step}'
+    if mpi.proc0_world: logfile = f'jdotB_log_max_mode{max_mode}'#_step{step}'
     bootstrap_mismatch = VmecRedlBootstrapMismatch(redl_geom, ne, Te, Ti, Zeff, helicity_n, logfile=logfile)
 
     opt_tuple = [(vmec.aspect, aspect_ratio, 1),

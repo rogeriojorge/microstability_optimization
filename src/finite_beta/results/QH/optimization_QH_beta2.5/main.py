@@ -28,7 +28,7 @@ parser.add_argument("--type", type=int, default=1)
 args = parser.parse_args()
 
 QA_or_QH = 'QH' if args.type == 1 else 'QA'
-MAXITER = 10
+MAXITER = 50
 optimize_well = True
 optimize_DMerc = True
 optimize_shear = True
@@ -36,15 +36,15 @@ plot_result = True
 max_modes = [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5]
 
 beta = 2.5 #%
-diff_method = 'forward'
+diff_method = 'centered'
 abs_step = 2.0e-5
 rel_step = 2.0e-3
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 7, 5: 7}
+maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 6, 4: 6, 5: 6}
 ftol = 1e-6
 xtol = 1e-7
 aspect_ratio = 6.5
 shear_min_QA = 0.10
-shear_min_QH = 0.10
+shear_min_QH = 0.12
 shear_weight = 1e-2
 iota_min_QA = 0.42
 iota_min_QH = 1.05
@@ -52,7 +52,7 @@ iota_Weight = 1e2
 well_Weight = 1e5
 DMerc_Weight = 1e17
 opt_method = 'trf'#'lm'
-DMerc_fraction = 0.70 # The starting radius of the Mercier criterion minimum find (0<...<1)
+DMerc_fraction = 0.50 # The starting radius of the Mercier criterion minimum find (0<...<1)
 
 # Set up Vmec object
 home_directory = os.path.expanduser("~")

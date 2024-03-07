@@ -1,27 +1,45 @@
 #!/usr/bin/env python3
 import os
-import shutil
 import numpy as np
 from pathlib import Path
+from simsopt import save, load
 from scipy.optimize import minimize
 from simsopt.mhd import VirtualCasing, Vmec
-from simsopt.objectives import QuadraticPenalty, SquaredFlux
+from simsopt.objectives import QuadraticPenalty, SquaredFlux, Weight
 from simsopt.field import BiotSavart, Current, coils_via_symmetries
-from simsopt.geo import CurveLength, curves_to_vtk, create_equally_spaced_curves, SurfaceRZFourier
+from simsopt.geo import (CurveLength, curves_to_vtk, create_equally_spaced_curves,
+                         SurfaceRZFourier, CurveLength, CurveCurveDistance, ArclengthVariation,
+                         MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance, LinkingNumber)
 this_path = os.path.dirname(os.path.abspath(__file__))
 
 QA_or_QH = "QH"
 beta = 2.5
-
 filename = 'wout_final.nc'
 results_folder = 'results_finally_DMerc'
 
-ncoils = 5
+ncoils = 6
 R0 = 11.3
-R1 = 2.0
-order = 6
-LENGTH_PENALTY = 1e0
-MAXITER = 50
+R1 = 4.3
+order = 12
+max_length_per_coil = 38
+MAXITER = 550
+
+start_from_sratch = False # True if starting from circular coils, False if starting from a previous optimization
+
+CC_THRESHOLD = 0.7 # Initial 0.7, final 1.0
+CS_THRESHOLD = 1.2 # Initial 1.2, final 1.5
+CURVATURE_THRESHOLD = 1.5 # Initial 1.5, final 1.0
+ALS_THRESHOLD = 1.
+MSC_THRESHOLD = 1.
+
+LENGTH_WEIGHT = 1.
+CC_WEIGHT = 1.
+CS_WEIGHT = 1.
+CURVATURE_WEIGHT = 1.
+MSC_WEIGHT = 1.
+ALS_WEIGHT = 1.
+
+output_interval = 250
 
 nphi = 32
 ntheta = 32
@@ -35,7 +53,7 @@ os.chdir(OUT_DIR)
 vmec_file = os.path.join(OUT_DIR,filename)
 
 # Directory for output
-out_dir = Path("output")
+out_dir = Path("coils")
 out_dir.mkdir(parents=True, exist_ok=True)
 head, tail = os.path.split(vmec_file)
 vc_filename = os.path.join(head, tail.replace('wout', 'vcasing'))
@@ -47,29 +65,71 @@ else:
     print('Running the virtual casing calculation')
     vc = VirtualCasing.from_vmec(vmec_file, src_nphi=vc_src_nphi, trgt_nphi=nphi, trgt_ntheta=ntheta)
 s = SurfaceRZFourier.from_wout(vmec_file, range="half period", nphi=nphi, ntheta=ntheta)
-total_current = Vmec(vmec_file).external_current() / (2 * s.nfp)
-base_curves = create_equally_spaced_curves(ncoils, s.nfp, stellsym=True, R0=R0, R1=R1, order=order, numquadpoints=128)
-base_currents = [Current(total_current / ncoils * 1e-5) * 1e5 for _ in range(ncoils-1)]
-total_current = Current(total_current)
-total_current.fix_all()
-base_currents += [total_current - sum(base_currents)]
+s_full = SurfaceRZFourier.from_wout(vmec_file, range="full torus", nphi=nphi*2*s.nfp, ntheta=ntheta)
+
+if start_from_sratch:
+    total_current = Vmec(vmec_file).external_current() / (2 * s.nfp)
+    base_curves = create_equally_spaced_curves(ncoils, s.nfp, stellsym=True, R0=R0, R1=R1, order=order, numquadpoints=128)
+    base_currents = [Current(total_current / ncoils * 1e-6) * 1e6 for _ in range(ncoils-1)]
+    total_current = Current(total_current)
+    total_current.fix_all()
+    base_currents += [total_current - sum(base_currents)]
+else:
+    bs_initial_file = f"biot_savart_nfp{s.nfp}_{QA_or_QH}_ncoils{ncoils}_order{order}.json"
+    print('Loading initial Biot-Savart object:', bs_initial_file)
+    if os.path.isfile(bs_initial_file):
+        bs_temporary = load(bs_initial_file)
+        base_curves = [bs_temporary.coils[i]._curve for i in range(ncoils)]
+        base_currents = [bs_temporary.coils[i]._current for i in range(ncoils)]
+    else:
+        # output error and exit
+        print(f"Error: {bs_initial_file} does not exist")
+        exit()
+    base_curves = [bs_temporary.coils[i]._curve for i in range(ncoils)]
+    base_currents = [bs_temporary.coils[i]._current for i in range(ncoils)]
+print('base_currents:', [current.get_value()/1e6 for current in base_currents], 'MA')
+# Create the initial coils
+# base_currents[0].fix_all()
 
 coils = coils_via_symmetries(base_curves, base_currents, s.nfp, True)
 bs = BiotSavart(coils)
 
 bs.set_points(s.gamma().reshape((-1, 3)))
+
 curves = [c.curve for c in coils]
 curves_to_vtk(curves, out_dir / "curves_init")
+curves_to_vtk(base_curves, out_dir / "curves_init_half_nfp")
 pointData = {"B_N": np.sum(bs.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)[:, :, None]}
-s.to_vtk(out_dir / "surf_init", extra_data=pointData)
+s.to_vtk(out_dir / "surf_init_half_nfp", extra_data=pointData)
+s_full.to_vtk(out_dir / "surf_init")
 
-Jf = SquaredFlux(s, bs, target=vc.B_external_normal)
+Jf = SquaredFlux(s, bs, target=vc.B_external_normal, definition="local")
 Jls = [CurveLength(c) for c in base_curves]
+Jccdist = CurveCurveDistance(curves, CC_THRESHOLD, num_basecurves=ncoils)
+Jcsdist = CurveSurfaceDistance(curves, s, CS_THRESHOLD)
+Jcs = [LpCurveCurvature(c, 2, CURVATURE_THRESHOLD) for c in base_curves]
+Jmscs = [MeanSquaredCurvature(c) for c in base_curves]
+linkNum = LinkingNumber(curves)
+Jals = [ArclengthVariation(c) for c in base_curves]
+
+J_LENGTH = LENGTH_WEIGHT * sum(QuadraticPenalty(J, max_length_per_coil, "max") for J in Jls)
+J_CC = CC_WEIGHT * Jccdist
+J_CS = CS_WEIGHT * Jcsdist
+J_CURVATURE = CURVATURE_WEIGHT * sum(Jcs)
+J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD) for J in Jmscs)
+J_ALS = ALS_WEIGHT * sum(QuadraticPenalty(J, ALS_THRESHOLD) for J in Jals)
 
 JF = Jf \
-    + LENGTH_PENALTY * sum(QuadraticPenalty(Jls[i], Jls[i].J(), "identity") for i in range(len(base_curves)))
+    + J_LENGTH \
+    + J_CC \
+    + J_ALS \
+    + J_CURVATURE \
+    + J_CS \
+    # + J_MSC \
+    # + linkNum
 
-def fun(dofs):
+def fun(dofs, info={'Nfeval':0}):
+    info['Nfeval'] += 1
     JF.x = dofs
     J = JF.J()
     grad = JF.dJ()
@@ -78,18 +138,44 @@ def fun(dofs):
     BdotN = np.abs(np.sum(Bbs * s.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
     BdotN_mean = np.mean(BdotN)
     BdotN_max = np.max(BdotN)
-    outstr = f"J={J:.1e}, Jf={jf:.1e}, ⟨|B·n|⟩={BdotN_mean:.1e}, max(|B·n|)={BdotN_max:.1e}"
-    cl_string = ", ".join([f"{J.J():.1f}" for J in Jls])
-    outstr += f", Len=sum([{cl_string}])={sum(J.J() for J in Jls):.1f}"
-    outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
+    outstr = f"#{info['Nfeval']} - J={J:.1e}, Jf={jf:.1e}, max(B·n)/B={BdotN_max:.1e}"#, ⟨B·n⟩/B={BdotN_mean:.1e}"
+    cl_string = ",".join([f"{J.J():.1f}" for J in Jls])
+    outstr += f", L=[{cl_string}], "
+    outstr += f'lCC={float(Jccdist.shortest_distance()):.2f}, '
+    outstr += f"lCS={Jcsdist.shortest_distance():.2f}, "
+    # outstr += f", ║∇J║={np.linalg.norm(grad):.1e}, "
+    kap_string = ",".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
+    outstr +=f"k=[{kap_string}], "
+    # msc_string = ",".join(f"{j.J():.1f}" for j in Jmscs)
+    # outstr +=f"msc=[{msc_string}], "
+    outstr +=f"J_L={J_LENGTH.J():.1e}, "
+    outstr +=f"J_CC={J_CC.J():.1e}, "
+    outstr +=f"J_K={J_CURVATURE.J():.1e}, "
+    # outstr +=f"J_MSC={J_MSC.J():.1e}, "
+    outstr +=f"J_ALS={J_ALS.J():.1e}, "
+    outstr +=f"J_CS={J_CS.J():.1e}, "
+    # outstr +=f"Link Number = {linkNum.J()}, "
     print(outstr)
-    return 1e-4*J, 1e-4*grad
+
+    if np.mod(info['Nfeval'],output_interval)==0:
+        curves_to_vtk(curves, out_dir / f"curves_intermediate_{info['Nfeval']}")
+        curves_to_vtk(base_curves, out_dir / f"curves_intermediate_{info['Nfeval']}_half_nfp")
+        s.to_vtk(out_dir / f"surf_intermediate_{info['Nfeval']}_half_nfp", extra_data={"B_N": BdotN[:, :, None]})
+        s_full.x = s.x
+        s_full.to_vtk(out_dir / f"surf_intermediate_{info['Nfeval']}")
+
+    return J, grad
 
 dofs = JF.x
-res = minimize(fun, dofs, jac=True, method='L-BFGS-B', options={'maxiter': MAXITER, 'maxcor': 300, 'ftol': 1e-20, 'gtol': 1e-20}, tol=1e-20)
+res = minimize(fun, dofs, args=({'Nfeval':0},), jac=True, method='L-BFGS-B', options={'maxiter': MAXITER, 'maxcor': 300, 'ftol': 1e-20, 'gtol': 1e-20}, tol=1e-20)
 dofs = res.x
 curves_to_vtk(curves, out_dir / "curves_opt")
+curves_to_vtk(base_curves, out_dir / "curves_opt_half_nfp")
 Bbs = bs.B().reshape((nphi, ntheta, 3))
 BdotN = np.abs(np.sum(Bbs * s.unitnormal(), axis=2) - vc.B_external_normal) / np.linalg.norm(Bbs, axis=2)
 pointData = {"B_N": BdotN[:, :, None]}
-s.to_vtk(out_dir / "surf_opt", extra_data=pointData)
+s.to_vtk(out_dir / "surf_opt_half_nfp", extra_data=pointData)
+s_full.x = s.x
+s_full.to_vtk(out_dir / "surf_opt")
+
+save(bs, out_dir / f"biot_savart_nfp{s.nfp}_{QA_or_QH}_ncoils{ncoils}_order{order}.json")

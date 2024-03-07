@@ -19,7 +19,7 @@ results_folder = 'results_finally_DMerc'
 ncoils = 6
 order = 12
 
-nfieldlines = 12
+nfieldlines = 14
 tmax_fl = 4000 # 20000
 degree = 4
 
@@ -48,7 +48,7 @@ sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.02*R_axis)
 
 def trace_fieldlines(bfield, label):
     t1 = time.time()
-    R0 = np.linspace(0.93*R_axis, 1.01*R_max, nfieldlines)
+    R0 = np.linspace(0.997*R_axis, 0.995*R_max, nfieldlines)
     proc0_print(f"R0={R0}", flush=True)
     Z0 = np.zeros(nfieldlines)
     phis = [(i/4)*(2*np.pi/surf.nfp) for i in range(4)]
@@ -59,8 +59,7 @@ def trace_fieldlines(bfield, label):
     proc0_print(f"Time for fieldline tracing={t2-t1:.3f}s. Num steps={sum([len(l) for l in fieldlines_tys])//nfieldlines}", flush=True)
     if comm_world is None or comm_world.rank == 0:
         # particles_to_vtk(fieldlines_tys, os.path.join(OUT_DIR,f'fieldlines_{label}'))
-        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=150)
-
+        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=150, surf=surf)
 
 # uncomment this to run tracing using the biot savart field (very slow!)
 # trace_fieldlines(bs, 'bs')
@@ -75,7 +74,7 @@ zrange = (0, np.max(zs), n//2)
 def skip(rs, phis, zs):
     rphiz = np.asarray([rs, phis, zs]).T.copy()
     dists = sc_fieldline.evaluate_rphiz(rphiz)
-    skip = list((dists < -0.05*R_axis).flatten())
+    skip = list((dists < -0.05*R_axis*1.5).flatten())
     proc0_print("Skip", sum(skip), "cells out of", len(skip), flush=True)
     return skip
 

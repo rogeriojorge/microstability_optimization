@@ -21,16 +21,40 @@ ncoils = 6
 R0 = 11.3
 R1 = 4.3
 order = 12
-max_length_per_coil = 38
-MAXITER = 550
+MAXITER = 1000
 
 start_from_sratch = False # True if starting from circular coils, False if starting from a previous optimization
 
-CC_THRESHOLD = 0.7 # Initial 0.7, final 1.0
-CS_THRESHOLD = 1.2 # Initial 1.2, final 1.5
-CURVATURE_THRESHOLD = 1.5 # Initial 1.5, final 1.0
-ALS_THRESHOLD = 1.
-MSC_THRESHOLD = 1.
+if start_from_sratch:
+    max_length_per_coil = 30
+    CC_THRESHOLD = 0.5
+    CS_THRESHOLD = 0.6
+    CURVATURE_THRESHOLD = 1.5
+    ALS_THRESHOLD = 0.1
+    MSC_THRESHOLD = 1.
+else:
+    # # copy bs.json file from coils folder to this_path
+    # # First run
+    # max_length_per_coil = 36
+    # CC_THRESHOLD = 0.8
+    # CS_THRESHOLD = 1.1
+    # CURVATURE_THRESHOLD = 1.2
+    # ALS_THRESHOLD = 1.0
+    MSC_THRESHOLD = 1.
+    # # copy again bs.json file from coils folder to this_path
+    # # Second run
+    # max_length_per_coil = 40
+    # CC_THRESHOLD = 0.9
+    # CS_THRESHOLD = 1.3
+    # CURVATURE_THRESHOLD = 1.1
+    # ALS_THRESHOLD = 0.9
+    # copy again bs.json file from coils folder to this_path
+    # Third run
+    max_length_per_coil = 42
+    CC_THRESHOLD = 1.0
+    CS_THRESHOLD = 1.5
+    CURVATURE_THRESHOLD = 1.0
+    ALS_THRESHOLD = 0.8
 
 LENGTH_WEIGHT = 1.
 CC_WEIGHT = 1.
@@ -39,6 +63,7 @@ CURVATURE_WEIGHT = 1.
 MSC_WEIGHT = 1.
 ALS_WEIGHT = 1.
 
+output_intermediate_curves = False
 output_interval = 250
 
 nphi = 32
@@ -116,8 +141,8 @@ J_LENGTH = LENGTH_WEIGHT * sum(QuadraticPenalty(J, max_length_per_coil, "max") f
 J_CC = CC_WEIGHT * Jccdist
 J_CS = CS_WEIGHT * Jcsdist
 J_CURVATURE = CURVATURE_WEIGHT * sum(Jcs)
-J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD) for J in Jmscs)
-J_ALS = ALS_WEIGHT * sum(QuadraticPenalty(J, ALS_THRESHOLD) for J in Jals)
+J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs)
+J_ALS = ALS_WEIGHT * sum(QuadraticPenalty(J, ALS_THRESHOLD, "max") for J in Jals)
 
 JF = Jf \
     + J_LENGTH \
@@ -157,7 +182,7 @@ def fun(dofs, info={'Nfeval':0}):
     # outstr +=f"Link Number = {linkNum.J()}, "
     print(outstr)
 
-    if np.mod(info['Nfeval'],output_interval)==0:
+    if np.mod(info['Nfeval'],output_interval)==0 and output_intermediate_curves==True:
         curves_to_vtk(curves, out_dir / f"curves_intermediate_{info['Nfeval']}")
         curves_to_vtk(base_curves, out_dir / f"curves_intermediate_{info['Nfeval']}_half_nfp")
         s.to_vtk(out_dir / f"surf_intermediate_{info['Nfeval']}_half_nfp", extra_data={"B_N": BdotN[:, :, None]})

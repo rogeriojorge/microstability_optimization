@@ -13,14 +13,15 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 QA_or_QH = "QH"
 beta = 2.5
-filename = 'wout_final.nc'
+filename_wout = 'wout_final.nc'
+filename_input = 'input.final'
 results_folder = 'results_finally_DMerc'
 ncoils = 6
 order = 12
 
-nfieldlines = 3 # 10
-tmax_fl = 10000 # 20000
-degree = 2 # 4
+nfieldlines = 12
+tmax_fl = 4000 # 20000
+degree = 4
 
 prefix_save = 'optimization'
 out_dir_APPENDIX=f"{prefix_save}_{QA_or_QH}_beta{beta:.1f}"
@@ -30,23 +31,25 @@ os.chdir(out_dir)
 OUT_DIR = Path("coils")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-vmec_file = os.path.join(out_dir,filename)
-surf = SurfaceRZFourier.from_wout(filename, nphi=200, ntheta=30, range="full torus")
+vmec_file_input = os.path.join(out_dir,filename_input)
+surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=200, ntheta=30, range="full torus")
 R_max = np.max(surf.gamma()[0,:,0])
-R_axis = np.sum(Vmec(vmec_file).wout.raxis_cc)
+vmec_file_wout = os.path.join(out_dir,filename_wout)
+R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
 
 proc0_print('Loading coils file')
 coils_filename = os.path.join(OUT_DIR,f"biot_savart_nfp{surf.nfp}_{QA_or_QH}_ncoils{ncoils}_order{order}.json")
 bs = load(coils_filename)
 
 proc0_print('Computing surface classifier')
-surf.to_vtk(OUT_DIR / 'surface_for_Poincare')
-sc_fieldline = SurfaceClassifier(surf, h=0.03, p=2)
-sc_fieldline.to_vtk(OUT_DIR / 'levelset', h=0.02)
+surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
+sc_fieldline = SurfaceClassifier(surf, h=0.03*R_axis, p=2)
+sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.02*R_axis)
 
 def trace_fieldlines(bfield, label):
     t1 = time.time()
-    R0 = np.linspace(R_axis, 0.95*R_max, nfieldlines)
+    R0 = np.linspace(0.93*R_axis, 1.01*R_max, nfieldlines)
+    proc0_print(f"R0={R0}", flush=True)
     Z0 = np.zeros(nfieldlines)
     phis = [(i/4)*(2*np.pi/surf.nfp) for i in range(4)]
     fieldlines_tys, fieldlines_phi_hits = compute_fieldlines(
@@ -55,8 +58,8 @@ def trace_fieldlines(bfield, label):
     t2 = time.time()
     proc0_print(f"Time for fieldline tracing={t2-t1:.3f}s. Num steps={sum([len(l) for l in fieldlines_tys])//nfieldlines}", flush=True)
     if comm_world is None or comm_world.rank == 0:
-        particles_to_vtk(fieldlines_tys, OUT_DIR + f'fieldlines_{label}')
-        plot_poincare_data(fieldlines_phi_hits, phis, OUT_DIR + f'poincare_fieldline_{label}.png', dpi=150)
+        # particles_to_vtk(fieldlines_tys, os.path.join(OUT_DIR,f'fieldlines_{label}'))
+        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=150)
 
 
 # uncomment this to run tracing using the biot savart field (very slow!)
@@ -72,7 +75,7 @@ zrange = (0, np.max(zs), n//2)
 def skip(rs, phis, zs):
     rphiz = np.asarray([rs, phis, zs]).T.copy()
     dists = sc_fieldline.evaluate_rphiz(rphiz)
-    skip = list((dists < -0.05).flatten())
+    skip = list((dists < -0.05*R_axis).flatten())
     proc0_print("Skip", sum(skip), "cells out of", len(skip), flush=True)
     return skip
 

@@ -1,47 +1,57 @@
 #!/usr/bin/env python3
 import os
+import re
 import shutil
 import subprocess
 
 QA_or_QH = "QH"
 beta = 2.5
+ne0 = 3  * (beta/100/0.05)**(1/3)
+Te0 = 15 * (beta/100/0.05)**(2/3)
 finite_beta_folder = "/Users/rogeriojorge/local/microstability_optimization/src/util/finite_beta"
 files_to_copy = ['input.namelist', 'job.sfincsScan', 'profiles']
 
-# prefix_save = 'optimization'
-# results_folder = 'results'
-# OUT_DIR_APPENDIX=f"{prefix_save}_{QA_or_QH}"
-# OUT_DIR_APPENDIX+=f'_beta{beta:.1f}'
-# output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
-# this_path = os.path.dirname(os.path.abspath(__file__))
-# OUT_DIR = os.path.join(this_path,results_folder,QA_or_QH,OUT_DIR_APPENDIX)
-OUT_DIR = "/Users/rogeriojorge/local/microstability_optimization/src/finite_beta/zenodo_Matt"
+prefix_save = 'optimization'
+results_folder = 'results'
+OUT_DIR_APPENDIX=f"{prefix_save}_{QA_or_QH}_beta{beta:.1f}"
+this_path = os.path.dirname(os.path.abspath(__file__))
+OUT_DIR = os.path.join(this_path,results_folder,QA_or_QH,OUT_DIR_APPENDIX)
+# OUT_DIR = "/Users/rogeriojorge/local/microstability_optimization/src/finite_beta/zenodo_Matt"
 os.chdir(OUT_DIR)
 
-# Copy necessary files to the output directory
-for filename in files_to_copy:
-    source_path = os.path.join(finite_beta_folder, filename)
-    destination_path = os.path.join(OUT_DIR, filename)
-    try:
-        shutil.copy2(source_path, destination_path)
-        print(f"Successfully copied {filename} from {finite_beta_folder} to {OUT_DIR}")
-    except FileNotFoundError:
-        print(f"File {filename} not found in {finite_beta_folder}")
-    except Exception as e:
-        print(f"Error copying {filename} from {finite_beta_folder} to {OUT_DIR}: {e}")
+def copy_files(source_folder, destination_folder, filenames):
+    for filename in filenames:
+        source_path = os.path.join(source_folder, filename)
+        destination_path = os.path.join(destination_folder, filename)
+        try:
+            shutil.copy2(source_path, destination_path)
+            # print(f"Successfully copied {filename} from {source_folder} to {destination_folder}")
+        except FileNotFoundError: print(f"File {filename} not found in {source_folder}")
+        except Exception as e: print(f"Error copying {filename} from {source_folder} to {destination_folder}: {e}")
 
-def change_equilibrium_file(input_file_path, new_path):
-    backup_path = input_file_path + ".bak"
-    os.rename(input_file_path, backup_path)
-    with open(backup_path, 'r') as backup, open(input_file_path, 'w') as original:
-        original.writelines(line.replace(f'"{line.split()[1]}"', f'"{new_path}"') if 'equilibriumFile' in line else line for line in backup)
+def change_file_content(file_path, replace_dict):
+    backup_path = file_path + ".bak"
+    with open(file_path, 'r') as original, open(backup_path, 'w') as backup:
+        backup.writelines(original.readlines())
+    with open(backup_path, 'r') as backup, open(file_path, 'w') as original:
+        for line in backup:
+            for old_value, new_value in replace_dict.items():
+                if isinstance(new_value, (int, float)):
+                    line = line.replace(str(old_value), f"{new_value:.2f}")
+                else:
+                    line = line.replace(str(old_value), str(new_value))
+            original.write(line)
     os.remove(backup_path)
-# Specify the path to your input.namelist file
-input_file_path = os.path.join(OUT_DIR, "input.namelist")
-# Specify the new path for equilibriumFile
-new_equilibrium_path = os.path.join(OUT_DIR, "wout_final.nc")
-# Call the function to change the equilibriumFile path
-change_equilibrium_file(input_file_path, new_equilibrium_path)
+
+# Copy necessary files to the output directory
+copy_files(finite_beta_folder, OUT_DIR, files_to_copy)
+
+# Change equilibrium file and profiles file content
+equilibrium_replace_dict = {'wout_final.nc': os.path.join(OUT_DIR, "wout_final.nc")}
+profiles_replace_dict = {2.38: ne0, -2.38: -ne0, 9.45: Te0, -9.45: -Te0}
+
+change_file_content(os.path.join(OUT_DIR, "input.namelist"), equilibrium_replace_dict)
+change_file_content(os.path.join(OUT_DIR, "profiles"), profiles_replace_dict)
 
 # Run sfincsScan, sfincsScanPlot_4, and convertSfincsToVmecCurrentProfile
 for script_name in ["sfincsScan", "sfincsScanPlot_4", "convertSfincsToVmecCurrentProfile"]:

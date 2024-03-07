@@ -62,6 +62,8 @@ mpi = MpiPartition()
 
 ne0 = 3e20 * (beta/100/0.05)**(1/3)
 Te0 = 15e3 * (beta/100/0.05)**(2/3)
+# ne0 = 4.13e20
+# Te0 = 12.0e3
 ne = ProfilePolynomial(ne0 * np.array([1, 0, 0, 0, 0, -1.0]))
 Te = ProfilePolynomial(Te0 * np.array([1, -1.0]))
 

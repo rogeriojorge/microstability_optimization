@@ -1,0 +1,2 @@
+export OMP_NUM_THREADS=4
+mpiexec -n 14 ~/local/sfincs/fortran/version3/sfincs &> output

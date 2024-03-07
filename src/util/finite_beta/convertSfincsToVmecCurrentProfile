@@ -348,17 +348,27 @@ if makePDF:
    print("Saving PDF 1")
    plt.savefig("J_dot_B_comparison_1.pdf")
 
-
+plt.rcParams.update({
+    'font.size': 14,        # Adjust the font size
+    'axes.labelsize': 14,   # Adjust the label size
+    'axes.titlesize': 16,   # Adjust the title size
+    'xtick.labelsize': 12,  # Adjust the x-axis tick label size
+    'ytick.labelsize': 12,  # Adjust the y-axis tick label size
+    'axes.linewidth': 1.5,  # Adjust the axes linewidth
+    'lines.linewidth': 2.0, # Adjust the linewidth of plot lines
+})
 plt.figure(figsize=(6,4))
 plt.plot([0,1],[0,0],':k')
 #plt.plot(np.sqrt(s_full), jdotb, '.-b',label='jdotb from VMEC')
-plt.plot(s_full, jdotb, '.-b',label='jdotb from VMEC')
-##plt.plot(s_full, FSABjHat_vmecGrid, '.-r',label='SFINCS output (interpolated to vmec grid)')
-#plt.plot(rN_sfincsGrid, FSABjHat_SI_sfincsGrid, '.-r',label='FSABjHat from sfincs')
-plt.plot(psiN_sfincsGrid, FSABjHat_SI_sfincsGrid, '.-r',label='FSABjHat from sfincs')
-#plt.xlabel('r/a = sqrt(s)')
+# plt.plot(s_full, jdotb, '.-b',label='jdotb from VMEC')
+plt.plot(s_full, jdotb, '.-b', label=r'$\left<\mathbf{J} \cdot \mathbf{B}\right>$ from VMEC')
+# plt.plot(s_full, FSABjHat_vmecGrid, '.-r',label='SFINCS output (interpolated to vmec grid)')
+# plt.plot(rN_sfincsGrid, FSABjHat_SI_sfincsGrid, '.-r',label='FSABjHat from sfincs')
+# plt.plot(psiN_sfincsGrid, FSABjHat_SI_sfincsGrid, '.-r',label='FSABjHat from sfincs')
+plt.plot(psiN_sfincsGrid, FSABjHat_SI_sfincsGrid, '.-r',label=r'$\left<\mathbf{J} \cdot \mathbf{B}\right>$ from sfincs')
+# plt.xlabel('r/a = sqrt(s)')
 plt.xlabel('s')
-plt.ylabel('<J dot B> (SI units)')
+plt.ylabel(r'$\left<\mathbf{J} \cdot \mathbf{B}\right>$ (SI units)')
 plt.legend(loc=0)
 
 plt.tight_layout()

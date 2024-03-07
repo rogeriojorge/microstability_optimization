@@ -6,6 +6,7 @@ home_directory = os.path.expanduser("~")
 
 QA_or_QH = "QH"
 number_of_cores = 14
+Nradius = 31
 beta = 2.5
 ne0 = 3  * (beta/100/0.05)**(1/3)
 Te0 = 15 * (beta/100/0.05)**(2/3)
@@ -48,11 +49,11 @@ def change_file_content(file_path, replace_dict):
 copy_files(finite_beta_folder, OUT_DIR, files_to_copy)
 
 # Change equilibrium file and profiles file content
-equilibrium_replace_dict = {'wout_final.nc': os.path.join(OUT_DIR, "wout_final.nc")}
+equilibrium_nr_replace_dict = {'wout_final.nc': os.path.join(OUT_DIR, "wout_final.nc"), "!ss Nradius = 5": f"!ss Nradius = {Nradius}"}
 profiles_replace_dict = {2.38: ne0, -2.38: -ne0, 9.45: Te0, -9.45: -Te0}
 job_replace_dict = {'mpiexec -n 6': f'mpiexec -n {number_of_cores}'}
 
-change_file_content(os.path.join(OUT_DIR, "input.namelist"), equilibrium_replace_dict)
+change_file_content(os.path.join(OUT_DIR, "input.namelist"), equilibrium_nr_replace_dict)
 change_file_content(os.path.join(OUT_DIR, "profiles"), profiles_replace_dict)
 change_file_content(os.path.join(OUT_DIR, "job.sfincsScan"), job_replace_dict)
 

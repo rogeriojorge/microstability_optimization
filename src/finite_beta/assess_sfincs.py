@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 import os
-import re
 import shutil
 import subprocess
+home_directory = os.path.expanduser("~")
 
 QA_or_QH = "QH"
 number_of_cores = 14
 beta = 2.5
 ne0 = 3  * (beta/100/0.05)**(1/3)
 Te0 = 15 * (beta/100/0.05)**(2/3)
-finite_beta_folder = "/Users/rogeriojorge/local/microstability_optimization/src/util/finite_beta"
+finite_beta_folder = f'{home_directory}/local/microstability_optimization/src/util/finite_beta'
 files_to_copy = ['input.namelist', 'job.sfincsScan', 'profiles']
 
 prefix_save = 'optimization'
@@ -17,7 +17,7 @@ results_folder = 'results'
 OUT_DIR_APPENDIX=f"{prefix_save}_{QA_or_QH}_beta{beta:.1f}"
 this_path = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(this_path,results_folder,QA_or_QH,OUT_DIR_APPENDIX)
-# OUT_DIR = "/Users/rogeriojorge/local/microstability_optimization/src/finite_beta/zenodo_Matt"
+# OUT_DIR = f'{home_directory}/local/microstability_optimization/src/finite_beta/zenodo_Matt'
 os.chdir(OUT_DIR)
 
 def copy_files(source_folder, destination_folder, filenames):

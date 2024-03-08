@@ -386,7 +386,7 @@ def AspectRatioPen(vmec,t=10):
     return pen
 
 # Penalizes the configuration's maximum elongation
-def MaxElongationPen(vmec,t=6.0,ntheta=14,nphi=6):
+def MaxElongationPen(vmec,t=6.0,ntheta=14,nphi=6, print_all=False):
     """
     Penalizes the configuration's maximum elongation (e_max) if it exceeds some threshold (t).
     Specifically, if e_max > t, then output (e_max - t). Else, output zero.
@@ -584,9 +584,12 @@ def MaxElongationPen(vmec,t=6.0,ntheta=14,nphi=6):
     # Penalize maximum elongation
     # print("Max Elongation =",np.max(elongs))
     # print("Mean Elongation =",np.mean(elongs))
-    e = np.max(elongs)
-    pen = np.max([0,e-t])
-    return pen
+    if print_all == True:
+        return elongs
+    else:
+        e = np.max(elongs)
+        pen = np.max([0,e-t])
+        return pen
     # return elongs/len(elongs)
 
 # Finds unit normal vector of plane defined by points a, b, and c

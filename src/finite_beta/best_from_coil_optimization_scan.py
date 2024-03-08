@@ -46,9 +46,10 @@ df = df[df["max_max_curvature"] < 50]
 #########################################################
 
 succeeded = df["linking_number"] < 0.1
-succeeded = np.logical_and(succeeded, df["coil_coil_distance"] > 0.9)
+succeeded = np.logical_and(succeeded, df["coil_coil_distance"] > 0.85)
 succeeded = np.logical_and(succeeded, df["Jf"] < 5e-3)
-succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 4)
+succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 1.5)
+succeeded = np.logical_and(succeeded, df["max_mean_squared_curvature"] < 0.3)
 succeeded = np.logical_and(succeeded, df["coil_surface_distance"] > 1.1)
 succeeded = np.logical_and(succeeded, df["length"] < 240)
 

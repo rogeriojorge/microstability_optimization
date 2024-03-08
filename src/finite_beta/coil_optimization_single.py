@@ -33,29 +33,7 @@ if start_from_sratch:
     CURVATURE_THRESHOLD = 1.5
     ALS_THRESHOLD = 0.1
 else:
-    # # copy bs.json file from coils folder to this_path
-    # # First run
-    # max_length_per_coil = 33
-    # CC_THRESHOLD = 0.8
-    # CS_THRESHOLD = 1.1
-    # CURVATURE_THRESHOLD = 1.2
-    # ALS_THRESHOLD = 1.0
-    # # copy again bs.json file from coils folder to this_path
-    # # Second run
-    # max_length_per_coil = 36
-    # CC_THRESHOLD = 0.9
-    # CS_THRESHOLD = 1.3
-    # CURVATURE_THRESHOLD = 1.1
-    # ALS_THRESHOLD = 0.8
-    # # copy again bs.json file from coils folder to this_path
-    # # Third run
-    # max_length_per_coil = 39
-    # CC_THRESHOLD = 0.9
-    # CS_THRESHOLD = 1.4
-    # CURVATURE_THRESHOLD = 1.1
-    # ALS_THRESHOLD = 0.6
-    # copy again bs.json file from coils folder to this_path
-    # fourth run
+    # copy bs.json file from coils folder to this_path
     max_length_per_coil = 41
     CC_THRESHOLD = 0.90
     CS_THRESHOLD = 1.4

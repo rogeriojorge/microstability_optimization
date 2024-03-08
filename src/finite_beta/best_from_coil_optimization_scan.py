@@ -48,7 +48,7 @@ for results_file in results:
 succeeded = df["linking_number"] < 0.1
 succeeded = np.logical_and(succeeded, df["coil_coil_distance"] > 0.8)
 succeeded = np.logical_and(succeeded, df["Jf"] < 6e-3)
-succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 4)
+succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 6)
 succeeded = np.logical_and(succeeded, df["coil_surface_distance"] > 1.0)
 succeeded = np.logical_and(succeeded, df["length"] < 250)
 

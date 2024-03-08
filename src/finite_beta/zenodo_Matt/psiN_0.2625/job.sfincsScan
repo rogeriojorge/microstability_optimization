@@ -1,2 +1,0 @@
-export OMP_NUM_THREADS=4
-mpiexec -n 14 ~/local/sfincs/fortran/version3/sfincs -mat_mumps_icntl_23 1000 &> output

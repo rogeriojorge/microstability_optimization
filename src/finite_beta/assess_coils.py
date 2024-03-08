@@ -17,9 +17,9 @@ filename_wout = 'wout_final.nc'
 filename_input = 'input.final'
 results_folder = 'results'
 ncoils = 6
-order = 12
+order = 9
 
-nfieldlines = 14
+nfieldlines = 13
 tmax_fl = 4000 # 20000
 degree = 4
 

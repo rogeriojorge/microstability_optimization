@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script runs coil optimizations, one after another, choosing the weights
 # and target values from a random distribution. This is effectively a crude form
@@ -34,16 +34,19 @@ R1_mean = 4.4
 R1_std = 0.3
 min_length_per_coil = 31
 max_length_per_coil = 44
-min_curvature = 0.1
-max_curvature = 1.5
-CC_min = 0.5
-CC_max = 1.5
-# CS_THRESHOLD = 0.3
-# CS_WEIGHT = 10
+min_curvature = 0.6
+max_curvature = 5
+CC_min = 0.4
+CC_max = 1.1
+order_min = 6
+order_max = 16
 # surface and virtual casing resolution
 nphi = 32
 ntheta = 32
 vc_src_nphi = 80
+# not using coil-surface distance
+CS_THRESHOLD = 0.3
+CS_WEIGHT = 10
 
 # Directories
 prefix_save = 'optimization'
@@ -149,7 +152,7 @@ def run_optimization(
     Jf = SquaredFlux(surf, bs, target=vc.B_external_normal, definition="local")
     Jls = [CurveLength(c) for c in base_curves]
     Jccdist = CurveCurveDistance(curves, cc_threshold, num_basecurves=ncoils)
-    # Jcsdist = CurveSurfaceDistance(curves, s, CS_THRESHOLD)
+    Jcsdist = CurveSurfaceDistance(curves, surf, CS_THRESHOLD)
     Jcs = [LpCurveCurvature(c, 2, max_curvature_threshold) for c in base_curves]
     Jmscs = [MeanSquaredCurvature(c) for c in base_curves]
 
@@ -251,6 +254,7 @@ def run_optimization(
         "iterations": res.nit,
         "function_evaluations": res.nfev,
         "coil_currents": [c.get_value() for c in base_currents],
+        "coil_surface_distance":  float(Jcsdist.shortest_distance()),
     }
 
     with open(new_OUT_DIR + "results.json", "w") as outfile:
@@ -273,7 +277,7 @@ for index in range(10000):
     R1 = np.random.rand() * R1_std + R1_mean
 
     # Number of Fourier modes describing each Cartesian component of each coil:
-    order = int(np.round(rand(4, 16)))
+    order = int(np.round(rand(order_min, order_max)))
 
     # Target length (per coil!) and weight for the length term in the objective function:
     length_target = rand(min_length_per_coil, max_length_per_coil)

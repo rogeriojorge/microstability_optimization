@@ -1,0 +1,56 @@
+{
+  "nfp": 4,
+  "R0": 11.34443056562854,
+  "R1": 4.727945026540678,
+  "ncoils": 4,
+  "order": 14,
+  "nphi": 32,
+  "ntheta": 32,
+  "length_target": 35.870451554009435,
+  "length_weight": 0.1992567200432452,
+  "max_curvature_threshold": 7.7947366298243,
+  "max_curvature_weight": 0.00017046000594305284,
+  "msc_threshold": 2.6218153607053765,
+  "msc_weight": 5.004911039469154e-05,
+  "JF": 0.0005234332540046794,
+  "Jf": 0.0005232952752249773,
+  "BdotN": 0.004526183840960252,
+  "lengths": [
+    36.90090755979285,
+    35.90389945290743,
+    35.8420231374775,
+    34.83549239505309
+  ],
+  "length": 143.48232254523086,
+  "max_curvatures": [
+    7.318380364587588,
+    6.777856603425606,
+    7.089219485813039,
+    7.677603176504302
+  ],
+  "max_max_curvature": 7.677603176504302,
+  "coil_coil_distance": 0.6713788811065028,
+  "cc_threshold": 0.6718375722024247,
+  "cc_weight": 16.527011273647258,
+  "gradient_norm": 0.002468878951094968,
+  "linking_number": 0,
+  "directory": "ncoils_4_order_14_R1_4.7_length_target_3.6e+01_weight_0.2_max_curvature_7.8_weight_0.00017_msc_2.6_weight_5e-05_cc_0.67_weight_1.7e+01",
+  "mean_squared_curvatures": [
+    0.39918678821164266,
+    0.3050513419732678,
+    0.3533087628032512,
+    0.5298769176123702
+  ],
+  "max_mean_squared_curvature": 0.5298769176123702,
+  "message": "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT",
+  "success": false,
+  "iterations": 700,
+  "function_evaluations": 773,
+  "coil_currents": [
+    12126485.579770349,
+    12073807.892059771,
+    12226350.146391552,
+    12154771.099867411
+  ],
+  "coil_surface_distance": 1.411690125427689
+}

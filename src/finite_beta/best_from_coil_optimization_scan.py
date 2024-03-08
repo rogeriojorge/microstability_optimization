@@ -46,9 +46,9 @@ for results_file in results:
 #########################################################
 
 succeeded = df["linking_number"] < 0.1
-succeeded = np.logical_and(succeeded, df["coil_coil_distance"] > 0.5)
+succeeded = np.logical_and(succeeded, df["coil_coil_distance"] > 0.6)
 succeeded = np.logical_and(succeeded, df["Jf"] < 1e-2)
-succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 8)
+succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 6)
 succeeded = np.logical_and(succeeded, df["coil_surface_distance"] > 0.8)
 
 #########################################################
@@ -57,7 +57,7 @@ succeeded = np.logical_and(succeeded, df["coil_surface_distance"] > 0.8)
 
 df_filtered = df[succeeded]
 
-pareto_mask = paretoset(df_filtered[["Jf", "max_max_curvature", "coil_coil_distance", "coil_surface_distance"]], sense=[min, min, max, max])
+pareto_mask = paretoset(df_filtered[["Jf", "max_max_curvature", "coil_coil_distance", "coil_surface_distance", "length"]], sense=[min, min, max, max, min])
 df_pareto = df_filtered[pareto_mask]
 
 print("Best Pareto-optimal results:")

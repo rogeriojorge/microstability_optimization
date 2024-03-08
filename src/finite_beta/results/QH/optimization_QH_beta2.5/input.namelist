@@ -2,7 +2,7 @@
 ! See the user manual for documentation of the parameters in this file.
 !----------------------------------------------------------------------
 
-!ss scanType = 4
+!ss scanType = 1
 
 !ss profilesScheme = 2
 !ss Nradius = 31
@@ -34,10 +34,10 @@
 /
 
 &speciesParameters
-  nHats = 4.1286784 4.1286784 ! Set by sfincsScan_4.
-  dnHatdrHats = -0.17557787376066025 -0.17557787376066025 ! Set by sfincsScan_4.
-  THats = 9.600000000000001 9.600000000000001 ! Set by sfincsScan_4.
-  dTHatdrHats = -63.76920354503406 -63.76920354503406 ! Set by sfincsScan_4.
+  nHats = 2.379940777984 2.379940777984 ! Set by sfincsScan_4.
+  dnHatdrHats = -0.0009876722647919767 -0.0009876722647919767 ! Set by sfincsScan_4.
+  THats = 8.315999999999999 8.315999999999999 ! Set by sfincsScan_4.
+  dTHatdrHats = -3.782445867003588 -3.782445867003588 ! Set by sfincsScan_4.
   Zs = 1 -1
   mHats = 1 0.000545509d+0
 /

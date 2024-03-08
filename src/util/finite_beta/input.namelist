@@ -34,10 +34,10 @@
 /
 
 &speciesParameters
-  nHats = 4.1286784 4.1286784 ! Set by sfincsScan_4.
-  dnHatdrHats = -0.17557787376066025 -0.17557787376066025 ! Set by sfincsScan_4.
-  THats = 9.600000000000001 9.600000000000001 ! Set by sfincsScan_4.
-  dTHatdrHats = -63.76920354503406 -63.76920354503406 ! Set by sfincsScan_4.
+  nHats = 2.379940777984 2.379940777984 ! Set by sfincsScan_4.
+  dnHatdrHats = -0.0009876722647919767 -0.0009876722647919767 ! Set by sfincsScan_4.
+  THats = 8.315999999999999 8.315999999999999 ! Set by sfincsScan_4.
+  dTHatdrHats = -3.782445867003588 -3.782445867003588 ! Set by sfincsScan_4.
   Zs = 1 -1
   mHats = 1 0.000545509d+0
 /
@@ -61,22 +61,22 @@
   Ntheta = 25 ! Set by sfincsScan_1.
 !ss NthetaMinFactor = 1
 !ss NthetaMaxFactor = 2
-!ss NthetaNumRuns = 3
+!ss NthetaNumRuns = 2
 
   Nzeta = 39 ! Set by sfincsScan_1.
 !ss NzetaMinFactor = 1
 !ss NzetaMaxFactor = 2
-!ss NzetaNumRuns = 3
+!ss NzetaNumRuns = 2
 
   Nxi = 60 ! Set by sfincsScan_1.
 !ss NxiMinFactor = 1
-!ss NxiMaxFactor = 1.05
+!ss NxiMaxFactor = 2
 !ss NxiNumRuns = 4
   
   Nx = 7 ! Set by sfincsScan_1.
 !ss NxMinFactor = 1
 !ss NxMaxFactor = 2
-!ss NxNumRuns = 4
+!ss NxNumRuns = 2
 
   solverTolerance = 1e-05 ! Set by sfincsScan_1.
 !ss solverToleranceMinFactor = 0.01

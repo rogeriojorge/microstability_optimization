@@ -21,6 +21,7 @@ from simsopt.mhd.bootstrap import RedlGeomBoozer, VmecRedlBootstrapMismatch, j_d
 this_path = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(1, os.path.join(this_path, '..', 'util'))
 import vmecPlot2 # pylint: disable=import-error
+from qi_functions import MaxElongationPen
 start_time = time.time()
 
 parser = argparse.ArgumentParser()
@@ -32,6 +33,7 @@ MAXITER = 50
 optimize_well = True
 optimize_DMerc = True
 optimize_shear = True
+optimize_elongation = False
 plot_result = True
 max_modes = [2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5]
 
@@ -51,6 +53,9 @@ iota_min_QH = 1.05
 iota_Weight = 1e2
 well_Weight = 1e5
 DMerc_Weight = 1e17
+elongation_target = 6
+elongation_weight = 1e-2
+# Should we target a max/min elongation?
 opt_method = 'trf'#'lm'
 DMerc_fraction = 0.50 # The starting radius of the Mercier criterion minimum find (0<...<1)
 
@@ -101,6 +106,7 @@ def DMerc_min_objective(vmec): return np.min((np.min(vmec.wout.DMerc[int(len(vme
 def magnetic_well_objective(vmec): return np.min((vmec.vacuum_well(),0))
 def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH=='QA' else iota_min_QH),0))
 def shear_objective(vmec): return np.min((np.abs(vmec.mean_shear())-(shear_min_QA if QA_or_QH=='QA' else shear_min_QH),0))
+def elongation_objective(vmec): return MaxElongationPen(vmec,t=6.0,ntheta=16,nphi=6,print_all=True)
 
 minor_radius_optimizable =  make_optimizable(minor_radius_objective, vmec)
 volavgB_optimizable      =  make_optimizable(volavgB_objective, vmec)
@@ -108,6 +114,7 @@ DMerc_optimizable        =  make_optimizable(DMerc_min_objective, vmec)
 magnetic_well_optimizable = make_optimizable(magnetic_well_objective, vmec)
 iota_min_optimizable    =   make_optimizable(iota_min_objective, vmec)
 shear_optimizable       =   make_optimizable(shear_objective, vmec)
+elongation_optimizable  =   make_optimizable(elongation_objective, vmec)
 
 # Define quasisymmetry objective:
 helicity_n = -1 if QA_or_QH == 'QH' else 0
@@ -208,6 +215,7 @@ for step, max_mode in enumerate(max_modes):
     if optimize_well:  opt_tuple.append((magnetic_well_optimizable.J, 0.0, well_Weight))
     if optimize_DMerc: opt_tuple.append((DMerc_optimizable.J, 0.0, DMerc_Weight))
     if optimize_shear: opt_tuple.append((shear_optimizable.J, 0.0, shear_weight))
+    if optimize_elongation: opt_tuple.append((elongation_optimizable.J, elongation_target, elongation_weight))
 
     prob = LeastSquaresProblem.from_tuples(opt_tuple)
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import sys
 import numpy as np
@@ -51,8 +52,12 @@ def compute_kappa(wout_path):
 
 if __name__ == '__main__':
     # wout_path = os.path.join('/mnt', 'HSX_Database', 'HSX_Configs', 'main_coil_0', 'set_1', 'job_0', 'wout_HSX_main_opt0.nc')
-    wout_path = '/Users/rogeriojorge/local/microstability_optimization/src/finite_beta/results/QH/optimization_QH_beta2.5/wout_final.nc'
+    home_directory = os.path.expanduser("~")
+    wout_path = f'{home_directory}/local/microstability_optimization/src/finite_beta/results/QH/optimization_QH_beta2.5/wout_final.nc'
+    import time
+    start=time.time()
     shapes = compute_kappa(wout_path)
-    print(shapes)
-    elong = np.max(1/np.array(MaxElongationPen(Vmec(wout_path),t=6.0,ntheta=16,nphi=6,print_all=True)))
-    print(elong)
+    print(f'kappa={shapes} took {time.time()-start}s')
+    start=time.time()
+    elong = np.array(MaxElongationPen(Vmec(wout_path),t=6.0,ntheta=16,nphi=6,print_all=True))
+    print(f'elong={elong} took {time.time()-start}')

@@ -5,8 +5,8 @@ import subprocess
 home_directory = os.path.expanduser("~")
 
 QA_or_QH = "QH"
-number_of_cores = 4
-Nradius = 31
+number_of_cores = 14
+Nradius = 5
 beta = 2.5
 ne0 = 3  * (beta/100/0.05)**(1/3)
 Te0 = 15 * (beta/100/0.05)**(2/3)
@@ -21,7 +21,6 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(this_path,results_folder,QA_or_QH,OUT_DIR_APPENDIX)
 OUT_DIR = os.path.join(OUT_DIR,sfincs_result_folder)
 os.makedirs(OUT_DIR, exist_ok=True)
-# OUT_DIR = f'{home_directory}/local/microstability_optimization/src/finite_beta/zenodo_Matt'
 os.chdir(OUT_DIR)
 
 def copy_files(source_folder, destination_folder, filenames):
@@ -60,17 +59,17 @@ change_file_content(os.path.join(OUT_DIR, "input.namelist"), equilibrium_nr_repl
 change_file_content(os.path.join(OUT_DIR, "profiles"), profiles_replace_dict)
 change_file_content(os.path.join(OUT_DIR, "job.sfincsScan"), job_replace_dict)
 
-# # Run sfincsScan, sfincsScanPlot_4, and convertSfincsToVmecCurrentProfile
-# for script_name in ["sfincsScan", "sfincsScanPlot_4", "convertSfincsToVmecCurrentProfile"]:
-#     script_path = os.path.join(finite_beta_folder, script_name)
-#     command = ["python", script_path]
-#     try:
-#         subprocess.run(command, check=True)
-#         print(f"Successfully ran {script_name}")
-#     except subprocess.CalledProcessError as e: print(f"Error running {script_name}: {e}")
+# Run sfincsScan, sfincsScanPlot_4, and convertSfincsToVmecCurrentProfile
+for script_name in ["sfincsScan", "sfincsScanPlot_4", "convertSfincsToVmecCurrentProfile"]:
+    script_path = os.path.join(finite_beta_folder, script_name)
+    command = ["python", script_path]
+    try:
+        subprocess.run(command, check=True)
+        print(f"Successfully ran {script_name}")
+    except subprocess.CalledProcessError as e: print(f"Error running {script_name}: {e}")
 
-# run sfuncsScan again but now replace in the input.namelist file !ss scanType = 4 to !ss scanType = 1
+# run sfuncsScan for convergence and plot - replace in the input.namelist file !ss scanType = 4 to !ss scanType = 1
 change_file_content(os.path.join(OUT_DIR, "input.namelist"), {'!ss scanType = 4': '!ss scanType = 1'})
 try: subprocess.run(["python", os.path.join(finite_beta_folder, "sfincsScan")], check=True)
-except subprocess.CalledProcessError as e: exit()#print(f"Error running sfincsScan: {e}")
-# subprocess.run(["python", os.path.join(finite_beta_folder, "sfincsScanPlot_1")], check=True)
+except subprocess.CalledProcessError as e: print(f"Error running sfincsScan: {e}")
+subprocess.run(["python", os.path.join(finite_beta_folder, "sfincsScanPlot_1")], check=True)

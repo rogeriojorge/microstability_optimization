@@ -57,7 +57,7 @@ elongation_target = 6
 elongation_weight = 1e-2
 # Should we target a max/min elongation?
 opt_method = 'trf'#'lm'
-DMerc_fraction = 0.50 # The starting radius of the Mercier criterion minimum find (0<...<1)
+DMerc_fraction = 0.40 # The starting radius of the Mercier criterion minimum find (0<...<1)
 
 # Set up Vmec object
 home_directory = os.path.expanduser("~")

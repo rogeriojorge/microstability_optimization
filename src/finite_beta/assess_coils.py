@@ -5,8 +5,9 @@ import numpy as np
 from pathlib import Path
 from simsopt import load
 from simsopt.mhd.vmec import Vmec
-from simsopt.field import (InterpolatedField, SurfaceClassifier, particles_to_vtk,
-                           compute_fieldlines, LevelsetStoppingCriterion, plot_poincare_data)
+from simsopt.field import (InterpolatedField, SurfaceClassifier, particles_to_vtk, 
+                           compute_fieldlines, LevelsetStoppingCriterion, plot_poincare_data,
+                           coils_to_focus, coils_to_makegrid)
 from simsopt.geo import SurfaceRZFourier
 from simsopt.util import proc0_print, comm_world
 this_path = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +31,9 @@ os.makedirs(out_dir, exist_ok=True)
 os.chdir(out_dir)
 OUT_DIR = Path("coils")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
-
+# OUT_DIR="potential_coils_n4_k0.87_L145_msc0.28_cc0.89_cs1.29_order11"
+# OUT_DIR="potential_coils_n5_k1.07_L177_msc0.27_cc1.09_cs1.12_order12"
+# OUT_DIR="potential_coils_n6_k1.43_L211_msc0.2_cc0.88_cs1.11_order9"
 vmec_file_input = os.path.join(out_dir,filename_input)
 surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=200, ntheta=30, range="full torus")
 R_max = np.max(surf.gamma()[0,:,0])
@@ -38,8 +41,19 @@ vmec_file_wout = os.path.join(out_dir,filename_wout)
 R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
 
 proc0_print('Loading coils file')
-coils_filename = os.path.join(OUT_DIR,f"biot_savart_nfp{surf.nfp}_{QA_or_QH}_ncoils{ncoils}_order{order}.json")
-bs = load(coils_filename)
+try:
+    coils_filename = os.path.join(OUT_DIR,f"biot_savart_nfp{surf.nfp}_{QA_or_QH}_ncoils{ncoils}_order{order}.json")
+    bs = load(coils_filename)
+except:
+    coils_filename = os.path.join(OUT_DIR,f"biot_savart.json")
+    bs = load(coils_filename)
+    print('Using default file name for coils - biot_savart.json')
+
+coils = bs.coils
+base_curves = [coils[i]._curve for i in range(ncoils)]
+base_currents = [coils[i]._current for i in range(ncoils)]
+coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,base_currents,nfp=surf.nfp, stellsym=True)
+coils_to_focus(os.path.join(OUT_DIR,"coils_focus_format.txt"),curves=[coil._curve for coil in coils],currents=[coil._current for coil in coils],nfp=surf.nfp,stellsym=True)
 
 proc0_print('Computing surface classifier')
 surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))

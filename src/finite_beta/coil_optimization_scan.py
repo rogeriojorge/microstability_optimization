@@ -29,17 +29,17 @@ beta = 2.5
 filename = 'wout_final.nc'
 results_folder = 'results'
 ncoils = 6
-MAXITER = 500
-R1_mean = 4.4
-R1_std = 0.3
+MAXITER = 700
+R1_mean = 4.2
+R1_std = 0.7
 min_length_per_coil = 31
 max_length_per_coil = 44
 min_curvature = 0.6
 max_curvature = 5
-CC_min = 0.4
+CC_min = 0.5
 CC_max = 1.1
 order_min = 6
-order_max = 16
+order_max = 15
 # surface and virtual casing resolution
 nphi = 32
 ntheta = 32
@@ -285,7 +285,7 @@ for index in range(10000):
 
     # Threshold and weight for the curvature penalty in the objective function:
     max_curvature_threshold = rand(min_curvature, max_curvature)
-    max_curvature_weight = 10.0 ** rand(-7, -4)
+    max_curvature_weight = 10.0 ** rand(-6, -4)
 
     # Threshold and weight for the mean squared curvature penalty in the objective function:
     msc_threshold = rand(min_curvature, max_curvature)

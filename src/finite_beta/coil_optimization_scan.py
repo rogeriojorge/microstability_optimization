@@ -30,9 +30,9 @@ filename = 'wout_final.nc'
 results_folder = 'results'
 ncoils = 3
 MAXITER = 700
-R1_mean = 4.2
-R1_std = 0.8
-min_length_per_coil = 30
+R1_mean = 4.1
+R1_std = 0.9
+min_length_per_coil = 28
 max_length_per_coil = 47
 min_curvature = 0.6
 max_curvature = 8
@@ -280,11 +280,11 @@ for index in range(10000):
 
     # Target length (per coil!) and weight for the length term in the objective function:
     length_target = rand(min_length_per_coil, max_length_per_coil)
-    length_weight = 10.0 ** rand(-1, 1)
+    length_weight = 10.0 ** rand(-2, 2)
 
     # Threshold and weight for the curvature penalty in the objective function:
-    max_curvature_threshold = rand(min_curvature, max_curvature)
-    max_curvature_weight = 10.0 ** rand(-6, -4)
+    max_curvature_threshold = rand(0.1*min_curvature, max_curvature)
+    max_curvature_weight = 10.0 ** rand(-6, -2)
 
     # Threshold and weight for the mean squared curvature penalty in the objective function:
     msc_threshold = rand(min_curvature, max_curvature)
@@ -292,7 +292,7 @@ for index in range(10000):
 
     # Threshold and weight for the coil-to-coil distance penalty in the objective function:
     cc_threshold = rand(CC_min, CC_max)
-    cc_weight = 10.0 ** rand(-1, 4)
+    cc_weight = 10.0 ** rand(-2, 3)
 
     run_optimization(
         R1,

@@ -1,43 +1,42 @@
 &INDATA
-!----- Runtime Parameters -----
-  DELT =   9.00E-01
-  NITER = 10000
-  NSTEP =  200
-  TCON0 =   2.00E+00
-  NS_ARRAY    =      21
-  NITER_ARRAY =    4500
-  FTOL_ARRAY  = 1.0E-12
-  PRECON_TYPE = 'none'
-  PREC2D_THRESHOLD =   1.000000E-19
-!----- Grid Parameters -----
-  LASYM = F
-  NFP = 0002
-  MPOL = 5
-  NTOR = 5
-  PHIEDGE =    0.08385727554
-!----- Free Boundary Parameters -----
-  LFREEB = F
-  NVACSKIP =    6
-!----- Pressure Parameters -----
-  GAMMA =    0.000000000000E+000
-  BLOAT =    1.000000000000E+000
-  SPRES_PED =    1.000000000000E+000
-  PRES_SCALE =    1.000000000000E+000
-  PMASS_TYPE = 'power_series'
-  AM =   000000000E+00
-!----- Current/Iota Parameters -----
-  CURTOR =  0
-  NCURR = 1
-  PIOTA_TYPE = 'power_series'
-  PCURR_TYPE = 'power_series'
-!----- Axis Parameters ----- 
-  RAXIS_CC = 0
-  ZAXIS_CS = 0
-!----- Boundary Parameters -----
-! n comes before m!
+! This file created by simsopt on March 18 2024, 10:28:16
+
+! ---- Geometric parameters ----
+NFP = 2
+LASYM = F
+
+! ---- Resolution parameters ----
+MPOL = 5
+NTOR = 5
+NTHETA = 16
+NZETA = 14
+NS_ARRAY    =     21
+NITER_ARRAY =   3200
+FTOL_ARRAY  =  1e-13
+
+! ---- Boundary toroidal flux ----
+PHIEDGE = 0.08385727554
+
+! ---- Pressure profile specification ----
+PMASS_TYPE = "power_series"
+AM = 0.0 
+PRES_SCALE = 1.0
+
+! ---- Profile specification of iota or current ----
+NCURR = 1
+CURTOR = 0.0
+PCURR_TYPE = "power_series"
+AC = 0.0 
+
+! ---- Other numerical parameters ----
+DELT = 0.9
+NSTEP = 200
+
+! ---- Boundary shape. Array index order is (n, m) ----
 RBC(   0,   0) =  1.000000000000000e+00,    ZBS(   0,   0) =  0.000000000000000e+00
-RBC(   1,   0) =  1.264085134961103e-01,    ZBS(   1,   0) = -1.427724523177978e-01
-RBC(  -1,   1) =  1.576688641942363e-02,    ZBS(  -1,   1) = -1.124131249186369e-03
-RBC(   0,   1) =  9.871502287630185e-02,    ZBS(   0,   1) =  1.354907058573178e-01
-RBC(   1,   1) = -4.059025302275945e-02,    ZBS(   1,   1) = -1.121965826843162e-01
+RBC(   1,   0) =  1.373620255533681e-01,    ZBS(   1,   0) = -1.094725554135983e-01
+RBC(  -1,   1) =  2.047583863317104e-03,    ZBS(  -1,   1) = -7.859866507868591e-03
+RBC(   0,   1) =  8.312687305495080e-02,    ZBS(   0,   1) =  1.462662001752150e-01
+RBC(   1,   1) = -1.830266623459906e-02,    ZBS(   1,   1) = -1.051788334422686e-01
 /
+

@@ -21,13 +21,13 @@ parent_path = str(Path(__file__).parent.resolve())
 os.chdir(parent_path)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
-parser.add_argument("--ncoils", type=int, default=3)
+parser.add_argument("--ncoils", type=int, default=2)
 args = parser.parse_args()
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
 MAXITER_stage_2 = 150
-MAXITER_single_stage = 15
+MAXITER_single_stage = 10
 max_mode_array = [1]*3 + [2]*3 + [3]*3 + [4]*3
 if args.type == 1: QA_or_QH = 'simple'
 elif args.type == 2: QA_or_QH = 'QA'
@@ -38,7 +38,7 @@ else: raise ValueError('Invalid type')
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
 nmodes_coils = 2
-maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 5}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
 aspect_ratio_target = 7.0
 CC_THRESHOLD = 0.2
 LENGTH_THRESHOLD = 3.6

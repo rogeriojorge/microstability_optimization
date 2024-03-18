@@ -23,12 +23,12 @@ os.chdir(parent_path)
 ##########################################################################################
 MAXITER_stage_2 = 200
 MAXITER_single_stage = 20
-max_mode_array = [1]*5 + [2]*5 + [3]*5
+max_mode_array = [1]*5 + [2]*5 + [3]*5 + [4]*5
 QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = 3
-nmodes_coils = 1
-maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5}
+nmodes_coils = 2
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
 aspect_ratio_target = 7.0
 CC_THRESHOLD = 0.2
 LENGTH_THRESHOLD = 3.6
@@ -36,15 +36,16 @@ CURVATURE_THRESHOLD = 10
 MSC_THRESHOLD = 22
 nphi_VMEC = 32
 ntheta_VMEC = 32
-coils_objective_weight = 1e+3
+coils_objective_weight = 3e+2
 aspect_ratio_weight = 1
 ftol = 1e-2
 diff_method = "forward"
 R0 = 1.0
 R1 = 0.45
 mirror_weight = 1
-iota_QA_simple = 0.41
-weight_iota = 1e1
+iota_min_QA = 0.27
+iota_min_QH = 0.65
+weight_iota = 1e2
 elongation_weight = 1
 nquadpoints = 100
 # iota_QI = -0.71
@@ -227,8 +228,13 @@ for max_mode in max_mode_array:
     surf.fix("rc(0,0)")
     number_vmec_dofs = int(len(surf.x))
     objective_tuple = [(vmec.aspect, aspect_ratio_target, aspect_ratio_weight)]
-    if QA_or_QH in ['QA', 'simple']:
-        objective_tuple.append((vmec.mean_iota, iota_QA_simple, weight_iota))
+    
+    def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
+    iota_min_optimizable = make_optimizable(iota_min_objective, vmec)
+    objective_tuple.append((iota_min_optimizable.J, 0, weight_iota))
+    
+    # if QA_or_QH in ['QA', 'simple']:
+    #     objective_tuple.append((vmec.mean_iota, iota_QA_simple, weight_iota))
     if QA_or_QH in ['QA', 'QH']:
         qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if QA_or_QH == 'QH' else 0)
         objective_tuple.append((qs.residuals, 0, 1))

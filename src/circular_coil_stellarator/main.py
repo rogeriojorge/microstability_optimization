@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import argparse
 import numpy as np
 from pathlib import Path
 from functools import partial
@@ -18,15 +19,24 @@ from qi_functions import QuasiIsodynamicResidual, MaxElongationPen, MirrorRatioP
 mpi = MpiPartition()
 parent_path = str(Path(__file__).parent.resolve())
 os.chdir(parent_path)
+parser = argparse.ArgumentParser()
+parser.add_argument("--type", type=int, default=1)
+parser.add_argument("--ncoils", type=int, default=3)
+args = parser.parse_args()
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
 MAXITER_stage_2 = 200
 MAXITER_single_stage = 20
 max_mode_array = [1]*5 + [2]*5 + [3]*5 + [4]*5
-QA_or_QH = 'simple' # QA, QH, QI or simple
+if args.type == 1: QA_or_QH = 'simple'
+elif args.type == 2: QA_or_QH = 'QA'
+elif args.type == 3: QA_or_QH = 'QH'
+elif args.type == 4: QA_or_QH = 'QI'
+else: raise ValueError('Invalid type')
+# QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
-ncoils = 3
+ncoils = args.ncoils # 3
 nmodes_coils = 2
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
 aspect_ratio_target = 7.0
@@ -104,7 +114,7 @@ surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=s
 # base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
 base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
 base_currents = [Current(1) * 1e5 for _ in range(ncoils)]
-# base_currents[0].fix_all()
+base_currents[0].fix_all()
 ##########################################################################################
 ##########################################################################################
 # Save initial surface and coil data

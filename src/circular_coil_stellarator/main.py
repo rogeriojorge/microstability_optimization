@@ -24,25 +24,24 @@ os.chdir(parent_path)
 MAXITER_stage_2 = 150
 MAXITER_single_stage = 10
 max_mode_array = [1]*4 + [2]*4
-QA_or_QH = 'QI'
+QA_or_QH = 'QA'
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = 2
-maxmodes_mpol_mapping = {1: 5, 2: 5}
+nmodes_coils = 1
+maxmodes_mpol_mapping = {1: 3, 2: 5}
 aspect_ratio_target = 7.0
 CC_THRESHOLD = 0.08
-LENGTH_THRESHOLD = 3.3
+LENGTH_THRESHOLD = 3.4
 CURVATURE_THRESHOLD = 10
-MSC_THRESHOLD = 10
+MSC_THRESHOLD = 22
 nphi_VMEC = 26
 ntheta_VMEC = 26
-numquadpoints = 80
-nmodes_coils = 1
 coils_objective_weight = 1e+3
 aspect_ratio_weight = 1
 ftol = 1e-2
 diff_method = "forward"
 R0 = 1.0
-R1 = 0.6
+R1 = 0.45
 mirror_weight = 1
 iota_QA = 0.41
 weight_iota = 1
@@ -51,13 +50,12 @@ elongation_weight = 1
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-6
 finite_difference_rel_step = 1e-3
-JACOBIAN_THRESHOLD = 100
-LENGTH_CON_WEIGHT = 0.1  # Weight on the quadratic penalty for the curve length
-LENGTH_WEIGHT = 1e-8  # Weight on the curve lengths in the objective function
+JACOBIAN_THRESHOLD = 2e4
+LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
-CURVATURE_WEIGHT = 1e-3  # Weight for the curvature penalty in the objective function
-MSC_WEIGHT = 1e-3  # Weight for the mean squared curvature penalty in the objective function
-ARCLENGTH_WEIGHT = 1e-9  # Weight for the arclength variation penalty in the objective function
+CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
+MSC_WEIGHT = 1e-5  # Weight for the mean squared curvature penalty in the objective function
+# ARCLENGTH_WEIGHT = 1e-9  # Weight for the arclength variation penalty in the objective function
 ######################################
 ##### QI FUNCTIONS #####
 ######################################
@@ -101,8 +99,8 @@ surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=s
 ##########################################################################################
 ##########################################################################################
 #Stage 2
-# base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=128)
-base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=numquadpoints)
+# base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils)
+base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils)
 base_currents = [Current(1) * 1e5 for _ in range(ncoils)]
 # base_currents[0].fix_all()
 ##########################################################################################
@@ -133,14 +131,14 @@ Jccdist = CurveCurveDistance(curves, CC_THRESHOLD, num_basecurves=len(curves))
 Jcs = [LpCurveCurvature(c, 2, CURVATURE_THRESHOLD) for i, c in enumerate(base_curves)]
 Jmscs = [MeanSquaredCurvature(c) for c in base_curves]
 Jals = [ArclengthVariation(c) for c in base_curves]
-J_LENGTH = LENGTH_WEIGHT * sum(Jls)
+# J_LENGTH = LENGTH_WEIGHT * sum(Jls)
 J_CC = CC_WEIGHT * Jccdist
 J_CURVATURE = CURVATURE_WEIGHT * sum(Jcs)
-J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD) for i, J in enumerate(Jmscs))
+J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs)
 J_ALS = ARCLENGTH_WEIGHT * sum(Jals)
-J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum([QuadraticPenalty(Jls[i], LENGTH_THRESHOLD) for i in range(len(base_curves))])
+J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * QuadraticPenalty(sum(Jls), LENGTH_THRESHOLD * ncoils)
 linkNum = LinkingNumber(curves)
-JF = Jf + J_CC + J_LENGTH + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + linkNum
+JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + linkNum
 ##########################################################################################
 proc0_print('  Starting optimization')
 ##########################################################################################

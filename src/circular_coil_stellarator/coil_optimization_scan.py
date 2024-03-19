@@ -22,9 +22,10 @@ parser.add_argument("--type", type=int, default=1)
 parser.add_argument("--ncoils", type=int, default=2)
 args = parser.parse_args()
 
-if args.type == 1: QA_or_QH = 'QA'
-elif args.type == 2: QA_or_QH = 'QH'
-elif args.type == 3: QA_or_QH = 'QI'
+if args.type == 1: QA_or_QH = 'simple'
+elif args.type == 2: QA_or_QH = 'QA'
+elif args.type == 3: QA_or_QH = 'QH'
+elif args.type == 4: QA_or_QH = 'QI'
 else: raise ValueError('Invalid type')
 
 ncoils = args.ncoils

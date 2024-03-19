@@ -27,9 +27,9 @@ args = parser.parse_args()
 ############## Input parameters
 ##########################################################################################
 MAXITER_stage_2 = 200
-MAXITER_single_stage = 15
+MAXITER_single_stage = 20
 MAXFEV_single_stage = 30
-max_mode_array = [3]*6# + [2]*3 + [3]*3 + [4]*3
+max_mode_array = [1]*6 + [2]*6 + [3]*6 + [4]*6
 if args.type == 1: QA_or_QH = 'simple'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
@@ -38,32 +38,33 @@ else: raise ValueError('Invalid type')
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
-nmodes_coils = 3
+nmodes_coils = 6
 maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 5}
-aspect_ratio_target = 7.0
+aspect_ratio_target = 6.0
 CC_THRESHOLD = 0.2
-LENGTH_THRESHOLD = 3.4
+LENGTH_THRESHOLD = 3.5
 CURVATURE_THRESHOLD = 10
 MSC_THRESHOLD = 22
 nphi_VMEC = 32
 ntheta_VMEC = 32
-coils_objective_weight = 3e+2
+coils_objective_weight = 1e+3
 aspect_ratio_weight = 1
 ftol = 1e-2
 diff_method = "forward"
 R0 = 1.0
-R1 = 0.45
+R1 = 0.70
 mirror_weight = 1e-3
-iota_min_QA = 0.15
+quasisymmetry_weight = 1e-3
+iota_min_QA = 0.21
 iota_min_QH = 0.53
-weight_iota = 5e1
+weight_iota = 1e3
 elongation_weight = 1
-nquadpoints = 100
+nquadpoints = 120
 # iota_QI = -0.71
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 1e-4
-JACOBIAN_THRESHOLD = 50
+JACOBIAN_THRESHOLD = 65
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
 CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
@@ -240,9 +241,9 @@ for max_mode in max_mode_array:
     surf.fix("rc(0,0)")
     number_vmec_dofs = int(len(surf.x))
     
-    def aspect_ratio_min_objective(vmec): return np.min((vmec.aspect()-aspect_ratio_target,0))
-    aspect_ratio_min_optimizable = make_optimizable(aspect_ratio_min_objective, vmec)
-    objective_tuple = [(aspect_ratio_min_optimizable.J, 0, aspect_ratio_weight)]
+    def aspect_ratio_max_objective(vmec): return np.max((vmec.aspect()-aspect_ratio_target,0))
+    aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
+    objective_tuple = [(aspect_ratio_max_optimizable.J, 0, aspect_ratio_weight)]
     
     def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
     iota_min_optimizable = make_optimizable(iota_min_objective, vmec)
@@ -252,7 +253,7 @@ for max_mode in max_mode_array:
     #     objective_tuple.append((vmec.mean_iota, iota_QA_simple, weight_iota))
     if QA_or_QH in ['QA', 'QH']:
         qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if QA_or_QH == 'QH' else 0)
-        objective_tuple.append((qs.residuals, 0, 1))
+        objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
     if QA_or_QH == 'QI':
         qi = make_optimizable(optQI, vmec)
         optElongation = make_optimizable(partial_MaxElongationPen, vmec)

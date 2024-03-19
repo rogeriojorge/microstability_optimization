@@ -26,9 +26,10 @@ args = parser.parse_args()
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
-MAXITER_stage_2 = 150
-MAXITER_single_stage = 10
-max_mode_array = [1]*3 + [2]*3 + [3]*3 + [4]*3
+MAXITER_stage_2 = 100
+MAXITER_single_stage = 15
+MAXFEV_single_stage = 30
+max_mode_array = [2]*6# + [2]*3 + [3]*3 + [4]*3
 if args.type == 1: QA_or_QH = 'simple'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
@@ -37,8 +38,8 @@ else: raise ValueError('Invalid type')
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
-nmodes_coils = 2
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
+nmodes_coils = 3
+maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 5}
 aspect_ratio_target = 7.0
 CC_THRESHOLD = 0.2
 LENGTH_THRESHOLD = 3.6
@@ -52,17 +53,17 @@ ftol = 1e-2
 diff_method = "forward"
 R0 = 1.0
 R1 = 0.45
-mirror_weight = 1
-iota_min_QA = 0.27
-iota_min_QH = 0.65
-weight_iota = 1e2
+mirror_weight = 1e-3
+iota_min_QA = 0.15
+iota_min_QH = 0.53
+weight_iota = 5e1
 elongation_weight = 1
 nquadpoints = 100
 # iota_QI = -0.71
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-finite_difference_abs_step = 1e-6
-finite_difference_rel_step = 1e-3
-JACOBIAN_THRESHOLD = 100
+finite_difference_abs_step = 1e-7
+finite_difference_rel_step = 1e-4
+JACOBIAN_THRESHOLD = 30
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
 CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
@@ -148,7 +149,7 @@ J_CC = CC_WEIGHT * Jccdist
 J_CURVATURE = CURVATURE_WEIGHT * sum(Jcs)
 J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs)
 # J_ALS = ARCLENGTH_WEIGHT * sum(Jals)
-J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * QuadraticPenalty(sum(Jls), LENGTH_THRESHOLD * ncoils)
+J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum(QuadraticPenalty(J, LENGTH_THRESHOLD, "max") for J in Jls)
 linkNum = LinkingNumber(curves)
 JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + linkNum
 ##########################################################################################
@@ -167,10 +168,11 @@ def fun_coils(dofss, info):
     if mpi.proc0_world:
         jf = Jf.J()
         Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
-        BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
-        BdotN = np.mean(np.abs(BdotN_surf))
+        # BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
+        # BdotN = np.mean(np.abs(BdotN_surf))
+        BdotN = np.max(np.abs((np.sum(Bbs * surf.unitnormal(), axis=2)) / np.linalg.norm(Bbs, axis=2)))
         # BdotNmax = np.max(np.abs(BdotN_surf))
-        outstr = f"fun_coils#{info['Nfeval']} - J={J:.1e}, Jf={jf:.1e}, ⟨B·n⟩={BdotN:.1e}"  # , B·n max={BdotNmax:.1e}"
+        outstr = f"fun_coils#{info['Nfeval']} - J={J:.1e}, Jf={jf:.1e}, max⟨B·n⟩/B={BdotN:.1e}"  # , B·n max={BdotNmax:.1e}"
         outstr += f", ║∇J coils║={np.linalg.norm(JF.dJ()):.1e}, C-C-Sep={Jccdist.shortest_distance():.2f}"
         cl_string = ", ".join([f"{j.J():.1f}" for j in Jls])
         kap_string = ", ".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
@@ -267,7 +269,7 @@ for max_mode in max_mode_array:
     proc0_print(f"Squared flux before optimization: {Jf.J()}")
     proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
     if comm_world.rank == 0:
-        res = minimize(fun_coils, dofs[:-number_vmec_dofs], jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
+        res = minimize(fun_coils, dofs[:-number_vmec_dofs], jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-7)
         dofs[:-number_vmec_dofs] = res.x
     mpi.comm_world.Bcast(dofs, root=0)
     JF.x = dofs[:-number_vmec_dofs]
@@ -291,7 +293,7 @@ for max_mode in max_mode_array:
     dofs = np.concatenate((JF.x, vmec.x))
     with MPIFiniteDifference(prob.objective, mpi, diff_method=diff_method, abs_step=finite_difference_abs_step, rel_step=finite_difference_rel_step) as prob_jacobian:
         if mpi.proc0_world:
-            res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage}, tol=ftol)
+            res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'maxfev': MAXFEV_single_stage, 'gtol': ftol, 'ftol': ftol}, tol=ftol)
     mpi.comm_world.Bcast(dofs, root=0)
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)

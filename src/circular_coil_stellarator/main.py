@@ -26,10 +26,10 @@ args = parser.parse_args()
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
-MAXITER_stage_2 = 100
+MAXITER_stage_2 = 200
 MAXITER_single_stage = 15
 MAXFEV_single_stage = 30
-max_mode_array = [2]*6# + [2]*3 + [3]*3 + [4]*3
+max_mode_array = [3]*6# + [2]*3 + [3]*3 + [4]*3
 if args.type == 1: QA_or_QH = 'simple'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
@@ -42,7 +42,7 @@ nmodes_coils = 3
 maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 5}
 aspect_ratio_target = 7.0
 CC_THRESHOLD = 0.2
-LENGTH_THRESHOLD = 3.6
+LENGTH_THRESHOLD = 3.4
 CURVATURE_THRESHOLD = 10
 MSC_THRESHOLD = 22
 nphi_VMEC = 32
@@ -63,7 +63,7 @@ nquadpoints = 100
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 1e-4
-JACOBIAN_THRESHOLD = 30
+JACOBIAN_THRESHOLD = 50
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
 CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
@@ -239,7 +239,10 @@ for max_mode in max_mode_array:
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")
     number_vmec_dofs = int(len(surf.x))
-    objective_tuple = [(vmec.aspect, aspect_ratio_target, aspect_ratio_weight)]
+    
+    def aspect_ratio_min_objective(vmec): return np.min((vmec.aspect()-aspect_ratio_target,0))
+    aspect_ratio_min_optimizable = make_optimizable(aspect_ratio_min_objective, vmec)
+    objective_tuple = [(aspect_ratio_min_optimizable.J, 0, aspect_ratio_weight)]
     
     def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
     iota_min_optimizable = make_optimizable(iota_min_objective, vmec)

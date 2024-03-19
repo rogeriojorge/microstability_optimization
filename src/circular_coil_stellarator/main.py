@@ -34,12 +34,13 @@ if args.type == 1: QA_or_QH = 'simple'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
 elif args.type == 4: QA_or_QH = 'QI'
+elif args.type == 5: QA_or_QH = 'simple_nfp3'
 else: raise ValueError('Invalid type')
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
 nmodes_coils = 6
-maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 5}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
 aspect_ratio_target = 6.0
 CC_THRESHOLD = 0.2
 LENGTH_THRESHOLD = 3.5
@@ -259,7 +260,7 @@ for max_mode in max_mode_array:
         optElongation = make_optimizable(partial_MaxElongationPen, vmec)
         optMirror = make_optimizable(partial_MirrorRatioPen, vmec)
         # objective_tuple.append((vmec.mean_iota, iota_QI, weight_iota))
-        objective_tuple.append((qi.J, 0, 1))
+        objective_tuple.append((qi.J, 0, quasisymmetry_weight))
         objective_tuple.append((optElongation.J, 0, elongation_weight))
         objective_tuple.append((optMirror.J, 0, mirror_weight))
     prob = LeastSquaresProblem.from_tuples(objective_tuple)

@@ -35,13 +35,14 @@ elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
 elif args.type == 4: QA_or_QH = 'QI'
 elif args.type == 5: QA_or_QH = 'simple_nfp3'
+elif args.type == 6: QA_or_QH = 'simple_nfp2'
 else: raise ValueError('Invalid type')
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
 nmodes_coils = 6
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
-aspect_ratio_target = 6.0
+aspect_ratio_target = 7.0
 CC_THRESHOLD = 0.2
 LENGTH_THRESHOLD = 3.5
 CURVATURE_THRESHOLD = 10
@@ -65,7 +66,7 @@ nquadpoints = 120
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 1e-4
-JACOBIAN_THRESHOLD = 65
+JACOBIAN_THRESHOLD = 300
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
 CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function

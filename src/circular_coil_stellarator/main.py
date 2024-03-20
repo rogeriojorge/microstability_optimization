@@ -34,13 +34,13 @@ MAXITER_stage_2 = 250
 MAXITER_single_stage = 15
 MAXFEV_single_stage = 23
 LENGTH_THRESHOLD = 2.4
-max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4
+max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*0 + [5]*4
 nmodes_coils = 2
 aspect_ratio_target = 6
 JACOBIAN_THRESHOLD = 30
-aspect_ratio_weight = 5e-2  # 2e-2 for nfp3
-iota_min_QA = 0.15 # 0.13 for nfp3
-iota_min_QH = 0.15 # 0.13 for nfp3
+aspect_ratio_weight = 6e-2  # 2e-2 for nfp3
+iota_min_QA = 0.21 # 0.13 for nfp3
+iota_min_QH = 0.21 # 0.13 for nfp3
 maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6}
 coils_objective_weight = 8e+2
 if args.type == 1: QA_or_QH = 'simple_nfp1'
@@ -259,10 +259,11 @@ for iteration, max_mode in enumerate(max_mode_array):
     aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
     objective_tuple = [(aspect_ratio_max_optimizable.J, 0, aspect_ratio_weight)]
     
-    def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
+    # def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
+    def iota_min_objective(vmec): return np.min((np.mean(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
     iota_min_optimizable = make_optimizable(iota_min_objective, vmec)
     objective_tuple.append((iota_min_optimizable.J, 0, weight_iota))
-    
+
     # if QA_or_QH in ['QA', 'simple']:
     #     objective_tuple.append((vmec.mean_iota, iota_QA_simple, weight_iota))
     if QA_or_QH in ['QA', 'QH']:

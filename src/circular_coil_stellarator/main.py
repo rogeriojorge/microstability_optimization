@@ -7,6 +7,7 @@ from functools import partial
 from scipy.optimize import minimize
 from simsopt import make_optimizable
 from simsopt._core.derivative import Derivative
+from simsopt.solve import least_squares_mpi_solve
 from simsopt.mhd import Vmec, QuasisymmetryRatioResidual
 from simsopt.util import MpiPartition, proc0_print, comm_world
 from simsopt._core.finite_difference import MPIFiniteDifference
@@ -26,10 +27,17 @@ args = parser.parse_args()
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
-MAXITER_stage_2 = 200
-MAXITER_single_stage = 20
+optimize_stage_1_with_coils = False
+MAXITER_stage_1 = 15
+MAXITER_stage_2 = 250
+MAXITER_single_stage = 10
 MAXFEV_single_stage = 30
-max_mode_array = [1]*0 + [2]*0 + [3]*6 + [4]*6
+max_mode_array = [1]*6 + [2]*6 + [3]*6 + [4]*0
+nmodes_coils = 4
+aspect_ratio_target = 10 # 7.5
+JACOBIAN_THRESHOLD = 250
+iota_min_QA = 0.11
+iota_min_QH = 0.11
 if args.type == 1: QA_or_QH = 'simple'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
@@ -41,33 +49,28 @@ else: raise ValueError('Invalid type')
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
-nmodes_coils = 1
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
-aspect_ratio_target = 7.0
 CC_THRESHOLD = 0.2
 LENGTH_THRESHOLD = 3.5
 CURVATURE_THRESHOLD = 10
 MSC_THRESHOLD = 22
 nphi_VMEC = 32
 ntheta_VMEC = 32
-coils_objective_weight = 1e+3
-aspect_ratio_weight = 1
+coils_objective_weight = 1e+4
+aspect_ratio_weight = 0.1
 ftol = 1e-2
 diff_method = "forward"
 R0 = 1.0
 R1 = 0.70
 mirror_weight = 1e-3
 quasisymmetry_weight = 1e-3
-iota_min_QA = 0.21
-iota_min_QH = 0.53
 weight_iota = 1e3
 elongation_weight = 1
 nquadpoints = 120
 # iota_QI = -0.71
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-finite_difference_abs_step = 1e-7
-finite_difference_rel_step = 1e-4
-JACOBIAN_THRESHOLD = 30
+finite_difference_abs_step = 1e-6
+finite_difference_rel_step = 1e-3
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
 CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
@@ -233,7 +236,9 @@ def fun(dofs, prob_jacobian=None, info={'Nfeval': 0}):
 ## Perform optimization
 #############################################################
 ##########################################################################################
-for max_mode in max_mode_array:
+max_mode_previous = 0
+free_coil_dofs_all = JF.dofs_free_status
+for iteration, max_mode in enumerate(max_mode_array):
     proc0_print(f'###############################################')
     proc0_print(f'  Performing optimization for max_mode={max_mode}')
     proc0_print(f'###############################################')
@@ -274,15 +279,44 @@ for max_mode in max_mode_array:
     if QA_or_QH in ['QA', 'QH']: proc0_print(f"Quasisymmetry objective before optimization: {qs.total()}")
     proc0_print(f"Magnetic well before optimization: {vmec.vacuum_well()}")
     proc0_print(f"Squared flux before optimization: {Jf.J()}")
+    
     proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
     if comm_world.rank == 0:
-        res = minimize(fun_coils, dofs[:-number_vmec_dofs], jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-7)
+        JF.full_unfix(free_coil_dofs_all)
+        print(f'   Len(dofs) of JF={len(JF.x)}')
+        print(f'   Len dofs to stage 2={len(dofs[:-number_vmec_dofs])}')
+        # print(f'   grad J ')
+        res = minimize(fun_coils, dofs[:-number_vmec_dofs], jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
+        print(f'   Len(res.x)={len(res.x)}')
         dofs[:-number_vmec_dofs] = res.x
     mpi.comm_world.Bcast(dofs, root=0)
     JF.x = dofs[:-number_vmec_dofs]
     bs.set_points(surf.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
+        
+    if optimize_stage_1_with_coils:
+        def JF_objective(vmec):
+            bs.set_points(vmec.boundary.gamma().reshape((-1, 3)))
+            return JF.J()
+        JF_objective_optimizable = make_optimizable(JF_objective, vmec)
+        Jf_residual = JF_objective_optimizable.J()
+        prob_residual = prob.objective()
+        new_Jf_weight = 1e3*prob_residual/Jf_residual
+        objective_tuples_with_coils = tuple(objective_tuple)+tuple([(JF_objective_optimizable.J, 0, new_Jf_weight)])
+        prob_with_coils = LeastSquaresProblem.from_tuples(objective_tuples_with_coils)
+        proc0_print(f'  Performing stage 1 optimization with coils with ~{MAXITER_stage_1} iterations')
+        free_coil_dofs_all = JF.dofs_free_status
+        JF.fix_all()
+        least_squares_mpi_solve(prob_with_coils, mpi, grad=True, rel_step=1e-5, abs_step=1e-7, max_nfev=MAXITER_stage_1)
+        JF.full_unfix(free_coil_dofs_all)
+        
+    mpi.comm_world.Bcast(dofs, root=0)
+    JF.x = dofs[:-number_vmec_dofs]
+    bs.set_points(surf.gamma().reshape((-1, 3)))
+    Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
+    BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
+
     if comm_world.rank == 0:
         curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_after_stage2_maxmode{max_mode}"))
         curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_after_stage2_maxmode{max_mode}"))

@@ -38,9 +38,9 @@ max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*2 + [5]*4 + [6]*4
 nmodes_coils = 2
 aspect_ratio_target = 5
 JACOBIAN_THRESHOLD = 30
-aspect_ratio_weight = 8e-2
-iota_min_QA = 0.28 # 0.13 for nfp3 # 0.29 for nfp4
-iota_min_QH = 0.28 # 0.13 for nfp3 # 0.29 for nfp4
+aspect_ratio_weight = 6e-2 # 4e-2 for nfp3 # 6e-2 for nfp4
+iota_min_QA = 0.29 # 0.16 for nfp3 # 0.29 for nfp4
+iota_min_QH = 0.29 # 0.16 for nfp3 # 0.29 for nfp4
 maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 6}
 coils_objective_weight = 8e+2
 if args.type == 1: QA_or_QH = 'simple_nfp1'

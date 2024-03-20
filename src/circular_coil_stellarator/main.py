@@ -27,38 +27,41 @@ args = parser.parse_args()
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
+use_previous_coils = True
 optimize_stage_1_with_coils = False
-MAXITER_stage_1 = 15
+MAXITER_stage_1 = 25
 MAXITER_stage_2 = 250
-MAXITER_single_stage = 10
-MAXFEV_single_stage = 30
-max_mode_array = [1]*6 + [2]*6 + [3]*6 + [4]*0
-nmodes_coils = 4
-aspect_ratio_target = 10 # 7.5
-JACOBIAN_THRESHOLD = 250
-iota_min_QA = 0.11
-iota_min_QH = 0.11
-if args.type == 1: QA_or_QH = 'simple'
+MAXITER_single_stage = 15
+MAXFEV_single_stage = 23
+LENGTH_THRESHOLD = 2.4
+max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4
+nmodes_coils = 2
+aspect_ratio_target = 6
+JACOBIAN_THRESHOLD = 30
+aspect_ratio_weight = 5e-2  # 2e-2 for nfp3
+iota_min_QA = 0.15 # 0.13 for nfp3
+iota_min_QH = 0.15 # 0.13 for nfp3
+maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6}
+coils_objective_weight = 8e+2
+if args.type == 1: QA_or_QH = 'simple_nfp1'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
 elif args.type == 4: QA_or_QH = 'QI'
-elif args.type == 5: QA_or_QH = 'simple_nfp3'
-elif args.type == 6: QA_or_QH = 'simple_nfp2'
-elif args.type == 7: QA_or_QH = 'simple_nfp2_nice'
+elif args.type == 5: QA_or_QH = 'simple_nfp2'
+elif args.type == 6: QA_or_QH = 'simple_nfp3'
+elif args.type == 7: QA_or_QH = 'simple_nfp4'
+elif args.type == 8: QA_or_QH = 'simple_nfp5'
+elif args.type == 9: QA_or_QH = 'simple_nfp6'
 else: raise ValueError('Invalid type')
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5}
-CC_THRESHOLD = 0.2
-LENGTH_THRESHOLD = 3.5
+CC_THRESHOLD = 0.13
 CURVATURE_THRESHOLD = 10
 MSC_THRESHOLD = 22
-nphi_VMEC = 32
-ntheta_VMEC = 32
-coils_objective_weight = 1e+4
-aspect_ratio_weight = 0.1
-ftol = 1e-2
+nphi_VMEC = 26
+ntheta_VMEC = 26
+ftol = 1e-3
 diff_method = "forward"
 R0 = 1.0
 R1 = 0.70
@@ -69,8 +72,8 @@ elongation_weight = 1
 nquadpoints = 120
 # iota_QI = -0.71
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
-finite_difference_abs_step = 1e-6
-finite_difference_rel_step = 1e-3
+finite_difference_abs_step = 1e-7
+finite_difference_rel_step = 1e-4
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
 CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
@@ -123,12 +126,12 @@ surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=s
 base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
 base_currents = [Current(1) * 1e5 for _ in range(ncoils)]
 base_currents[0].fix_all()
-##########################################################################################
-##########################################################################################
-# Save initial surface and coil data
 coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, True)
 curves = [c.curve for c in coils]
 bs = BiotSavart(coils)
+##########################################################################################
+##########################################################################################
+# Save initial surface and coil data
 bs.set_points(surf.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
 BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
@@ -192,6 +195,9 @@ def fun_coils(dofss, info):
 ## The function fun defined below is used to optimize the coils and the surface together.
 def fun(dofs, prob_jacobian=None, info={'Nfeval': 0}):
     info['Nfeval'] += 1
+    J = prob.objective() + coils_objective_weight * JF.J()
+    if info['Nfeval'] > MAXFEV_single_stage and J < JACOBIAN_THRESHOLD:
+        return J, [0] * len(dofs)
     JF.x = dofs[:-number_vmec_dofs]
     prob.x = dofs[-number_vmec_dofs:]
     bs.set_points(surf.gamma().reshape((-1, 3)))
@@ -205,7 +211,7 @@ def fun(dofs, prob_jacobian=None, info={'Nfeval': 0}):
         grad_with_respect_to_surface = [0] * number_vmec_dofs
         grad_with_respect_to_coils = [0] * len(JF.x)
     else:
-        proc0_print(f"fun#{info['Nfeval']}: Objective function = {J:.4f}")
+        proc0_print(f"fun#{info['Nfeval']}: Objective function = {J}")
         prob_dJ = prob_jacobian.jac(prob.x)
         ## Finite differences for the second-stage objective function
         coils_dJ = JF.dJ()
@@ -302,13 +308,13 @@ for iteration, max_mode in enumerate(max_mode_array):
         JF_objective_optimizable = make_optimizable(JF_objective, vmec)
         Jf_residual = JF_objective_optimizable.J()
         prob_residual = prob.objective()
-        new_Jf_weight = 1e3*prob_residual/Jf_residual
+        new_Jf_weight = (prob_residual/Jf_residual)**2
         objective_tuples_with_coils = tuple(objective_tuple)+tuple([(JF_objective_optimizable.J, 0, new_Jf_weight)])
         prob_with_coils = LeastSquaresProblem.from_tuples(objective_tuples_with_coils)
         proc0_print(f'  Performing stage 1 optimization with coils with ~{MAXITER_stage_1} iterations')
         free_coil_dofs_all = JF.dofs_free_status
         JF.fix_all()
-        least_squares_mpi_solve(prob_with_coils, mpi, grad=True, rel_step=1e-5, abs_step=1e-7, max_nfev=MAXITER_stage_1)
+        least_squares_mpi_solve(prob_with_coils, mpi, grad=True, rel_step=1e-5, abs_step=1e-7, max_nfev=MAXITER_stage_1, ftol=1e-04, xtol=1e-04, gtol=1e-04)
         JF.full_unfix(free_coil_dofs_all)
         
     mpi.comm_world.Bcast(dofs, root=0)

@@ -8,10 +8,10 @@ from simsopt.mhd.vmec import Vmec
 from simsopt.geo import QfmResidual, QfmSurface, SurfaceRZFourier, ToroidalFlux, Area, Volume
 this_path = os.path.dirname(os.path.abspath(__file__))
 
-filename_wout = f'wout_maxmode3_highres.nc'
-filename_input = f'input.example'
-results_folder = f'optimization_simple_nfp2_nice'
-coils_file = f'biot_savart_maxmode3.json'
+filename_wout = f'wout_final.nc'
+filename_input = f'input.final'
+results_folder = f'optimization_simple_nfp4'
+coils_file = f'biot_savart_maxmode4.json'
 ncoils = 2
 
 mpol = 2

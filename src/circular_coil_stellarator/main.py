@@ -38,12 +38,13 @@ else: raise ValueError('Invalid type')
 ############## Input parameters
 ##########################################################################################
 use_previous_coils = True
-optimize_stage_1_with_coils = False
+optimize_stage_1_with_coils = True
+planar_coils = True
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 250
 MAXITER_single_stage = 15
-MAXFEV_single_stage = 19
-LENGTH_THRESHOLD = 2.5
+MAXFEV_single_stage = 21
+LENGTH_THRESHOLD = 3.5
 max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*4
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 4
@@ -71,7 +72,9 @@ quasisymmetry_weight = 1e-3
 weight_iota = 1e3
 elongation_weight = 1
 nquadpoints = 120
-# iota_QI = -0.71
+directory = f'optimization_{QA_or_QH}_ncoils{ncoils}'
+if planar_coils: directory += '_planar'
+else: directory += '_nonplanar'
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 1e-4
@@ -98,7 +101,6 @@ partial_MaxElongationPen = partial(MaxElongationPen,t=maximum_elongation)
 partial_MirrorRatioPen = partial(MirrorRatioPen,t=maximum_mirror)
 ##########################################################################################
 ##########################################################################################
-directory = 'optimization_'+QA_or_QH
 vmec_verbose = False
 # Create output directories
 this_path = os.path.join(parent_path, directory)
@@ -123,8 +125,10 @@ surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=s
 ##########################################################################################
 ##########################################################################################
 #Stage 2
-# base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
-base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
+if planar_coils:
+    base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
+else:
+    base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
 base_currents = [Current(1) * 1e5 for _ in range(ncoils)]
 base_currents[0].fix_all()
 coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, True)

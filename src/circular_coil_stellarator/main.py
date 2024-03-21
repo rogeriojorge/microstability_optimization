@@ -44,8 +44,8 @@ MAXITER_stage_1 = 10
 MAXITER_stage_2 = 250
 MAXITER_single_stage = 15
 MAXFEV_single_stage = 21
-LENGTH_THRESHOLD = 3.1
-max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*4
+LENGTH_THRESHOLD = 2.8
+max_mode_array = [1]*0 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*4
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 4
 aspect_ratio_target = 5
@@ -55,7 +55,7 @@ iota_min_QA = 0.343 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_
 iota_min_QH = 0.343 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
 maxmodes_mpol_mapping = {1: 5, 2: 6, 3: 6, 4: 7, 5: 7, 6: 7}
 coils_objective_weight = 1e+3
-CC_THRESHOLD = 0.06
+CC_THRESHOLD = 0.1
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3

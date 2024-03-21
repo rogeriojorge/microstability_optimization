@@ -14,12 +14,12 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_simple_nfp2'
-coils_file = f'biot_savart_maxmode2.json'
+results_folder = f'optimization_simple_nfp4'
+coils_file = f'biot_savart_maxmode6.json'
 ncoils = 2
 
 nfieldlines = 12
-tmax_fl = 8000 # 20000
+tmax_fl = 10000 # 20000
 degree = 4
 
 out_dir = os.path.join(this_path,results_folder)

@@ -38,7 +38,7 @@ else: raise ValueError('Invalid type')
 ############## Input parameters
 ##########################################################################################
 use_previous_coils = True
-optimize_stage_1_with_coils = False
+optimize_stage_1_with_coils = True
 planar_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 250
@@ -53,7 +53,7 @@ JACOBIAN_THRESHOLD = 30
 aspect_ratio_weight = 8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='simple_nfp3' else 5e-3)
 iota_min_QA = 0.337 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
 iota_min_QH = 0.65 if QA_or_QH=='QH' else (0.337 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11))
-maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 6, 4: 7, 5: 7, 6: 7}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 7, 5: 7, 6: 7}
 coils_objective_weight = 1e+3
 CC_THRESHOLD = 0.1
 # QA_or_QH = 'simple' # QA, QH, QI or simple

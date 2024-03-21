@@ -45,7 +45,7 @@ MAXITER_stage_2 = 250
 MAXITER_single_stage = 15
 MAXFEV_single_stage = 21
 LENGTH_THRESHOLD = 2.8
-max_mode_array = [1]*0 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*4
+max_mode_array = [1]*2 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*4
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 4
 aspect_ratio_target = 5
@@ -80,7 +80,7 @@ finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 1e-4
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
 CC_WEIGHT = 5e+0  # Weight for the coil-to-coil distance penalty in the objective function
-CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
+CURVATURE_WEIGHT = 1e-5  # Weight for the curvature penalty in the objective function
 MSC_WEIGHT = 1e-5  # Weight for the mean squared curvature penalty in the objective function
 # ARCLENGTH_WEIGHT = 1e-9  # Weight for the arclength variation penalty in the objective function
 ######################################

@@ -24,25 +24,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
 parser.add_argument("--ncoils", type=int, default=2)
 args = parser.parse_args()
-##########################################################################################
-############## Input parameters
-##########################################################################################
-use_previous_coils = True
-optimize_stage_1_with_coils = False
-MAXITER_stage_1 = 25
-MAXITER_stage_2 = 250
-MAXITER_single_stage = 15
-MAXFEV_single_stage = 23
-LENGTH_THRESHOLD = 2.4
-max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*2 + [5]*4 + [6]*4
-nmodes_coils = 3
-aspect_ratio_target = 5
-JACOBIAN_THRESHOLD = 30
-aspect_ratio_weight = 6e-2 # 4e-2 for nfp3 # 9e-2 for nfp4
-iota_min_QA = 0.34 # 0.16 for nfp3 # 0.34 for nfp4
-iota_min_QH = 0.34 # 0.16 for nfp3 # 0.34 for nfp4
-maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 6}
-coils_objective_weight = 8e+2
 if args.type == 1: QA_or_QH = 'simple_nfp1'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
@@ -53,10 +34,30 @@ elif args.type == 7: QA_or_QH = 'simple_nfp4'
 elif args.type == 8: QA_or_QH = 'simple_nfp5'
 elif args.type == 9: QA_or_QH = 'simple_nfp6'
 else: raise ValueError('Invalid type')
+##########################################################################################
+############## Input parameters
+##########################################################################################
+use_previous_coils = True
+optimize_stage_1_with_coils = False
+MAXITER_stage_1 = 10
+MAXITER_stage_2 = 250
+MAXITER_single_stage = 15
+MAXFEV_single_stage = 30
+LENGTH_THRESHOLD = 2.5
+max_mode_array = [1]*0 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*4
+# max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*1 + [5]*4 + [6]*4
+nmodes_coils = 4
+aspect_ratio_target = 5
+JACOBIAN_THRESHOLD = 30
+aspect_ratio_weight = 8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='simple_nfp3' else 1e-2)
+iota_min_QA = 0.355 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
+iota_min_QH = 0.355 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
+maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 5, 5: 6, 6: 6}
+coils_objective_weight = 8e+2
+CC_THRESHOLD = 0.08
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
-CC_THRESHOLD = 0.05
 CURVATURE_THRESHOLD = 10
 MSC_THRESHOLD = 22
 nphi_VMEC = 26
@@ -75,7 +76,7 @@ quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9,
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 1e-4
 LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
-CC_WEIGHT = 1e+0  # Weight for the coil-to-coil distance penalty in the objective function
+CC_WEIGHT = 5e+0  # Weight for the coil-to-coil distance penalty in the objective function
 CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
 MSC_WEIGHT = 1e-5  # Weight for the mean squared curvature penalty in the objective function
 # ARCLENGTH_WEIGHT = 1e-9  # Weight for the arclength variation penalty in the objective function
@@ -259,10 +260,11 @@ for iteration, max_mode in enumerate(max_mode_array):
     aspect_ratio_max_optimizable = make_optimizable(aspect_ratio_max_objective, vmec)
     objective_tuple = [(aspect_ratio_max_optimizable.J, 0, aspect_ratio_weight)]
     
-    def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
     # def iota_min_objective(vmec): return np.min((np.mean(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
+    def iota_min_objective(vmec): return np.min((np.min(np.abs(vmec.wout.iotaf))-(iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH),0))
     iota_min_optimizable = make_optimizable(iota_min_objective, vmec)
     objective_tuple.append((iota_min_optimizable.J, 0, weight_iota))
+    # objective_tuple.append((vmec.mean_iota, iota_min_QA if QA_or_QH in ['QA','simple'] else iota_min_QH, weight_iota))
 
     # if QA_or_QH in ['QA', 'simple']:
     #     objective_tuple.append((vmec.mean_iota, iota_QA_simple, weight_iota))

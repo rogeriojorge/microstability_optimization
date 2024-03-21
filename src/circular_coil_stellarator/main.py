@@ -53,7 +53,7 @@ aspect_ratio_weight = 8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='s
 iota_min_QA = 0.343 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
 iota_min_QH = 0.343 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
 maxmodes_mpol_mapping = {1: 5, 2: 6, 3: 6, 4: 7, 5: 7, 6: 7}
-coils_objective_weight = 1e+33
+coils_objective_weight = 1e+3
 CC_THRESHOLD = 0.08
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)

@@ -39,7 +39,7 @@ else: raise ValueError('Invalid type')
 ##########################################################################################
 use_previous_coils = True
 optimize_stage_1_with_coils = True
-planar_coils = True
+planar_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 250
 MAXITER_single_stage = 15
@@ -55,7 +55,7 @@ iota_min_QA = 0.343 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_
 iota_min_QH = 0.343 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
 maxmodes_mpol_mapping = {1: 5, 2: 6, 3: 6, 4: 7, 5: 7, 6: 7}
 coils_objective_weight = 1e+3
-CC_THRESHOLD = 0.08
+CC_THRESHOLD = 0.04
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
@@ -166,7 +166,7 @@ J_MSC = MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmsc
 # J_ALS = ARCLENGTH_WEIGHT * sum(Jals)
 J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum(QuadraticPenalty(J, LENGTH_THRESHOLD, "max") for J in Jls)
 linkNum = LinkingNumber(curves)
-JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC + linkNum
+JF = Jf + J_CC + J_LENGTH_PENALTY + J_CURVATURE + J_MSC #+ linkNum
 ##########################################################################################
 proc0_print('  Starting optimization')
 ##########################################################################################

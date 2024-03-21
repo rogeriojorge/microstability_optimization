@@ -38,7 +38,7 @@ else: raise ValueError('Invalid type')
 ############## Input parameters
 ##########################################################################################
 use_previous_coils = True
-optimize_stage_1_with_coils = True
+optimize_stage_1_with_coils = False
 planar_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 250

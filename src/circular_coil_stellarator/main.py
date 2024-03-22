@@ -44,7 +44,7 @@ optimize_stage_1_with_coils = True
 if args.planar==1: planar_coils = True
 else:              planar_coils = False
 MAXITER_stage_1 = 10
-MAXITER_stage_2 = 250
+MAXITER_stage_2 = 300
 MAXITER_single_stage = 15
 MAXFEV_single_stage = 21
 LENGTH_THRESHOLD = 3.1

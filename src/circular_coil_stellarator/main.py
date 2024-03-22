@@ -45,7 +45,7 @@ MAXITER_stage_2 = 250
 MAXITER_single_stage = 15
 MAXFEV_single_stage = 21
 LENGTH_THRESHOLD = 2.8
-max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*4
+max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 4
 aspect_ratio_target = 6
@@ -53,9 +53,10 @@ JACOBIAN_THRESHOLD = 30
 aspect_ratio_weight = 8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='simple_nfp3' else 5e-3)
 iota_min_QA = 0.337 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
 iota_min_QH = 0.65 if QA_or_QH=='QH' else (0.337 if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11))
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 7, 5: 7, 6: 7}
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 6, 4: 6, 5: 6, 6: 6}
 coils_objective_weight = 1e+3
 CC_THRESHOLD = 0.1
+quasisymmetry_weight = 1e-0
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
@@ -68,7 +69,6 @@ diff_method = "forward"
 R0 = 1.0
 R1 = 0.70
 mirror_weight = 1e-3
-quasisymmetry_weight = 1e-1
 weight_iota = 1e3
 elongation_weight = 1
 nquadpoints = 120

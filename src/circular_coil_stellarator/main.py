@@ -23,6 +23,7 @@ os.chdir(parent_path)
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=1)
 parser.add_argument("--ncoils", type=int, default=2)
+parser.add_argument("--planar", type=int, default=2)
 args = parser.parse_args()
 if args.type == 1: QA_or_QH = 'simple_nfp1'
 elif args.type == 2: QA_or_QH = 'QA'
@@ -33,13 +34,15 @@ elif args.type == 6: QA_or_QH = 'simple_nfp3'
 elif args.type == 7: QA_or_QH = 'simple_nfp4'
 elif args.type == 8: QA_or_QH = 'simple_nfp5'
 elif args.type == 9: QA_or_QH = 'simple_nfp6'
+elif args.type == 10: QA_or_QH = 'simple_nfp4_planar'
 else: raise ValueError('Invalid type')
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
 use_previous_coils = True
 optimize_stage_1_with_coils = True
-planar_coils = False
+if args.planar==1: planar_coils = True
+else:              planar_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 250
 MAXITER_single_stage = 15
@@ -49,7 +52,7 @@ max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 4
 aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 45
+JACOBIAN_THRESHOLD = 350
 aspect_ratio_weight = 2e-3 if QA_or_QH=='QI' else (8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='simple_nfp3' else 5e-3))
 nfp_min_iota = 0.21 # 0.337
 iota_min_QA = nfp_min_iota if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)

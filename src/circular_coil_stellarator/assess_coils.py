@@ -14,13 +14,15 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_simple_nfp4_planar_ncoils1_planar'
-coils_file = f'biot_savart_maxmode3.json'
+results_folder = f'optimization_QH_ncoils3_nonplanar'
+coils_file = f'biot_savart_maxmode2.json'
 ncoils = 2
 
-nfieldlines = 12
-tmax_fl = 10000 # 20000
+nfieldlines = 3
+tmax_fl = 200 # 20000
 degree = 4
+
+interpolate_field = True
 
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
@@ -46,11 +48,11 @@ coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,
 proc0_print('Computing surface classifier')
 surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
 sc_fieldline = SurfaceClassifier(surf, h=0.03*R_axis, p=2)
-sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.02*R_axis)
+sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.04*R_axis)
 
 def trace_fieldlines(bfield, label):
     t1 = time.time()
-    R0 = np.linspace(0.999*R_axis, 0.999*R_max, nfieldlines)
+    R0 = np.linspace(0.999*R_axis, 0.99*R_max, nfieldlines)
     proc0_print(f"R0={R0}", flush=True)
     Z0 = np.zeros(nfieldlines)
     phis = [(i/4)*(2*np.pi/surf.nfp) for i in range(4)]
@@ -63,35 +65,35 @@ def trace_fieldlines(bfield, label):
         # particles_to_vtk(fieldlines_tys, os.path.join(OUT_DIR,f'fieldlines_{label}'))
         plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=150, surf=surf)
 
-# uncomment this to run tracing using the biot savart field (very slow!)
-# trace_fieldlines(bs, 'bs')
+if interpolate_field:
+    n = 30
+    rs = np.linalg.norm(surf.gamma()[:, :, 0:2], axis=2)
+    zs = surf.gamma()[:, :, 2]
+    rrange = (0.9*np.min(rs), 1.1*np.max(rs), n)
+    phirange = (0, 2*np.pi, n*2)
+    zrange = (-1.1*np.max(np.abs(zs)), 1.1*np.max(np.abs(zs)), n//2)
 
-n = 20
-rs = np.linalg.norm(surf.gamma()[:, :, 0:2], axis=2)
-zs = surf.gamma()[:, :, 2]
-rrange = (np.min(rs), np.max(rs), n)
-phirange = (0, 2*np.pi/surf.nfp, n*2)
-zrange = (0, np.max(zs), n//2)
+    def skip(rs, phis, zs):
+        rphiz = np.asarray([rs, phis, zs]).T.copy()
+        dists = sc_fieldline.evaluate_rphiz(rphiz)
+        skip = list((dists < -0.05*R_axis*2.0).flatten())
+        # skip = [False]*len(skip)
+        proc0_print("Skip", sum(skip), "cells out of", len(skip), flush=True)
+        return skip
 
-def skip(rs, phis, zs):
-    rphiz = np.asarray([rs, phis, zs]).T.copy()
-    dists = sc_fieldline.evaluate_rphiz(rphiz)
-    skip = list((dists < -0.05*R_axis*1.5).flatten())
-    proc0_print("Skip", sum(skip), "cells out of", len(skip), flush=True)
-    return skip
+    proc0_print('Initializing InterpolatedField')
+    bsh = InterpolatedField(bs, degree, rrange, phirange, zrange, True, nfp=surf.nfp, stellsym=False, skip=skip)
+    proc0_print('Done initializing InterpolatedField.')
 
-proc0_print('Initializing InterpolatedField')
-bsh = InterpolatedField(bs, degree, rrange, phirange, zrange, True, nfp=surf.nfp, stellsym=True, skip=skip)
-proc0_print('Done initializing InterpolatedField.')
+    bsh.set_points(surf.gamma().reshape((-1, 3)))
+    bs.set_points(surf.gamma().reshape((-1, 3)))
+    Bh = bsh.B()
+    B = bs.B()
+    proc0_print("Mean(|B|) on plasma surface =", np.mean(bs.AbsB()))
 
-bsh.set_points(surf.gamma().reshape((-1, 3)))
-bs.set_points(surf.gamma().reshape((-1, 3)))
-Bh = bsh.B()
-B = bs.B()
-proc0_print("Mean(|B|) on plasma surface =", np.mean(bs.AbsB()))
+    proc0_print("|B-Bh| on surface:", np.sort(np.abs(B-Bh).flatten()))
 
-proc0_print("|B-Bh| on surface:", np.sort(np.abs(B-Bh).flatten()))
-
-proc0_print('Beginning field line tracing')
-trace_fieldlines(bsh, 'bsh')
-
+    proc0_print('Beginning field line tracing')
+    trace_fieldlines(bsh, 'bsh')
+else:
+    trace_fieldlines(bs, 'bs')

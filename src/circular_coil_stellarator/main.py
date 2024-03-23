@@ -21,7 +21,7 @@ mpi = MpiPartition()
 parent_path = str(Path(__file__).parent.resolve())
 os.chdir(parent_path)
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=1)
+parser.add_argument("--type", type=int, default=7)
 parser.add_argument("--ncoils", type=int, default=2)
 parser.add_argument("--planar", type=int, default=2)
 args = parser.parse_args()
@@ -35,12 +35,14 @@ elif args.type == 7: QA_or_QH = 'simple_nfp4'
 elif args.type == 8: QA_or_QH = 'simple_nfp5'
 elif args.type == 9: QA_or_QH = 'simple_nfp6'
 elif args.type == 10: QA_or_QH = 'simple_nfp4_planar'
+elif args.type == 11: QA_or_QH = 'simple_nfp3_planar'
 else: raise ValueError('Invalid type')
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################
 use_previous_coils = True
 optimize_stage_1_with_coils = True
+stellsym_coils = False
 if args.planar==1: planar_coils = True
 else:              planar_coils = False
 MAXITER_stage_1 = 10
@@ -52,8 +54,8 @@ max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 4
 aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 350
-aspect_ratio_weight = 2e-3 if QA_or_QH=='QI' else (8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='simple_nfp3' else 5e-3))
+JACOBIAN_THRESHOLD = 30
+aspect_ratio_weight = 2e-3 if QA_or_QH=='QI' else (8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='simple_nfp3' else 2e-2))
 nfp_min_iota = 0.21 # 0.337
 iota_min_QA = nfp_min_iota if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
 iota_min_QH = 0.65 if QA_or_QH=='QH' else (nfp_min_iota if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11))
@@ -125,17 +127,17 @@ nphi_big   = nphi_VMEC * 2 * surf.nfp + 1
 ntheta_big = ntheta_VMEC + 1
 quadpoints_theta = np.linspace(0, 1, ntheta_big)
 quadpoints_phi   = np.linspace(0, 1, nphi_big)
-surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=surf.ntor, quadpoints_phi=quadpoints_phi, quadpoints_theta=quadpoints_theta)
+surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=surf.ntor, quadpoints_phi=quadpoints_phi, quadpoints_theta=quadpoints_theta, stellsym=surf.stellsym)
 ##########################################################################################
 ##########################################################################################
 #Stage 2
 if planar_coils:
-    base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
+    base_curves = create_equally_spaced_planar_curves(ncoils, surf.nfp, stellsym=stellsym_coils, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
 else:
-    base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=True, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
+    base_curves = create_equally_spaced_curves(ncoils, surf.nfp, stellsym=stellsym_coils, R0=R0, R1=R1, order=nmodes_coils, numquadpoints=nquadpoints)
 base_currents = [Current(1) * 1e5 for _ in range(ncoils)]
 base_currents[0].fix_all()
-coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, True)
+coils = coils_via_symmetries(base_curves, base_currents, surf.nfp, stellsym=stellsym_coils)
 curves = [c.curve for c in coils]
 bs = BiotSavart(coils)
 ##########################################################################################

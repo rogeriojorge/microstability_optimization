@@ -14,7 +14,7 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_QH_ncoils2_nonplanar'
+results_folder = f'optimization_simple_nfp4_planar_ncoils1_planar'
 coils_file = f'biot_savart_maxmode3.json'
 ncoils = 2
 

@@ -41,7 +41,7 @@ else: raise ValueError('Invalid type')
 ############## Input parameters
 ##########################################################################################
 use_previous_coils = True
-optimize_stage_1_with_coils = True
+optimize_stage_1_with_coils = False
 stellsym_coils = False
 if args.planar==1: planar_coils = True
 else:              planar_coils = False

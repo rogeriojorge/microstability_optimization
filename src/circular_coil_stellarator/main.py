@@ -42,39 +42,40 @@ else: raise ValueError('Invalid type')
 ##########################################################################################
 use_previous_coils = True
 optimize_stage_1_with_coils = False
-stellsym_coils = False
+stellsym_coils = True
 if args.planar==1: planar_coils = True
 else:              planar_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 200
 MAXITER_single_stage = 15
 MAXFEV_single_stage = 21
-LENGTH_THRESHOLD = 2.8
+LENGTH_THRESHOLD = 3.3
 max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 6
 aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 31
-aspect_ratio_weight = 2e-3 if QA_or_QH=='QI' else (8e-2 if QA_or_QH=='simple_nfp4' else (4e-2 if QA_or_QH=='simple_nfp3' else 6e-3))
-nfp_min_iota = 0.21 # 0.337
-iota_min_QA = nfp_min_iota if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11)
-iota_min_QH = 0.59 if QA_or_QH=='QH' else (nfp_min_iota if QA_or_QH=='simple_nfp4' else (0.175 if QA_or_QH=='simple_nfp3' else 0.11))
-maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 6, 4: 6, 5: 6, 6: 6}
-coils_objective_weight = 3e+3 if QA_or_QH=='QI' else 1e+3
+JACOBIAN_THRESHOLD = 20
+aspect_ratio_weight = 2e-3 if QA_or_QH=='QI' else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 6e-3))
+nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.21
+iota_min_QA = nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota)
+iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
+maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 6}
+coils_objective_weight = 3e+3 if QA_or_QH=='QI' else 2e+3
 CC_THRESHOLD = 0.1
 quasisymmetry_weight = 1e-1 if QA_or_QH=='QI' else 1e-0
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
-CURVATURE_THRESHOLD = 25
-MSC_THRESHOLD = 21
-nphi_VMEC = 26
-ntheta_VMEC = 26
+CURVATURE_THRESHOLD = 30
+MSC_THRESHOLD = 30
+nphi_VMEC = 64
+ntheta_VMEC = 32
 ftol = 1e-3
 diff_method = "forward"
 R0 = 1.0
 R1 = 0.70
-mirror_weight = 1e-3
+mirror_weight = 1e+3
+maximum_mirror = 0.21 if QA_or_QH in ['QI'] else 0.50
 weight_iota = 1e3
 elongation_weight = 1
 nquadpoints = 120
@@ -101,7 +102,6 @@ ntor_QI=18 # Toroidal modes in Boozer transformation
 nphi_out_QI=2000 # size of return array if arr_out_QI = True
 arr_out_QI=True # If True, returns (nphi_out*nalpha) values, each of which is the difference
 maximum_elongation = 6 # Defines the maximum elongation allowed in the QI elongation objective function
-maximum_mirror = 0.19 # Defines the maximum mirror ratio of |B| allowed in the QI elongation objective function
 optQI = partial(QuasiIsodynamicResidual,snorms=snorms, nphi=nphi_QI, nalpha=nalpha_QI, nBj=nBj_QI, mpol=mpol_QI, ntor=ntor_QI, nphi_out=nphi_out_QI, arr_out=arr_out_QI)
 partial_MaxElongationPen = partial(MaxElongationPen,t=maximum_elongation)
 partial_MirrorRatioPen = partial(MirrorRatioPen,t=maximum_mirror)
@@ -121,7 +121,7 @@ if comm_world.rank == 0:
 ##########################################################################################
 # Stage 1
 proc0_print(f' Using vmec input file {vmec_input_filename}')
-vmec = Vmec(vmec_input_filename, mpi=mpi, verbose=vmec_verbose, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='half period')
+vmec = Vmec(vmec_input_filename, mpi=mpi, verbose=vmec_verbose, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='field period')
 surf = vmec.boundary
 nphi_big   = nphi_VMEC * 2 * surf.nfp + 1
 ntheta_big = ntheta_VMEC + 1
@@ -281,7 +281,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     if QA_or_QH in ['QA', 'QH']:
         qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if QA_or_QH == 'QH' else 0)
         objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
-    if QA_or_QH == 'QI':
+    elif QA_or_QH == 'QI':
         qi = make_optimizable(optQI, vmec)
         optElongation = make_optimizable(partial_MaxElongationPen, vmec)
         optMirror = make_optimizable(partial_MirrorRatioPen, vmec)
@@ -289,6 +289,10 @@ for iteration, max_mode in enumerate(max_mode_array):
         objective_tuple.append((qi.J, 0, quasisymmetry_weight))
         objective_tuple.append((optElongation.J, 0, elongation_weight))
         objective_tuple.append((optMirror.J, 0, mirror_weight))
+    else:
+        optMirror = make_optimizable(partial_MirrorRatioPen, vmec)
+        objective_tuple.append((optMirror.J, 0, mirror_weight))
+        proc0_print(f"Mirror before optimization: {optMirror.J()}")
     prob = LeastSquaresProblem.from_tuples(objective_tuple)
     dofs = np.concatenate((JF.x, vmec.x))
     bs.set_points(surf.gamma().reshape((-1, 3)))
@@ -302,11 +306,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     proc0_print(f'  Performing stage 2 optimization with ~{MAXITER_stage_2} iterations')
     if comm_world.rank == 0:
         JF.full_unfix(free_coil_dofs_all)
-        print(f'   Len(dofs) of JF={len(JF.x)}')
-        print(f'   Len dofs to stage 2={len(dofs[:-number_vmec_dofs])}')
-        # print(f'   grad J ')
         res = minimize(fun_coils, dofs[:-number_vmec_dofs], jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
-        print(f'   Len(res.x)={len(res.x)}')
         dofs[:-number_vmec_dofs] = res.x
     mpi.comm_world.Bcast(dofs, root=0)
     JF.x = dofs[:-number_vmec_dofs]

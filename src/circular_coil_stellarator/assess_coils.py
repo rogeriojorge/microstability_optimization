@@ -14,13 +14,14 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_QH_ncoils3_nonplanar'
-coils_file = f'biot_savart_maxmode2.json'
+results_folder = f'optimization_simple_nfp4_ncoils1_nonplanar'
+coils_file = f'biot_savart_maxmode4.json'
 ncoils = 2
 
-nfieldlines = 3
-tmax_fl = 200 # 20000
+nfieldlines = 24
+tmax_fl = 8000 # 20000
 degree = 4
+extend_distance = 0.06
 
 interpolate_field = True
 
@@ -30,8 +31,13 @@ os.chdir(out_dir)
 OUT_DIR = Path("coils")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 vmec_file_input = os.path.join(out_dir,filename_input)
+surf_vmec = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=200, ntheta=30, range="full torus")
+R_max_vmec = np.max(surf_vmec.gamma()[0,:,0])
+
 surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=200, ntheta=30, range="full torus")
+surf.extend_via_normal(extend_distance)
 R_max = np.max(surf.gamma()[0,:,0])
+
 vmec_file_wout = os.path.join(out_dir,filename_wout)
 R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
 
@@ -46,13 +52,13 @@ coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,
 # coils_to_focus(os.path.join(OUT_DIR,"coils_focus_format.txt"),curves=[coil._curve for coil in coils],currents=[coil._current for coil in coils],nfp=surf.nfp,stellsym=True)
 
 proc0_print('Computing surface classifier')
-surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
+# surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
 sc_fieldline = SurfaceClassifier(surf, h=0.03*R_axis, p=2)
-sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.04*R_axis)
+# sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.04*R_axis)
 
 def trace_fieldlines(bfield, label):
     t1 = time.time()
-    R0 = np.linspace(0.999*R_axis, 0.99*R_max, nfieldlines)
+    R0 = np.linspace(0.999*R_axis, 1.00*R_max, nfieldlines)
     proc0_print(f"R0={R0}", flush=True)
     Z0 = np.zeros(nfieldlines)
     phis = [(i/4)*(2*np.pi/surf.nfp) for i in range(4)]
@@ -62,16 +68,18 @@ def trace_fieldlines(bfield, label):
     t2 = time.time()
     proc0_print(f"Time for fieldline tracing={t2-t1:.3f}s. Num steps={sum([len(l) for l in fieldlines_tys])//nfieldlines}", flush=True)
     if comm_world is None or comm_world.rank == 0:
-        # particles_to_vtk(fieldlines_tys, os.path.join(OUT_DIR,f'fieldlines_{label}'))
-        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=150, surf=surf)
+        for i, fieldline_tys in enumerate(fieldlines_tys[-8:]):
+            particles_to_vtk([fieldline_tys], os.path.join(OUT_DIR,f'fieldlines_{label}_{i}'))
+        # particles_to_vtk(fieldlines_tys[-6:], os.path.join(OUT_DIR,f'fieldlines_{label}'))
+        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=300, s=1.5, surf=surf_vmec)
 
 if interpolate_field:
     n = 30
     rs = np.linalg.norm(surf.gamma()[:, :, 0:2], axis=2)
     zs = surf.gamma()[:, :, 2]
-    rrange = (0.9*np.min(rs), 1.1*np.max(rs), n)
-    phirange = (0, 2*np.pi, n*2)
-    zrange = (-1.1*np.max(np.abs(zs)), 1.1*np.max(np.abs(zs)), n//2)
+    rrange = (0.8*np.min(rs), 1.2*np.max(rs), n)
+    phirange = (0, 2*np.pi/surf.nfp, n*2)
+    zrange = (0, 1.2*np.max(np.abs(zs)), n//2)
 
     def skip(rs, phis, zs):
         rphiz = np.asarray([rs, phis, zs]).T.copy()
@@ -82,7 +90,7 @@ if interpolate_field:
         return skip
 
     proc0_print('Initializing InterpolatedField')
-    bsh = InterpolatedField(bs, degree, rrange, phirange, zrange, True, nfp=surf.nfp, stellsym=False, skip=skip)
+    bsh = InterpolatedField(bs, degree, rrange, phirange, zrange, True, nfp=surf.nfp, stellsym=True, skip=skip)
     proc0_print('Done initializing InterpolatedField.')
 
     bsh.set_points(surf.gamma().reshape((-1, 3)))

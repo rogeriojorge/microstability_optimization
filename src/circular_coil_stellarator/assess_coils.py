@@ -15,13 +15,14 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
 results_folder = f'optimization_simple_nfp4_ncoils1_nonplanar'
-coils_file = f'biot_savart_maxmode4.json'
+coils_file = f'biot_savart_maxmode5.json'
 ncoils = 2
 
 nfieldlines = 24
 tmax_fl = 8000 # 20000
 degree = 4
-extend_distance = 0.06
+extend_distance = 0.2
+nfieldlines_to_plot = 12
 
 interpolate_field = True
 
@@ -68,7 +69,7 @@ def trace_fieldlines(bfield, label):
     t2 = time.time()
     proc0_print(f"Time for fieldline tracing={t2-t1:.3f}s. Num steps={sum([len(l) for l in fieldlines_tys])//nfieldlines}", flush=True)
     if comm_world is None or comm_world.rank == 0:
-        for i, fieldline_tys in enumerate(fieldlines_tys[-8:]):
+        for i, fieldline_tys in enumerate(fieldlines_tys[-nfieldlines_to_plot:]):
             particles_to_vtk([fieldline_tys], os.path.join(OUT_DIR,f'fieldlines_{label}_{i}'))
         # particles_to_vtk(fieldlines_tys[-6:], os.path.join(OUT_DIR,f'fieldlines_{label}'))
         plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=300, s=1.5, surf=surf_vmec)

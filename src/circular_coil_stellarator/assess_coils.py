@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import time
 import numpy as np
 from pathlib import Path
@@ -14,15 +15,15 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_simple_nfp4_ncoils1_nonplanar'
+results_folder = f'optimization_QH_ncoils2_nonplanar'
 coils_file = f'biot_savart_maxmode5.json'
-ncoils = 2
+ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
 nfieldlines = 24
 tmax_fl = 8000 # 20000
 degree = 4
-extend_distance = 0.2
-nfieldlines_to_plot = 12
+extend_distance = 0.03
+nfieldlines_to_plot = 13
 
 interpolate_field = True
 

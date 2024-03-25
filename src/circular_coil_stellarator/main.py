@@ -48,13 +48,13 @@ else:              planar_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 200
 MAXITER_single_stage = 15
-MAXFEV_single_stage = 35
-LENGTH_THRESHOLD = 2.7
+MAXFEV_single_stage = 30
+LENGTH_THRESHOLD = 2.8
 max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 6
 aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 20
+JACOBIAN_THRESHOLD = 25
 aspect_ratio_weight = 2e-3 if QA_or_QH=='QI' else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 6e-3))
 nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.41
 iota_min_QA = nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota)
@@ -68,7 +68,7 @@ vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
 CURVATURE_THRESHOLD = 20
 MSC_THRESHOLD = 20
-nphi_VMEC = 64
+nphi_VMEC = 32
 ntheta_VMEC = 32
 ftol = 1e-3
 diff_method = "forward"
@@ -121,7 +121,7 @@ if comm_world.rank == 0:
 ##########################################################################################
 # Stage 1
 proc0_print(f' Using vmec input file {vmec_input_filename}')
-vmec = Vmec(vmec_input_filename, mpi=mpi, verbose=vmec_verbose, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='field period')
+vmec = Vmec(vmec_input_filename, mpi=mpi, verbose=vmec_verbose, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='half period')
 surf = vmec.boundary
 nphi_big   = nphi_VMEC * 2 * surf.nfp + 1
 ntheta_big = ntheta_VMEC + 1
@@ -289,6 +289,8 @@ for iteration, max_mode in enumerate(max_mode_array):
         objective_tuple.append((qi.J, 0, quasisymmetry_weight))
         objective_tuple.append((optElongation.J, 0, elongation_weight))
         objective_tuple.append((optMirror.J, 0, mirror_weight))
+        proc0_print(f"QI before optimization: {quasisymmetry_weight*np.sum(np.array(qi.J())**2)}")
+        proc0_print(f"Mirror before optimization: {optMirror.J()}")
     else:
         optMirror = make_optimizable(partial_MirrorRatioPen, vmec)
         objective_tuple.append((optMirror.J, 0, mirror_weight))

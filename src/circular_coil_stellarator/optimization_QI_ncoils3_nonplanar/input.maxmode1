@@ -1,18 +1,18 @@
 &INDATA
-! This file created by simsopt on February 29 2024, 12:16:33
+! This file created by simsopt on March 25 2024, 11:15:43
 
 ! ---- Geometric parameters ----
 NFP = 3
 LASYM = F
 
 ! ---- Resolution parameters ----
-MPOL = 5
-NTOR = 5
+MPOL = 3
+NTOR = 3
 NTHETA = 16
 NZETA = 14
-NS_ARRAY    = 5        16    35
-NITER_ARRAY = 700    1000  3500
-FTOL_ARRAY  = 1e-11 6e-12 1e-12
+NS_ARRAY    =      5     16     35
+NITER_ARRAY =    700   1000   3500
+FTOL_ARRAY  =  1e-11  6e-12  1e-12
 
 ! ---- Boundary toroidal flux ----
 PHIEDGE = 0.05

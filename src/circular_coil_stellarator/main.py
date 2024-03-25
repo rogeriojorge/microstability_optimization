@@ -24,6 +24,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--type", type=int, default=7)
 parser.add_argument("--ncoils", type=int, default=2)
 parser.add_argument("--planar", type=int, default=2)
+parser.add_argument("--symcoils", type=int, default=1)
 args = parser.parse_args()
 if args.type == 1: QA_or_QH = 'simple_nfp1'
 elif args.type == 2: QA_or_QH = 'QA'
@@ -43,19 +44,20 @@ else: raise ValueError('Invalid type')
 ##########################################################################################
 use_previous_coils = True
 optimize_stage_1_with_coils = False
-stellsym_coils = True
+if args.symcoils==1: stellsym_coils = True
+else: stellsym_coils = False
 if args.planar==1: planar_coils = True
 else:              planar_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 200
-MAXITER_single_stage = 15
-MAXFEV_single_stage = 30
-LENGTH_THRESHOLD = 2.8
-max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
+MAXITER_single_stage = 50
+MAXFEV_single_stage  = 120
+LENGTH_THRESHOLD = 3.0
+max_mode_array = [1]*0 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
-nmodes_coils = 6
+nmodes_coils = 5
 aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 20
+JACOBIAN_THRESHOLD = 10
 aspect_ratio_weight = 5e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 6e-3))
 nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.41
 iota_min_QA = nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota)
@@ -69,7 +71,7 @@ vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
 CURVATURE_THRESHOLD = 20
 MSC_THRESHOLD = 20
-nphi_VMEC = 32
+nphi_VMEC = 32 if stellsym_coils else 64
 ntheta_VMEC = 32
 ftol = 1e-3
 diff_method = "forward"
@@ -85,11 +87,11 @@ if planar_coils: directory += '_planar'
 else: directory += '_nonplanar'
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
-finite_difference_rel_step = 1e-4
-LENGTH_CON_WEIGHT = 1.0  # Weight on the quadratic penalty for the curve length
-CC_WEIGHT = 5e+0  # Weight for the coil-to-coil distance penalty in the objective function
-CURVATURE_WEIGHT = 1e-5  # Weight for the curvature penalty in the objective function
-MSC_WEIGHT = 1e-5  # Weight for the mean squared curvature penalty in the objective function
+finite_difference_rel_step = 1e-5
+LENGTH_CON_WEIGHT = 1e-3  # Weight on the quadratic penalty for the curve length
+CC_WEIGHT = 1e-4  # Weight for the coil-to-coil distance penalty in the objective function
+CURVATURE_WEIGHT = 1e-8  # Weight for the curvature penalty in the objective function
+MSC_WEIGHT = 1e-8  # Weight for the mean squared curvature penalty in the objective function
 # ARCLENGTH_WEIGHT = 1e-9  # Weight for the arclength variation penalty in the objective function
 ######################################
 ##### QI FUNCTIONS #####
@@ -122,7 +124,7 @@ if comm_world.rank == 0:
 ##########################################################################################
 # Stage 1
 proc0_print(f' Using vmec input file {vmec_input_filename}')
-vmec = Vmec(vmec_input_filename, mpi=mpi, verbose=vmec_verbose, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='half period')
+vmec = Vmec(vmec_input_filename, mpi=mpi, verbose=vmec_verbose, nphi=nphi_VMEC, ntheta=ntheta_VMEC, range_surface='half period' if stellsym_coils else 'field period')
 surf = vmec.boundary
 nphi_big   = nphi_VMEC * 2 * surf.nfp + 1
 ntheta_big = ntheta_VMEC + 1

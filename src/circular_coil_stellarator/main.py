@@ -49,28 +49,28 @@ else: stellsym_coils = False
 if args.planar==1: planar_coils = True
 else:              planar_coils = False
 MAXITER_stage_1 = 10
-MAXITER_stage_2 = 200
-MAXITER_single_stage = 50
-MAXFEV_single_stage  = 120
-LENGTH_THRESHOLD = 3.0
-max_mode_array = [1]*0 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
+MAXITER_stage_2 = 150
+MAXITER_single_stage = 15
+MAXFEV_single_stage  = 25
+LENGTH_THRESHOLD = 2.8
+max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 5
 aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 10
-aspect_ratio_weight = 5e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 6e-3))
+JACOBIAN_THRESHOLD = 20
+aspect_ratio_weight = 8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 1e-2))
 nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.41
 iota_min_QA = nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota)
 iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
-maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
-coils_objective_weight = 3e+3 if 'QI' in QA_or_QH else 2e+3
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
+coils_objective_weight = 1e+3 if 'QI' in QA_or_QH else 1e+3
 CC_THRESHOLD = 0.08
 quasisymmetry_weight = 5e-1 if 'QI' in QA_or_QH else 1e+1
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 ncoils = args.ncoils # 3
-CURVATURE_THRESHOLD = 20
-MSC_THRESHOLD = 20
+CURVATURE_THRESHOLD = 10
+MSC_THRESHOLD = 10
 nphi_VMEC = 32 if stellsym_coils else 64
 ntheta_VMEC = 32
 ftol = 1e-3
@@ -88,10 +88,10 @@ else: directory += '_nonplanar'
 quasisymmetry_target_surfaces = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 finite_difference_abs_step = 1e-7
 finite_difference_rel_step = 1e-5
-LENGTH_CON_WEIGHT = 1e-3  # Weight on the quadratic penalty for the curve length
-CC_WEIGHT = 1e-4  # Weight for the coil-to-coil distance penalty in the objective function
-CURVATURE_WEIGHT = 1e-8  # Weight for the curvature penalty in the objective function
-MSC_WEIGHT = 1e-8  # Weight for the mean squared curvature penalty in the objective function
+LENGTH_CON_WEIGHT = 1e-1  # Weight on the quadratic penalty for the curve length
+CC_WEIGHT = 1e-1  # Weight for the coil-to-coil distance penalty in the objective function
+CURVATURE_WEIGHT = 1e-6  # Weight for the curvature penalty in the objective function
+MSC_WEIGHT = 1e-6  # Weight for the mean squared curvature penalty in the objective function
 # ARCLENGTH_WEIGHT = 1e-9  # Weight for the arclength variation penalty in the objective function
 ######################################
 ##### QI FUNCTIONS #####

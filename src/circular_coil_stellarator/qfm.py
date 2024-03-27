@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import numpy as np
 from pathlib import Path
 from simsopt import load
@@ -10,13 +11,16 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_simple_nfp4'
-coils_file = f'biot_savart_maxmode4.json'
-ncoils = 2
+results_folder = f'optimization_QA_ncoils4_nonplanar_symcoils'
+coils_file = f'biot_savart_maxmode3.json'
+ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
-mpol = 2
-ntor = 2
+mpol = 8
+ntor = 8
 constraint_weight = 1e0
+extend_distance = 0.01
+tol = 1e-15
+maxiter = 1000
 
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
@@ -25,9 +29,6 @@ OUT_DIR = Path("coils")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 vmec_file_input = os.path.join(out_dir,filename_input)
 surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=200, ntheta=30, range="full torus")
-R_max = np.max(surf.gamma()[0,:,0])
-vmec_file_wout = os.path.join(out_dir,filename_wout)
-R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
 
 print('Loading coils file')
 coils_filename = os.path.join(OUT_DIR,coils_file)
@@ -45,6 +46,7 @@ phis = np.linspace(0, 1/nfp, 25, endpoint=False)
 thetas = np.linspace(0, 1, 25, endpoint=False)
 s = SurfaceRZFourier(dofs = surf.dofs, mpol=surf.mpol, ntor=surf.ntor, stellsym=stellsym, nfp=nfp, quadpoints_phi=phis, quadpoints_theta=thetas)
 s.change_resolution(mpol, ntor)
+s.extend_via_normal(extend_distance)
 # First optimize at fixed volume
 
 qfm = QfmResidual(s, bs)
@@ -55,9 +57,9 @@ vol_target = vol.J()
 
 qfm_surface = QfmSurface(bs, s, vol, vol_target)
 print(f"Initial ||vol constraint||={0.5*(s.volume()-vol_target)**2:.8e}, ||residual||={np.linalg.norm(qfm.J()):.8e}")
-res = qfm_surface.minimize_qfm_penalty_constraints_LBFGS(tol=1e-14, maxiter=3000, constraint_weight=constraint_weight)
+res = qfm_surface.minimize_qfm_penalty_constraints_LBFGS(tol=tol, maxiter=maxiter, constraint_weight=constraint_weight)
 print(f"||vol constraint||={0.5*(s.volume()-vol_target)**2:.8e}, ||residual||={np.linalg.norm(qfm.J()):.8e}")
-res = qfm_surface.minimize_qfm_exact_constraints_SLSQP(tol=1e-14, maxiter=3000)
+res = qfm_surface.minimize_qfm_exact_constraints_SLSQP(tol=tol, maxiter=maxiter)
 print(f"||vol constraint||={0.5*(s.volume()-vol_target)**2:.8e}, ||residual||={np.linalg.norm(qfm.J()):.8e}")
 # Check that volume is not changed
 print(f"||vol constraint||={0.5*(vol.J()-vol_target)**2:.8e}")

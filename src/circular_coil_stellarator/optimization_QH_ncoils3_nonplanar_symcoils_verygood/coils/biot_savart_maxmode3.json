@@ -1,0 +1,7170 @@
+{
+  "@module": "simsopt._core.json",
+  "@class": "SIMSON",
+  "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+  "graph": {
+    "$type": "ref",
+    "value": "BiotSavart1"
+  },
+  "simsopt_objs": {
+    "12296280048": {
+      "@module": "simsopt._core.optimizable",
+      "@class": "DOFs",
+      "@name": "12296280048",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "x": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          1.2076120119646594,
+          0.07852782358801919,
+          0.3555480396139024,
+          0.03820259211370427,
+          0.0433617154346964,
+          -0.030270602390961552,
+          -0.049919037043404536,
+          -0.010742140223147801,
+          -0.011324969951706561,
+          -0.002725245448015909,
+          0.0019448685214383088,
+          0.17213408360597207,
+          -0.12109457259098053,
+          0.17643328465044472,
+          0.06529436007710393,
+          0.013923318162660073,
+          0.008750497632323117,
+          -0.002014247641988169,
+          -0.0027605729687442556,
+          -0.006913419496610566,
+          -0.004701979787861391,
+          -0.004483744787615917,
+          -0.07046980488866757,
+          -0.35308017573548334,
+          0.04008087855098077,
+          -0.013514272052705304,
+          0.05664589488892041,
+          0.06935412374475625,
+          -0.01654333134430287,
+          0.027747045957534366,
+          -0.0069215106155176955,
+          0.008264738428662802,
+          0.005313559502051812
+        ]
+      },
+      "names": [
+        "xc(0)",
+        "xs(1)",
+        "xc(1)",
+        "xs(2)",
+        "xc(2)",
+        "xs(3)",
+        "xc(3)",
+        "xs(4)",
+        "xc(4)",
+        "xs(5)",
+        "xc(5)",
+        "yc(0)",
+        "ys(1)",
+        "yc(1)",
+        "ys(2)",
+        "yc(2)",
+        "ys(3)",
+        "yc(3)",
+        "ys(4)",
+        "yc(4)",
+        "ys(5)",
+        "yc(5)",
+        "zc(0)",
+        "zs(1)",
+        "zc(1)",
+        "zs(2)",
+        "zc(2)",
+        "zs(3)",
+        "zc(3)",
+        "zs(4)",
+        "zc(4)",
+        "zs(5)",
+        "zc(5)"
+      ],
+      "free": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "bool",
+        "data": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "lower_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity
+        ]
+      },
+      "upper_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity
+        ]
+      }
+    },
+    "CurveXYZFourier1": {
+      "@module": "simsopt.geo.curvexyzfourier",
+      "@class": "CurveXYZFourier",
+      "@name": "CurveXYZFourier1",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "quadpoints": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          0.0,
+          0.008403361344537815,
+          0.01680672268907563,
+          0.025210084033613446,
+          0.03361344537815126,
+          0.04201680672268907,
+          0.05042016806722689,
+          0.058823529411764705,
+          0.06722689075630252,
+          0.07563025210084033,
+          0.08403361344537814,
+          0.09243697478991596,
+          0.10084033613445378,
+          0.1092436974789916,
+          0.11764705882352941,
+          0.12605042016806722,
+          0.13445378151260504,
+          0.14285714285714285,
+          0.15126050420168066,
+          0.15966386554621848,
+          0.1680672268907563,
+          0.1764705882352941,
+          0.18487394957983191,
+          0.19327731092436973,
+          0.20168067226890757,
+          0.21008403361344538,
+          0.2184873949579832,
+          0.226890756302521,
+          0.23529411764705882,
+          0.24369747899159663,
+          0.25210084033613445,
+          0.26050420168067223,
+          0.2689075630252101,
+          0.2773109243697479,
+          0.2857142857142857,
+          0.29411764705882354,
+          0.3025210084033613,
+          0.31092436974789917,
+          0.31932773109243695,
+          0.3277310924369748,
+          0.3361344537815126,
+          0.3445378151260504,
+          0.3529411764705882,
+          0.36134453781512604,
+          0.36974789915966383,
+          0.37815126050420167,
+          0.38655462184873945,
+          0.3949579831932773,
+          0.40336134453781514,
+          0.4117647058823529,
+          0.42016806722689076,
+          0.42857142857142855,
+          0.4369747899159664,
+          0.4453781512605042,
+          0.453781512605042,
+          0.4621848739495798,
+          0.47058823529411764,
+          0.4789915966386554,
+          0.48739495798319327,
+          0.49579831932773105,
+          0.5042016806722689,
+          0.5126050420168067,
+          0.5210084033613445,
+          0.5294117647058824,
+          0.5378151260504201,
+          0.5462184873949579,
+          0.5546218487394958,
+          0.5630252100840336,
+          0.5714285714285714,
+          0.5798319327731092,
+          0.5882352941176471,
+          0.5966386554621849,
+          0.6050420168067226,
+          0.6134453781512604,
+          0.6218487394957983,
+          0.6302521008403361,
+          0.6386554621848739,
+          0.6470588235294117,
+          0.6554621848739496,
+          0.6638655462184874,
+          0.6722689075630252,
+          0.680672268907563,
+          0.6890756302521008,
+          0.6974789915966386,
+          0.7058823529411764,
+          0.7142857142857143,
+          0.7226890756302521,
+          0.7310924369747899,
+          0.7394957983193277,
+          0.7478991596638656,
+          0.7563025210084033,
+          0.7647058823529411,
+          0.7731092436974789,
+          0.7815126050420168,
+          0.7899159663865546,
+          0.7983193277310924,
+          0.8067226890756303,
+          0.8151260504201681,
+          0.8235294117647058,
+          0.8319327731092436,
+          0.8403361344537815,
+          0.8487394957983193,
+          0.8571428571428571,
+          0.8655462184873949,
+          0.8739495798319328,
+          0.8823529411764706,
+          0.8907563025210083,
+          0.8991596638655461,
+          0.907563025210084,
+          0.9159663865546218,
+          0.9243697478991596,
+          0.9327731092436974,
+          0.9411764705882353,
+          0.9495798319327731,
+          0.9579831932773109,
+          0.9663865546218487,
+          0.9747899159663865,
+          0.9831932773109243,
+          0.9915966386554621,
+          1.0
+        ]
+      },
+      "order": 5,
+      "dofs": {
+        "$type": "ref",
+        "value": "12296280048"
+      }
+    },
+    "12296280384": {
+      "@module": "simsopt._core.optimizable",
+      "@class": "DOFs",
+      "@name": "12296280384",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "x": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          1.0
+        ]
+      },
+      "names": [
+        "x0"
+      ],
+      "free": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "bool",
+        "data": [
+          false
+        ]
+      },
+      "lower_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          -Infinity
+        ]
+      },
+      "upper_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          Infinity
+        ]
+      }
+    },
+    "Current1": {
+      "@module": "simsopt.field.coil",
+      "@class": "Current",
+      "@name": "Current1",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current": 1.0,
+      "dofs": {
+        "$type": "ref",
+        "value": "12296280384"
+      }
+    },
+    "ScaledCurrent1": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent1",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "Current1"
+      },
+      "scale": 100000.0
+    },
+    "Coil1": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil1",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      }
+    },
+    "12296280160": {
+      "@module": "simsopt._core.optimizable",
+      "@class": "DOFs",
+      "@name": "12296280160",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "x": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          0.9842343725248811,
+          -0.04988757267682679,
+          0.24982335076413098,
+          0.014207459185257286,
+          0.03838457804506412,
+          -0.02174806902693699,
+          -0.021634614937201386,
+          0.0090569869268122,
+          -0.018278308424859235,
+          0.0067878495481357055,
+          0.0013704752371514097,
+          0.4175828486656701,
+          0.005289354119478142,
+          0.2455445746196654,
+          0.03726777487149391,
+          -0.12274622483195378,
+          -0.02372210127965988,
+          0.011174196733118947,
+          0.009138320153433258,
+          0.010042434343844765,
+          -0.006925214209645369,
+          0.00072240399308587,
+          -0.1589045275263273,
+          -0.36958719489113356,
+          0.07661490680546733,
+          0.08507449967916061,
+          0.026986443522873937,
+          0.018640755715359985,
+          -0.04177749623853589,
+          0.017913050814087377,
+          0.010991107466918493,
+          0.005653346374902267,
+          -0.004958997477899603
+        ]
+      },
+      "names": [
+        "xc(0)",
+        "xs(1)",
+        "xc(1)",
+        "xs(2)",
+        "xc(2)",
+        "xs(3)",
+        "xc(3)",
+        "xs(4)",
+        "xc(4)",
+        "xs(5)",
+        "xc(5)",
+        "yc(0)",
+        "ys(1)",
+        "yc(1)",
+        "ys(2)",
+        "yc(2)",
+        "ys(3)",
+        "yc(3)",
+        "ys(4)",
+        "yc(4)",
+        "ys(5)",
+        "yc(5)",
+        "zc(0)",
+        "zs(1)",
+        "zc(1)",
+        "zs(2)",
+        "zc(2)",
+        "zs(3)",
+        "zc(3)",
+        "zs(4)",
+        "zc(4)",
+        "zs(5)",
+        "zc(5)"
+      ],
+      "free": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "bool",
+        "data": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "lower_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity
+        ]
+      },
+      "upper_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity
+        ]
+      }
+    },
+    "CurveXYZFourier2": {
+      "@module": "simsopt.geo.curvexyzfourier",
+      "@class": "CurveXYZFourier",
+      "@name": "CurveXYZFourier2",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "quadpoints": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          0.0,
+          0.008403361344537815,
+          0.01680672268907563,
+          0.025210084033613446,
+          0.03361344537815126,
+          0.04201680672268907,
+          0.05042016806722689,
+          0.058823529411764705,
+          0.06722689075630252,
+          0.07563025210084033,
+          0.08403361344537814,
+          0.09243697478991596,
+          0.10084033613445378,
+          0.1092436974789916,
+          0.11764705882352941,
+          0.12605042016806722,
+          0.13445378151260504,
+          0.14285714285714285,
+          0.15126050420168066,
+          0.15966386554621848,
+          0.1680672268907563,
+          0.1764705882352941,
+          0.18487394957983191,
+          0.19327731092436973,
+          0.20168067226890757,
+          0.21008403361344538,
+          0.2184873949579832,
+          0.226890756302521,
+          0.23529411764705882,
+          0.24369747899159663,
+          0.25210084033613445,
+          0.26050420168067223,
+          0.2689075630252101,
+          0.2773109243697479,
+          0.2857142857142857,
+          0.29411764705882354,
+          0.3025210084033613,
+          0.31092436974789917,
+          0.31932773109243695,
+          0.3277310924369748,
+          0.3361344537815126,
+          0.3445378151260504,
+          0.3529411764705882,
+          0.36134453781512604,
+          0.36974789915966383,
+          0.37815126050420167,
+          0.38655462184873945,
+          0.3949579831932773,
+          0.40336134453781514,
+          0.4117647058823529,
+          0.42016806722689076,
+          0.42857142857142855,
+          0.4369747899159664,
+          0.4453781512605042,
+          0.453781512605042,
+          0.4621848739495798,
+          0.47058823529411764,
+          0.4789915966386554,
+          0.48739495798319327,
+          0.49579831932773105,
+          0.5042016806722689,
+          0.5126050420168067,
+          0.5210084033613445,
+          0.5294117647058824,
+          0.5378151260504201,
+          0.5462184873949579,
+          0.5546218487394958,
+          0.5630252100840336,
+          0.5714285714285714,
+          0.5798319327731092,
+          0.5882352941176471,
+          0.5966386554621849,
+          0.6050420168067226,
+          0.6134453781512604,
+          0.6218487394957983,
+          0.6302521008403361,
+          0.6386554621848739,
+          0.6470588235294117,
+          0.6554621848739496,
+          0.6638655462184874,
+          0.6722689075630252,
+          0.680672268907563,
+          0.6890756302521008,
+          0.6974789915966386,
+          0.7058823529411764,
+          0.7142857142857143,
+          0.7226890756302521,
+          0.7310924369747899,
+          0.7394957983193277,
+          0.7478991596638656,
+          0.7563025210084033,
+          0.7647058823529411,
+          0.7731092436974789,
+          0.7815126050420168,
+          0.7899159663865546,
+          0.7983193277310924,
+          0.8067226890756303,
+          0.8151260504201681,
+          0.8235294117647058,
+          0.8319327731092436,
+          0.8403361344537815,
+          0.8487394957983193,
+          0.8571428571428571,
+          0.8655462184873949,
+          0.8739495798319328,
+          0.8823529411764706,
+          0.8907563025210083,
+          0.8991596638655461,
+          0.907563025210084,
+          0.9159663865546218,
+          0.9243697478991596,
+          0.9327731092436974,
+          0.9411764705882353,
+          0.9495798319327731,
+          0.9579831932773109,
+          0.9663865546218487,
+          0.9747899159663865,
+          0.9831932773109243,
+          0.9915966386554621,
+          1.0
+        ]
+      },
+      "order": 5,
+      "dofs": {
+        "$type": "ref",
+        "value": "12296280160"
+      }
+    },
+    "12296280720": {
+      "@module": "simsopt._core.optimizable",
+      "@class": "DOFs",
+      "@name": "12296280720",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "x": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          0.9597198462361053
+        ]
+      },
+      "names": [
+        "x0"
+      ],
+      "free": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "bool",
+        "data": [
+          true
+        ]
+      },
+      "lower_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          -Infinity
+        ]
+      },
+      "upper_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          Infinity
+        ]
+      }
+    },
+    "Current2": {
+      "@module": "simsopt.field.coil",
+      "@class": "Current",
+      "@name": "Current2",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current": 0.9597198462361053,
+      "dofs": {
+        "$type": "ref",
+        "value": "12296280720"
+      }
+    },
+    "ScaledCurrent2": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent2",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "Current2"
+      },
+      "scale": 100000.0
+    },
+    "Coil2": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil2",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      }
+    },
+    "12296280272": {
+      "@module": "simsopt._core.optimizable",
+      "@class": "DOFs",
+      "@name": "12296280272",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "x": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          0.7578051035638169,
+          -0.05120478233505352,
+          0.2968589891715168,
+          0.11577477047317909,
+          -0.023687650379458504,
+          -0.04588384607552398,
+          0.01119790325605681,
+          0.012536156748504775,
+          -0.011420704274274883,
+          -0.010998989074200284,
+          -0.009958324857903876,
+          0.5822463733787648,
+          0.06350431417735873,
+          0.2724557788622449,
+          -0.09153613554378102,
+          -0.08909020996084714,
+          0.017165943741348735,
+          0.04525883138394145,
+          0.0009502695689778254,
+          -0.029022442560219373,
+          0.008401754930377389,
+          0.009513364769984371,
+          -0.0507030800574563,
+          -0.2432847199062543,
+          0.0882597684622739,
+          0.05138188004036658,
+          -0.013957077555967156,
+          -0.009853169370740638,
+          0.005186106707667931,
+          0.02115622776704813,
+          0.0017095705767999133,
+          0.005875714538564722,
+          0.0045926405443516925
+        ]
+      },
+      "names": [
+        "xc(0)",
+        "xs(1)",
+        "xc(1)",
+        "xs(2)",
+        "xc(2)",
+        "xs(3)",
+        "xc(3)",
+        "xs(4)",
+        "xc(4)",
+        "xs(5)",
+        "xc(5)",
+        "yc(0)",
+        "ys(1)",
+        "yc(1)",
+        "ys(2)",
+        "yc(2)",
+        "ys(3)",
+        "yc(3)",
+        "ys(4)",
+        "yc(4)",
+        "ys(5)",
+        "yc(5)",
+        "zc(0)",
+        "zs(1)",
+        "zc(1)",
+        "zs(2)",
+        "zc(2)",
+        "zs(3)",
+        "zc(3)",
+        "zs(4)",
+        "zc(4)",
+        "zs(5)",
+        "zc(5)"
+      ],
+      "free": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "bool",
+        "data": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ]
+      },
+      "lower_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity,
+          -Infinity
+        ]
+      },
+      "upper_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity,
+          Infinity
+        ]
+      }
+    },
+    "CurveXYZFourier3": {
+      "@module": "simsopt.geo.curvexyzfourier",
+      "@class": "CurveXYZFourier",
+      "@name": "CurveXYZFourier3",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "quadpoints": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          0.0,
+          0.008403361344537815,
+          0.01680672268907563,
+          0.025210084033613446,
+          0.03361344537815126,
+          0.04201680672268907,
+          0.05042016806722689,
+          0.058823529411764705,
+          0.06722689075630252,
+          0.07563025210084033,
+          0.08403361344537814,
+          0.09243697478991596,
+          0.10084033613445378,
+          0.1092436974789916,
+          0.11764705882352941,
+          0.12605042016806722,
+          0.13445378151260504,
+          0.14285714285714285,
+          0.15126050420168066,
+          0.15966386554621848,
+          0.1680672268907563,
+          0.1764705882352941,
+          0.18487394957983191,
+          0.19327731092436973,
+          0.20168067226890757,
+          0.21008403361344538,
+          0.2184873949579832,
+          0.226890756302521,
+          0.23529411764705882,
+          0.24369747899159663,
+          0.25210084033613445,
+          0.26050420168067223,
+          0.2689075630252101,
+          0.2773109243697479,
+          0.2857142857142857,
+          0.29411764705882354,
+          0.3025210084033613,
+          0.31092436974789917,
+          0.31932773109243695,
+          0.3277310924369748,
+          0.3361344537815126,
+          0.3445378151260504,
+          0.3529411764705882,
+          0.36134453781512604,
+          0.36974789915966383,
+          0.37815126050420167,
+          0.38655462184873945,
+          0.3949579831932773,
+          0.40336134453781514,
+          0.4117647058823529,
+          0.42016806722689076,
+          0.42857142857142855,
+          0.4369747899159664,
+          0.4453781512605042,
+          0.453781512605042,
+          0.4621848739495798,
+          0.47058823529411764,
+          0.4789915966386554,
+          0.48739495798319327,
+          0.49579831932773105,
+          0.5042016806722689,
+          0.5126050420168067,
+          0.5210084033613445,
+          0.5294117647058824,
+          0.5378151260504201,
+          0.5462184873949579,
+          0.5546218487394958,
+          0.5630252100840336,
+          0.5714285714285714,
+          0.5798319327731092,
+          0.5882352941176471,
+          0.5966386554621849,
+          0.6050420168067226,
+          0.6134453781512604,
+          0.6218487394957983,
+          0.6302521008403361,
+          0.6386554621848739,
+          0.6470588235294117,
+          0.6554621848739496,
+          0.6638655462184874,
+          0.6722689075630252,
+          0.680672268907563,
+          0.6890756302521008,
+          0.6974789915966386,
+          0.7058823529411764,
+          0.7142857142857143,
+          0.7226890756302521,
+          0.7310924369747899,
+          0.7394957983193277,
+          0.7478991596638656,
+          0.7563025210084033,
+          0.7647058823529411,
+          0.7731092436974789,
+          0.7815126050420168,
+          0.7899159663865546,
+          0.7983193277310924,
+          0.8067226890756303,
+          0.8151260504201681,
+          0.8235294117647058,
+          0.8319327731092436,
+          0.8403361344537815,
+          0.8487394957983193,
+          0.8571428571428571,
+          0.8655462184873949,
+          0.8739495798319328,
+          0.8823529411764706,
+          0.8907563025210083,
+          0.8991596638655461,
+          0.907563025210084,
+          0.9159663865546218,
+          0.9243697478991596,
+          0.9327731092436974,
+          0.9411764705882353,
+          0.9495798319327731,
+          0.9579831932773109,
+          0.9663865546218487,
+          0.9747899159663865,
+          0.9831932773109243,
+          0.9915966386554621,
+          1.0
+        ]
+      },
+      "order": 5,
+      "dofs": {
+        "$type": "ref",
+        "value": "12296280272"
+      }
+    },
+    "12296280944": {
+      "@module": "simsopt._core.optimizable",
+      "@class": "DOFs",
+      "@name": "12296280944",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "x": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          0.9211496345478051
+        ]
+      },
+      "names": [
+        "x0"
+      ],
+      "free": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "bool",
+        "data": [
+          true
+        ]
+      },
+      "lower_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          -Infinity
+        ]
+      },
+      "upper_bounds": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          Infinity
+        ]
+      }
+    },
+    "Current3": {
+      "@module": "simsopt.field.coil",
+      "@class": "Current",
+      "@name": "Current3",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current": 0.9211496345478051,
+      "dofs": {
+        "$type": "ref",
+        "value": "12296280944"
+      }
+    },
+    "ScaledCurrent3": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent3",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "Current3"
+      },
+      "scale": 100000.0
+    },
+    "Coil3": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil3",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      }
+    },
+    "RotatedCurve1": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve1",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "phi": 0.0,
+      "flip": true
+    },
+    "ScaledCurrent4": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent4",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      },
+      "scale": -1.0
+    },
+    "Coil4": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil4",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve1"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent4"
+      }
+    },
+    "RotatedCurve2": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve2",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "phi": 0.0,
+      "flip": true
+    },
+    "ScaledCurrent5": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent5",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      },
+      "scale": -1.0
+    },
+    "Coil5": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil5",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve2"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent5"
+      }
+    },
+    "RotatedCurve3": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve3",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "phi": 0.0,
+      "flip": true
+    },
+    "ScaledCurrent6": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent6",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      },
+      "scale": -1.0
+    },
+    "Coil6": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil6",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve3"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent6"
+      }
+    },
+    "RotatedCurve4": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve4",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "phi": 1.5707963267948966,
+      "flip": false
+    },
+    "Coil7": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil7",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve4"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      }
+    },
+    "RotatedCurve5": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve5",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "phi": 1.5707963267948966,
+      "flip": false
+    },
+    "Coil8": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil8",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve5"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      }
+    },
+    "RotatedCurve6": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve6",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "phi": 1.5707963267948966,
+      "flip": false
+    },
+    "Coil9": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil9",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve6"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      }
+    },
+    "RotatedCurve7": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve7",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "phi": 1.5707963267948966,
+      "flip": true
+    },
+    "ScaledCurrent7": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent7",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      },
+      "scale": -1.0
+    },
+    "Coil10": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil10",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve7"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent7"
+      }
+    },
+    "RotatedCurve8": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve8",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "phi": 1.5707963267948966,
+      "flip": true
+    },
+    "ScaledCurrent8": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent8",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      },
+      "scale": -1.0
+    },
+    "Coil11": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil11",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve8"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent8"
+      }
+    },
+    "RotatedCurve9": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve9",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "phi": 1.5707963267948966,
+      "flip": true
+    },
+    "ScaledCurrent9": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent9",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      },
+      "scale": -1.0
+    },
+    "Coil12": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil12",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve9"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent9"
+      }
+    },
+    "RotatedCurve10": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve10",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "phi": 3.141592653589793,
+      "flip": false
+    },
+    "Coil13": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil13",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve10"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      }
+    },
+    "RotatedCurve11": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve11",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "phi": 3.141592653589793,
+      "flip": false
+    },
+    "Coil14": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil14",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve11"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      }
+    },
+    "RotatedCurve12": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve12",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "phi": 3.141592653589793,
+      "flip": false
+    },
+    "Coil15": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil15",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve12"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      }
+    },
+    "RotatedCurve13": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve13",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "phi": 3.141592653589793,
+      "flip": true
+    },
+    "ScaledCurrent10": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent10",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      },
+      "scale": -1.0
+    },
+    "Coil16": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil16",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve13"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent10"
+      }
+    },
+    "RotatedCurve14": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve14",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "phi": 3.141592653589793,
+      "flip": true
+    },
+    "ScaledCurrent11": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent11",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      },
+      "scale": -1.0
+    },
+    "Coil17": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil17",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve14"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent11"
+      }
+    },
+    "RotatedCurve15": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve15",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "phi": 3.141592653589793,
+      "flip": true
+    },
+    "ScaledCurrent12": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent12",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      },
+      "scale": -1.0
+    },
+    "Coil18": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil18",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve15"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent12"
+      }
+    },
+    "RotatedCurve16": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve16",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "phi": 4.71238898038469,
+      "flip": false
+    },
+    "Coil19": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil19",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve16"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      }
+    },
+    "RotatedCurve17": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve17",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "phi": 4.71238898038469,
+      "flip": false
+    },
+    "Coil20": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil20",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve17"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      }
+    },
+    "RotatedCurve18": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve18",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "phi": 4.71238898038469,
+      "flip": false
+    },
+    "Coil21": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil21",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve18"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      }
+    },
+    "RotatedCurve19": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve19",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier1"
+      },
+      "phi": 4.71238898038469,
+      "flip": true
+    },
+    "ScaledCurrent13": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent13",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent1"
+      },
+      "scale": -1.0
+    },
+    "Coil22": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil22",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve19"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent13"
+      }
+    },
+    "RotatedCurve20": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve20",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier2"
+      },
+      "phi": 4.71238898038469,
+      "flip": true
+    },
+    "ScaledCurrent14": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent14",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent2"
+      },
+      "scale": -1.0
+    },
+    "Coil23": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil23",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve20"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent14"
+      }
+    },
+    "RotatedCurve21": {
+      "@module": "simsopt.geo.curve",
+      "@class": "RotatedCurve",
+      "@name": "RotatedCurve21",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "CurveXYZFourier3"
+      },
+      "phi": 4.71238898038469,
+      "flip": true
+    },
+    "ScaledCurrent15": {
+      "@module": "simsopt.field.coil",
+      "@class": "ScaledCurrent",
+      "@name": "ScaledCurrent15",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "current_to_scale": {
+        "$type": "ref",
+        "value": "ScaledCurrent3"
+      },
+      "scale": -1.0
+    },
+    "Coil24": {
+      "@module": "simsopt.field.coil",
+      "@class": "Coil",
+      "@name": "Coil24",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "curve": {
+        "$type": "ref",
+        "value": "RotatedCurve21"
+      },
+      "current": {
+        "$type": "ref",
+        "value": "ScaledCurrent15"
+      }
+    },
+    "BiotSavart1": {
+      "@module": "simsopt.field.biotsavart",
+      "@class": "BiotSavart",
+      "@name": "BiotSavart1",
+      "@version": "1.3.1.dev0+g5b1cb70c.d20240308",
+      "coils": [
+        {
+          "$type": "ref",
+          "value": "Coil1"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil2"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil3"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil4"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil5"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil6"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil7"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil8"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil9"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil10"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil11"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil12"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil13"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil14"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil15"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil16"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil17"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil18"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil19"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil20"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil21"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil22"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil23"
+        },
+        {
+          "$type": "ref",
+          "value": "Coil24"
+        }
+      ],
+      "points": {
+        "@module": "numpy",
+        "@class": "array",
+        "dtype": "float64",
+        "data": [
+          [
+            1.2234377796570237,
+            0.0154989868798912,
+            -0.0014931954508142357
+          ],
+          [
+            1.221166460969016,
+            0.01547021292903662,
+            0.04258645932381532
+          ],
+          [
+            1.2139136747211043,
+            0.015378331804578822,
+            0.08403062180309741
+          ],
+          [
+            1.2022651985310058,
+            0.015230764365806684,
+            0.12081606936446328
+          ],
+          [
+            1.187175975531417,
+            0.015039608204711234,
+            0.1513038920740669
+          ],
+          [
+            1.169945278689297,
+            0.014821323017897507,
+            0.17431837489516958
+          ],
+          [
+            1.152127465483549,
+            0.014595600012039653,
+            0.18916276099188956
+          ],
+          [
+            1.1353611460901278,
+            0.014383197739832931,
+            0.19558389140343618
+          ],
+          [
+            1.1211302354235892,
+            0.014202915014076811,
+            0.19370616302368376
+          ],
+          [
+            1.110503312140456,
+            0.014068289005891035,
+            0.18395668091118378
+          ],
+          [
+            1.1039196721280686,
+            0.013984884886882612,
+            0.16699847860737033
+          ],
+          [
+            1.101091197837504,
+            0.013949052671588538,
+            0.14367985135345646
+          ],
+          [
+            1.1010655357779695,
+            0.013948727574611275,
+            0.11499878843108582
+          ],
+          [
+            1.1024536496563777,
+            0.013966312742526618,
+            0.0820754479158176
+          ],
+          [
+            1.103776337569843,
+            0.013983069068804803,
+            0.04612434324033084
+          ],
+          [
+            1.1038455154478388,
+            0.0139839454411396,
+            0.008421126635351278
+          ],
+          [
+            1.1020803452340227,
+            0.013961583576531836,
+            -0.02973551356211079
+          ],
+          [
+            1.0986719074527072,
+            0.013918404157576551,
+            -0.06706123424220589
+          ],
+          [
+            1.0945499173594768,
+            0.013866185179679753,
+            -0.10231515663261168
+          ],
+          [
+            1.091159197778533,
+            0.0138232302217961,
+            -0.13431560374295665
+          ],
+          [
+            1.0901056934358069,
+            0.013809884017961852,
+            -0.16194337531278083
+          ],
+          [
+            1.0927658540407434,
+            0.013843583969851416,
+            -0.18414070387789822
+          ],
+          [
+            1.0999592468003048,
+            0.013934712674437928,
+            -0.19991923821790653
+          ],
+          [
+            1.1117614214976173,
+            0.014084227225835149,
+            -0.20839085438991983
+          ],
+          [
+            1.1274906905354105,
+            0.01428349173973252,
+            -0.20882968186457307
+          ],
+          [
+            1.1458531359587547,
+            0.014516114358905612,
+            -0.2007635142057059
+          ],
+          [
+            1.165190483996371,
+            0.014761087424565661,
+            -0.18408077035066883
+          ],
+          [
+            1.1837570062752345,
+            0.014996295368925515,
+            -0.15912940420598437
+          ],
+          [
+            1.199957979978474,
+            0.01520153562146894,
+            -0.12678027352883825
+          ],
+          [
+            1.2125084499092318,
+            0.015360529868685838,
+            -0.08843143790362723
+          ],
+          [
+            1.2205056272637287,
+            0.015461841229961814,
+            -0.04594116650294886
+          ],
+          [
+            1.2234377796570237,
+            0.0154989868798912,
+            -0.0014931954508142981
+          ],
+          [
+            1.221584829425203,
+            0.04644641760812666,
+            -0.004498209122505182
+          ],
+          [
+            1.2199800998346826,
+            0.04638540347393468,
+            0.038835227115756814
+          ],
+          [
+            1.213495738546598,
+            0.04613885870270495,
+            0.07892075912628693
+          ],
+          [
+            1.202780817182002,
+            0.0457314619338924,
+            0.11392942595735016
+          ],
+          [
+            1.1888263236970664,
+            0.045200891959299494,
+            0.14244906866972254
+          ],
+          [
+            1.1729258136963927,
+            0.04459633162923958,
+            0.16350791505959142
+          ],
+          [
+            1.1565718973988728,
+            0.04397453213763951,
+            0.17654813501607186
+          ],
+          [
+            1.1412771515075544,
+            0.043393003832959576,
+            0.18137354720264565
+          ],
+          [
+            1.1283393016987195,
+            0.04290108811765464,
+            0.1780950459743946
+          ],
+          [
+            1.1186013062650861,
+            0.04253083548215868,
+            0.16708895156185552
+          ],
+          [
+            1.1122743772509556,
+            0.04229027651311388,
+            0.14897138476829996
+          ],
+          [
+            1.1088871448839501,
+            0.0421614890517243,
+            0.12458096811430845
+          ],
+          [
+            1.1073959001900266,
+            0.0421047897770268,
+            0.09495681835120758
+          ],
+          [
+            1.1064464985719127,
+            0.04206869215779433,
+            0.061300685608613965
+          ],
+          [
+            1.1047318091661158,
+            0.04200349719278536,
+            0.02491999537789967
+          ],
+          [
+            1.101355089120596,
+            0.041875109425024905,
+            -0.012841193229284155
+          ],
+          [
+            1.0961013126272312,
+            0.041675353263068135,
+            -0.050668315653688706
+          ],
+          [
+            1.0895393973583782,
+            0.041425859777601645,
+            -0.08732258339223288
+          ],
+          [
+            1.0829230369275062,
+            0.04117429620852658,
+            -0.12165600344690668
+          ],
+          [
+            1.0779131387184098,
+            0.040983812650783484,
+            -0.15259509933921936
+          ],
+          [
+            1.0761937651164617,
+            0.040918439585878895,
+            -0.17910645073562806
+          ],
+          [
+            1.0790810645623532,
+            0.04102821887634921,
+            -0.20016698052943785
+          ],
+          [
+            1.0872229548473955,
+            0.041337785291377924,
+            -0.2147641457094023
+          ],
+          [
+            1.100457754332801,
+            0.041840991461798524,
+            -0.22194410848693347
+          ],
+          [
+            1.1178528170760778,
+            0.04250237684333929,
+            -0.22091115287560228
+          ],
+          [
+            1.1378949507785054,
+            0.0432644076817043,
+            -0.21116355032600445
+          ],
+          [
+            1.1587682818772107,
+            0.044058041844253076,
+            -0.19263569837577083
+          ],
+          [
+            1.1786423384043125,
+            0.044813682145925474,
+            -0.16580902349465532
+          ],
+          [
+            1.195905124596831,
+            0.04547003818216963,
+            -0.1317577732382965
+          ],
+          [
+            1.2093060303659118,
+            0.04597955995313887,
+            -0.09210982617438673
+          ],
+          [
+            1.2180090730633675,
+            0.046310462192468066,
+            -0.048923027462728697
+          ],
+          [
+            1.221584829425203,
+            0.04644641760812666,
+            -0.004498209122505229
+          ],
+          [
+            1.217893886257277,
+            0.07724296829149532,
+            -0.0075565153393592
+          ],
+          [
+            1.2169500634707489,
+            0.0771831078435571,
+            0.03467952755405306
+          ],
+          [
+            1.211243430681251,
+            0.0768211738026818,
+            0.07314049849501335
+          ],
+          [
+            1.2014734359310386,
+            0.07620152754021646,
+            0.10621414913854473
+          ],
+          [
+            1.1886499979185774,
+            0.0753882215314077,
+            0.1327101833682946
+          ],
+          [
+            1.1740414564218093,
+            0.07446169819439714,
+            0.1518331960657522
+          ],
+          [
+            1.1590595705167717,
+            0.07351149608650581,
+            0.1631259318004022
+          ],
+          [
+            1.1450759167653524,
+            0.07262460525347969,
+            0.1664148631559075
+          ],
+          [
+            1.133195415012262,
+            0.0718711034660447,
+            0.1617794704184312
+          ],
+          [
+            1.124040861342697,
+            0.0712904905679916,
+            0.14954939014169136
+          ],
+          [
+            1.1176149691541113,
+            0.07088293865220618,
+            0.13031689825936627
+          ],
+          [
+            1.1132961834787034,
+            0.07060902659077982,
+            0.10494256695012537
+          ],
+          [
+            1.1099921796171253,
+            0.07039947543989987,
+            0.07453297576804528
+          ],
+          [
+            1.1064295030136395,
+            0.07017351838483853,
+            0.040380399292777765
+          ],
+          [
+            1.1015137380431768,
+            0.06986174386816962,
+            0.0038708169098873144
+          ],
+          [
+            1.0946669620147127,
+            0.06942749806922659,
+            -0.033618391941694234
+          ],
+          [
+            1.0860483920062742,
+            0.06888087907606809,
+            -0.07080245007417087
+          ],
+          [
+            1.0765919206695247,
+            0.0682811175337397,
+            -0.10653025254376386
+          ],
+          [
+            1.0678431072770902,
+            0.06772623806264162,
+            -0.13977229661435336
+          ],
+          [
+            1.0616334897910131,
+            0.06733240302332355,
+            -0.16956521232306304
+          ],
+          [
+            1.0596748454917437,
+            0.06720817914699906,
+            -0.19494081000192934
+          ],
+          [
+            1.063176582188853,
+            0.06743027118614313,
+            -0.21487691586677227
+          ],
+          [
+            1.0725799249272143,
+            0.06802666313224727,
+            -0.2283036201684299
+          ],
+          [
+            1.0874667662129283,
+            0.06897083718744898,
+            -0.2341822431534692
+          ],
+          [
+            1.1066509907208166,
+            0.07018756588777413,
+            -0.23165022326909956
+          ],
+          [
+            1.1284118316078455,
+            0.07156771235340632,
+            -0.22020112091622016
+          ],
+          [
+            1.1507970123532103,
+            0.07298745657416707,
+            -0.19985318232279864
+          ],
+          [
+            1.1719164804092457,
+            0.07432692499567203,
+            -0.1712580570266931
+          ],
+          [
+            1.1901650777677664,
+            0.07548431304321389,
+            -0.13571440977326474
+          ],
+          [
+            1.2043459686664968,
+            0.07638371332627303,
+            -0.09507543574704659
+          ],
+          [
+            1.2137027553102213,
+            0.07697715252667216,
+            -0.05156709654883894
+          ],
+          [
+            1.217893886257277,
+            0.07724296829149532,
+            -0.007556515339359296
+          ],
+          [
+            1.2123950018750695,
+            0.10779056766581178,
+            -0.010695271900026818
+          ],
+          [
+            1.2120954915505482,
+            0.10776393906057008,
+            0.030130528657919525
+          ],
+          [
+            1.2071615468840755,
+            0.10732527616967374,
+            0.06675449559019282
+          ],
+          [
+            1.1983283211088802,
+            0.1065399393618215,
+            0.09779138586115917
+          ],
+          [
+            1.1866070168773835,
+            0.1054978317690463,
+            0.12225651802802472
+          ],
+          [
+            1.173222276054589,
+            0.10430783279254321,
+            0.139496420513543
+          ],
+          [
+            1.1594886082802993,
+            0.10308681172000922,
+            0.14911571135768276
+          ],
+          [
+            1.1466258708779662,
+            0.10194322257275157,
+            0.15093496529246475
+          ],
+          [
+            1.1355448552818286,
+            0.1009580412089435,
+            0.144993615535692
+          ],
+          [
+            1.1266591670524875,
+            0.10016804011453052,
+            0.13158762815066327
+          ],
+          [
+            1.1197872953844776,
+            0.09955708168359358,
+            0.11131333580587341
+          ],
+          [
+            1.1141933723793078,
+            0.099059742008592,
+            0.08508344728531896
+          ],
+          [
+            1.1087792871883573,
+            0.09857839119864882,
+            0.05409077528905031
+          ],
+          [
+            1.1023950684216115,
+            0.09801078859066548,
+            0.019715794149826632
+          ],
+          [
+            1.094193768333373,
+            0.09728163448598698,
+            -0.016602399064072522
+          ],
+          [
+            1.0839357853502634,
+            0.0963696265948743,
+            -0.05349517132784951
+          ],
+          [
+            1.0721541949572166,
+            0.09532215913211793,
+            -0.08975352257178268
+          ],
+          [
+            1.0601267926555227,
+            0.09425283723649844,
+            -0.12434956649643264
+          ],
+          [
+            1.049652613907606,
+            0.0933216079990593,
+            -0.156386515809667
+          ],
+          [
+            1.0426849643279483,
+            0.09270213422827817,
+            -0.18500063504884157
+          ],
+          [
+            1.0409127532051832,
+            0.09254457201245651,
+            -0.20925913726113832
+          ],
+          [
+            1.0453950049838465,
+            0.09294307618221637,
+            -0.2281037409506753
+          ],
+          [
+            1.056336219840787,
+            0.0939158282626516,
+            -0.2403775912852707
+          ],
+          [
+            1.0730488315061038,
+            0.0954016987056975,
+            -0.24494676769610652
+          ],
+          [
+            1.0940969397693805,
+            0.09727302573565161,
+            -0.24089519638235007
+          ],
+          [
+            1.117569188699726,
+            0.0993598761702725,
+            -0.22774437834784042
+          ],
+          [
+            1.1414018465734808,
+            0.10147876953194424,
+            -0.2056364369360979
+          ],
+          [
+            1.1636724004635755,
+            0.1034587807018457,
+            -0.17542534153677203
+          ],
+          [
+            1.1828068688521973,
+            0.10515997149065896,
+            -0.13864508127165362
+          ],
+          [
+            1.1976804106024186,
+            0.10648233549412152,
+            -0.09735743046913123
+          ],
+          [
+            1.2076267598277,
+            0.1073666369202552,
+            -0.053914828470136233
+          ],
+          [
+            1.2123950018750695,
+            0.10779056766581178,
+            -0.010695271900026794
+          ],
+          [
+            1.20513354609795,
+            0.13799497722958326,
+            -0.013929816058180632
+          ],
+          [
+            1.2054517942876035,
+            0.1380314185450099,
+            0.025220598537502352
+          ],
+          [
+            1.2012720857030583,
+            0.13755281698851174,
+            0.059852548985244405
+          ],
+          [
+            1.1933493386173506,
+            0.13664561520392285,
+            0.08880589085132395
+          ],
+          [
+            1.1826783332977981,
+            0.13542372146371764,
+            0.11127559773977926
+          ],
+          [
+            1.1704229511903317,
+            0.13402040713367058,
+            0.12671153738318014
+          ],
+          [
+            1.1577870429548602,
+            0.13257352029289282,
+            0.13474388430213
+          ],
+          [
+            1.1458323870277893,
+            0.1312046409037288,
+            0.13516628859526306
+          ],
+          [
+            1.1352795036114258,
+            0.12999627282579862,
+            0.12797890300289116
+          ],
+          [
+            1.126348903404811,
+            0.12897366584904607,
+            0.11346438898227718
+          ],
+          [
+            1.1187031267364314,
+            0.12809817882881355,
+            0.09225320764531755
+          ],
+          [
+            1.1115297087811773,
+            0.12727677969790502,
+            0.0653361843290275
+          ],
+          [
+            1.1037665288763367,
+            0.12638784930702324,
+            0.034001750263844006
+          ],
+          [
+            1.0944257196929574,
+            0.1253182709563584,
+            -0.00029513011280210257
+          ],
+          [
+            1.0829356735899993,
+            0.1240025921625198,
+            -0.03609704083915834
+          ],
+          [
+            1.0694060280465965,
+            0.1224533670706357,
+            -0.0720900825729779
+          ],
+          [
+            1.0547344548130912,
+            0.12077338444892949,
+            -0.10718392316976777
+          ],
+          [
+            1.0405139159368624,
+            0.11914504795064561,
+            -0.14050016183803796
+          ],
+          [
+            1.0287533574592467,
+            0.11779839387684567,
+            -0.17127651057646895
+          ],
+          [
+            1.0214770660454433,
+            0.11696521512149965,
+            -0.1987268735193608
+          ],
+          [
+            1.0203019361967358,
+            0.11683065574653308,
+            -0.2219171754392397
+          ],
+          [
+            1.0260972289285633,
+            0.11749425132160995,
+            -0.23971587996862204
+          ],
+          [
+            1.0388067700113528,
+            0.1189495695624777,
+            -0.2508558633752543
+          ],
+          [
+            1.057467186368993,
+            0.12108629850733592,
+            -0.2541075987149063
+          ],
+          [
+            1.0804026165033407,
+            0.12371254202149894,
+            -0.24852469749199296
+          ],
+          [
+            1.1055328386877392,
+            0.1265901023129196,
+            -0.23369508101852565
+          ],
+          [
+            1.1307105032521982,
+            0.1294730950397557,
+            -0.20992417136468994
+          ],
+          [
+            1.154008756358454,
+            0.1321408839477126,
+            -0.17829324594051388
+          ],
+          [
+            1.1739085078223603,
+            0.13441952415238326,
+            -0.14057121057623054
+          ],
+          [
+            1.1893733217325808,
+            0.13619033756166093,
+            -0.09900000591312362
+          ],
+          [
+            1.1998350963978048,
+            0.13738827314430488,
+            -0.056008905718797256
+          ],
+          [
+            1.20513354609795,
+            0.13799497722958326,
+            -0.013929816058180748
+          ],
+          [
+            1.19617042223596,
+            0.16776742459362343,
+            -0.01726034259719476
+          ],
+          [
+            1.1970711996436945,
+            0.16789376203101405,
+            0.02000391534479208
+          ],
+          [
+            1.1936152265173674,
+            0.16740904873256546,
+            0.05254714755526992
+          ],
+          [
+            1.186560511103598,
+            0.16641959822099311,
+            0.07942097044208801
+          ],
+          [
+            1.1768681044891132,
+            0.165060201545069,
+            0.09996658421679842
+          ],
+          [
+            1.1656258067362735,
+            0.16348342677665184,
+            0.113697310722519
+          ],
+          [
+            1.1539165332025396,
+            0.16184115688926842,
+            0.12023738129952659
+          ],
+          [
+            1.1426419215672698,
+            0.16025984997665743,
+            0.1193411218384813
+          ],
+          [
+            1.132340967028752,
+            0.15881510215338934,
+            0.11097894235116429
+          ],
+          [
+            1.1230617717086375,
+            0.15751365992390595,
+            0.09544580110317202
+          ],
+          [
+            1.1143424359521916,
+            0.15629074011512853,
+            0.07343572280101177
+          ],
+          [
+            1.1053325042885622,
+            0.1550270631315879,
+            0.046036996507963765
+          ],
+          [
+            1.0950455287858443,
+            0.15358427592094723,
+            0.01463258326139151
+          ],
+          [
+            1.0826892156675074,
+            0.15185125628528293,
+            -0.019272415502419725
+          ],
+          [
+            1.0679875492763728,
+            0.14978929198502478,
+            -0.054244005489244164
+          ],
+          [
+            1.0514014112567394,
+            0.14746302341343875,
+            -0.0890695791051682
+          ],
+          [
+            1.0341751299239679,
+            0.1450469723217205,
+            -0.12281407431881848
+          ],
+          [
+            1.0181811931713811,
+            0.14280376221702734,
+            -0.1547635901868156
+          ],
+          [
+            1.005590954536777,
+            0.14103793364320394,
+            -0.1842795353880009
+          ],
+          [
+            0.9984485041831586,
+            0.14003617797458065,
+            -0.210621629803275
+          ],
+          [
+            0.9982525835025879,
+            0.14000869935832919,
+            -0.2328138572243785
+          ],
+          [
+            1.0056489156337776,
+            0.14104606290621668,
+            -0.24961721472146575
+          ],
+          [
+            1.0203036756863733,
+            0.1431014484151358,
+            -0.2596394087755573
+          ],
+          [
+            1.0409783330532054,
+            0.14600114728438673,
+            -0.2615655094311118
+          ],
+          [
+            1.0657727586480203,
+            0.14947865922498862,
+            -0.25445064830803005
+          ],
+          [
+            1.0924635904668425,
+            0.1532221493090646,
+            -0.2379909956582828
+          ],
+          [
+            1.1188495843473303,
+            0.15692288471965757,
+            -0.21269131812839903
+          ],
+          [
+            1.1430276241796076,
+            0.16031394622642925,
+            -0.17987608685439274
+          ],
+          [
+            1.1635557328395612,
+            0.16319309108542088,
+            -0.14153696611201386
+          ],
+          [
+            1.179499923356898,
+            0.16542932409252326,
+            -0.1000573163013637
+          ],
+          [
+            1.190395584250508,
+            0.1669574817307547,
+            -0.05788829388405394
+          ],
+          [
+            1.19617042223596,
+            0.16776742459362343,
+            -0.01726034259719483
+          ],
+          [
+            1.185582147168132,
+            0.197026295485971,
+            -0.020669843912791135
+          ],
+          [
+            1.1870230475230767,
+            0.19726575190809856,
+            0.014555519928384796
+          ],
+          [
+            1.1842499163874636,
+            0.19680489834695836,
+            0.04496956661758396
+          ],
+          [
+            1.1780070008257058,
+            0.19576741770582112,
+            0.06981241016121992
+          ],
+          [
+            1.1692051477005854,
+            0.19430467932130985,
+            0.088533239415521
+          ],
+          [
+            1.158842738478693,
+            0.19258259949227752,
+            0.10067047938390235
+          ],
+          [
+            1.147874629856624,
+            0.19075986134169406,
+            0.10581769208169173
+          ],
+          [
+            1.137044341004882,
+            0.1889600268075805,
+            0.10368648736350215
+          ],
+          [
+            1.126722533820003,
+            0.18724469443924582,
+            0.09423452520575643
+          ],
+          [
+            1.1168095231474429,
+            0.18559729803184155,
+            0.07779739497306223
+          ],
+          [
+            1.1067528837274385,
+            0.18392603264150614,
+            0.0551587537706189
+          ],
+          [
+            1.095702736947719,
+            0.18208966095711068,
+            0.027515174430983547
+          ],
+          [
+            1.082784975347775,
+            0.17994291918971209,
+            -0.003667693244375544
+          ],
+          [
+            1.067430424840983,
+            0.17739121898704666,
+            -0.03686805677083145
+          ],
+          [
+            1.0496708231445633,
+            0.1744398346903871,
+            -0.07072108579315932
+          ],
+          [
+            1.0303113519411706,
+            0.17122257563931026,
+            -0.1041592061774697
+          ],
+          [
+            1.010916850409504,
+            0.16799949506348633,
+            -0.1364302210032348
+          ],
+          [
+            0.9935977534920627,
+            0.16512131617478037,
+            -0.16698733698191806
+          ],
+          [
+            0.9806377301437041,
+            0.16296755112708802,
+            -0.1952930410372774
+          ],
+          [
+            0.9740506369587294,
+            0.16187287323289365,
+            -0.2206136089081455
+          ],
+          [
+            0.9751753976682259,
+            0.16205979190101763,
+            -0.24188962766576796
+          ],
+          [
+            0.9844071816489983,
+            0.1635939784631238,
+            -0.25774616995635297
+          ],
+          [
+            1.0011251629847306,
+            0.1663722607934125,
+            -0.26666080895751854
+          ],
+          [
+            1.0238233654727562,
+            0.17014436782208886,
+            -0.26725371322556724
+          ],
+          [
+            1.0503984670384359,
+            0.1745607583911911,
+            -0.2586201181724673
+          ],
+          [
+            1.0785127908107612,
+            0.17923294502641113,
+            -0.24060686536099105
+          ],
+          [
+            1.1059417055651757,
+            0.18379122677531498,
+            -0.2139481745964637
+          ],
+          [
+            1.130832801397711,
+            0.1879277603880932,
+            -0.1802171131934883
+          ],
+          [
+            1.1518411056111253,
+            0.19141903120681983,
+            -0.14160455338426617
+          ],
+          [
+            1.1681462775292424,
+            0.1941287106904068,
+            -0.10058822235399098
+          ],
+          [
+            1.1793897284040675,
+            0.19599720666905882,
+            -0.05958392272553561
+          ],
+          [
+            1.1855821471681323,
+            0.19702629548597103,
+            -0.02066984391279118
+          ],
+          [
+            1.1734606531831837,
+            0.22569884838341525,
+            -0.02412348088215895
+          ],
+          [
+            1.1753936774963933,
+            0.22607063874571248,
+            0.008968858584522144
+          ],
+          [
+            1.1732539036726177,
+            0.22565908298837453,
+            0.03726476116715263
+          ],
+          [
+            1.1677553491806778,
+            0.2246015124484183,
+            0.0601617646551012
+          ],
+          [
+            1.159743408482737,
+            0.22306052700170884,
+            0.07717686918138235
+          ],
+          [
+            1.1501158598147119,
+            0.22120880181498515,
+            0.08783935879286527
+          ],
+          [
+            1.1396954456514539,
+            0.21920457996916035,
+            0.09169551870372722
+          ],
+          [
+            1.1290733342600565,
+            0.21716156446460513,
+            0.08841950671737552
+          ],
+          [
+            1.1184689219873993,
+            0.21512195313956478,
+            0.07797879306371229
+          ],
+          [
+            1.1076625370327329,
+            0.21304349517607024,
+            0.06077797839955604
+          ],
+          [
+            1.0960466753411986,
+            0.21080934561200212,
+            0.03771061262456395
+          ],
+          [
+            1.0828096700608956,
+            0.20826339160859747,
+            0.010082622916364416
+          ],
+          [
+            1.0672226148511348,
+            0.20526543816125456,
+            -0.020579698674411426
+          ],
+          [
+            1.0489605235748476,
+            0.20175297870302733,
+            -0.052778171968896156
+          ],
+          [
+            1.0283667691470522,
+            0.1977920562420688,
+            -0.0852636407004243
+          ],
+          [
+            1.006575205933559,
+            0.19360075190781775,
+            -0.11715131794551195
+          ],
+          [
+            0.9854375762027087,
+            0.18953522259086394,
+            -0.14788840820644017
+          ],
+          [
+            0.9672559043407838,
+            0.1860382306893545,
+            -0.1770851767893364
+          ],
+          [
+            0.9543749199574996,
+            0.18356075235766459,
+            -0.2042723681705855
+          ],
+          [
+            0.9487308299508131,
+            0.1824751900840375,
+            -0.2286790174532127
+          ],
+          [
+            0.9514668466852542,
+            0.18300142487891197,
+            -0.24912322748019036
+          ],
+          [
+            0.9627082297447439,
+            0.18516354868245086,
+            -0.2640737946073558
+          ],
+          [
+            0.9815457928705466,
+            0.1887866921532698,
+            -0.27188388322034457
+          ],
+          [
+            1.0062206811921544,
+            0.1935325640008424,
+            -0.2711385097575809
+          ],
+          [
+            1.0344521291004714,
+            0.19896249065736818,
+            -0.2610159440433152
+          ],
+          [
+            1.0638190325652916,
+            0.20461080641010967,
+            -0.2415538941019675
+          ],
+          [
+            1.0921035148631906,
+            0.21005093349442217,
+            -0.21373804271948052
+          ],
+          [
+            1.1175286900797532,
+            0.21494111259907162,
+            -0.17938430706118022
+          ],
+          [
+            1.1388633962839287,
+            0.21904454683678462,
+            -0.1408489498496797
+          ],
+          [
+            1.1554089201828297,
+            0.22222684841609394,
+            -0.10065127034748178
+          ],
+          [
+            1.1669124596739548,
+            0.2244393943659195,
+            -0.06111533022779507
+          ],
+          [
+            1.1734606531831837,
+            0.22569884838341525,
+            -0.024123480882158956
+          ],
+          [
+            1.159912671600068,
+            0.25372288686986694,
+            -0.027569433121280965
+          ],
+          [
+            1.162285772509115,
+            0.25424198630572903,
+            0.0033519841752437055
+          ],
+          [
+            1.1607230870249559,
+            0.2539001596475518,
+            0.02958539592078752
+          ],
+          [
+            1.155892852319679,
+            0.2528435791620647,
+            0.05064943121024208
+          ],
+          [
+            1.1485613393956629,
+            0.25123986133937803,
+            0.06608964867398817
+          ],
+          [
+            1.1395167961748005,
+            0.2492614299689794,
+            0.07539819175331054
+          ],
+          [
+            1.1294486960454235,
+            0.24705910259324984,
+            0.07806623296033759
+          ],
+          [
+            1.1188049349016271,
+            0.2447308533459751,
+            0.07374336275866508
+          ],
+          [
+            1.107673920568687,
+            0.24229602082841362,
+            0.06243269231197217
+          ],
+          [
+            1.0957461410423546,
+            0.23968690142704213,
+            0.04463360142401249
+          ],
+          [
+            1.08239508874592,
+            0.23676645093594695,
+            0.02136201495172063
+          ],
+          [
+            1.0668831595731543,
+            0.23337332355058457,
+            -0.005975930366507911
+          ],
+          [
+            1.0486550418072629,
+            0.22938604866773846,
+            -0.035824232740193904
+          ],
+          [
+            1.0276441929282205,
+            0.22479007057067774,
+            -0.06675274236170982
+          ],
+          [
+            1.0045013169923447,
+            0.21972772627813586,
+            -0.09767197357115759
+          ],
+          [
+            0.9806651974658207,
+            0.21451373973749213,
+            -0.1279089690479092
+          ],
+          [
+            0.958234416988299,
+            0.2096071614089269,
+            -0.15711456865025716
+          ],
+          [
+            0.9396527835994486,
+            0.20554255742484165,
+            -0.18503404506119325
+          ],
+          [
+            0.9272751377110978,
+            0.20283503286343388,
+            -0.21122569625534382
+          ],
+          [
+            0.9229166211690856,
+            0.20188163746860305,
+            -0.23483616100172797
+          ],
+          [
+            0.9274956849554712,
+            0.20288327605010104,
+            -0.25452728163687083
+          ],
+          [
+            0.940856580323889,
+            0.20580587964521893,
+            -0.26860104669964086
+          ],
+          [
+            0.9618084335497935,
+            0.2103889528505638,
+            -0.2753025645228355
+          ],
+          [
+            0.9883604402388086,
+            0.21619702095282156,
+            -0.2732189556541041
+          ],
+          [
+            1.0180839087978069,
+            0.22269882443788175,
+            -0.261656073126701
+          ],
+          [
+            1.0485061264178785,
+            0.22935347445468002,
+            -0.24087778510825317
+          ],
+          [
+            1.0774446059758223,
+            0.23568356701668083,
+            -0.21213354504146054
+          ],
+          [
+            1.1032197000781683,
+            0.24132169085575256,
+            -0.17746531881185235
+          ],
+          [
+            1.12472715473891,
+            0.24602629803813503,
+            -0.13935248018900814
+          ],
+          [
+            1.141394415364871,
+            0.2496721462004779,
+            -0.10030027809741737
+          ],
+          [
+            1.1530716007693904,
+            0.2522264498682379,
+            -0.06248851861226353
+          ],
+          [
+            1.159912671600068,
+            0.25372288686986694,
+            -0.02756943312128098
+          ],
+          [
+            1.145058580336689,
+            0.2810482998010132,
+            -0.03094115398333825
+          ],
+          [
+            1.147817055606389,
+            0.2817253523098589,
+            -0.002177309606161188
+          ],
+          [
+            1.1467700963329308,
+            0.28146838194273605,
+            0.022085415751113432
+          ],
+          [
+            1.142526015744352,
+            0.28042669581931706,
+            0.041447938163187766
+          ],
+          [
+            1.135760167126935,
+            0.2787660556710401,
+            0.05544869411817963
+          ],
+          [
+            1.1271446505406773,
+            0.27665142474293236,
+            0.06352249182236407
+          ],
+          [
+            1.1172371905138723,
+            0.27421969343791797,
+            0.0651062647934044
+          ],
+          [
+            1.1063542992735322,
+            0.27154854793275307,
+            0.05984392767187002
+          ],
+          [
+            1.0944761466646373,
+            0.2686331210254892,
+            0.0478008184292776
+          ],
+          [
+            1.0812349836505455,
+            0.26538315074763297,
+            0.02959182917021784
+          ],
+          [
+            1.0660210819350053,
+            0.26164898265883957,
+            0.006358609329505805
+          ],
+          [
+            1.0482041645225975,
+            0.25727591875412653,
+            -0.0204115423652937
+          ],
+          [
+            1.0274259130751284,
+            0.25217601177781096,
+            -0.049170754605303076
+          ],
+          [
+            1.0038855529674844,
+            0.24639816049703928,
+            -0.0786024064209177
+          ],
+          [
+            0.9785289982154955,
+            0.24017453427892707,
+            -0.10781508277379406
+          ],
+          [
+            0.9530689564933388,
+            0.23392550775595997,
+            -0.1363659054496196
+          ],
+          [
+            0.9298055823377219,
+            0.22821564114621107,
+            -0.16410092013468477
+          ],
+          [
+            0.9112726840124831,
+            0.2236668436836726,
+            -0.19086784359862197
+          ],
+          [
+            0.8997860350348015,
+            0.2208475091788482,
+            -0.21620677400923696
+          ],
+          [
+            0.8970015285517718,
+            0.22016406745256528,
+            -0.2391386489401455
+          ],
+          [
+            0.9035914485878935,
+            0.22178152690292116,
+            -0.2581430827734998
+          ],
+          [
+            0.9191164527737563,
+            0.22559205337359078,
+            -0.2713555048639914
+          ],
+          [
+            0.942118382411503,
+            0.2312377498714332,
+            -0.27693909768603425
+          ],
+          [
+            0.9704010017340629,
+            0.23817956246602331,
+            -0.2735255600794023
+          ],
+          [
+            1.0014199010541625,
+            0.2457929798625808,
+            -0.2605916492634165
+          ],
+          [
+            1.0326823316580038,
+            0.25346617066673455,
+            -0.23865545532433952
+          ],
+          [
+            1.0620672523484798,
+            0.2606785370396563,
+            -0.20923187353983055
+          ],
+          [
+            1.0880100569801447,
+            0.2670460550505299,
+            -0.1745618992198954
+          ],
+          [
+            1.1095423353355438,
+            0.27233103376388773,
+            -0.13719962108207134
+          ],
+          [
+            1.1262186951774649,
+            0.2764241541167903,
+            -0.09958083872808947
+          ],
+          [
+            1.1379869294407863,
+            0.27931260217365217,
+            -0.06369516343160853
+          ],
+          [
+            1.145058580336689,
+            0.2810482998010132,
+            -0.030941153983338295
+          ],
+          [
+            1.1290306371649035,
+            0.30763836226421676,
+            -0.03416084006318403
+          ],
+          [
+            1.1321182868855357,
+            0.30847968531784625,
+            -0.007497062969454823
+          ],
+          [
+            1.1315220830631516,
+            0.308317231650553,
+            0.014913591236594735
+          ],
+          [
+            1.127778103394766,
+            0.3072970717579704,
+            0.03271585632023363
+          ],
+          [
+            1.1214611110067851,
+            0.30557581714476173,
+            0.04541118251042253
+          ],
+          [
+            1.1131227595060642,
+            0.30330378243177414,
+            0.05236554538677101
+          ],
+          [
+            1.103192957249892,
+            0.3005981090840896,
+            0.05297048243438539
+          ],
+          [
+            1.091870991701547,
+            0.2975130989663385,
+            0.04688708753637861
+          ],
+          [
+            1.0790532410592317,
+            0.2940205172013168,
+            0.034267739256615526
+          ],
+          [
+            1.0643458569866011,
+            0.29001304796145944,
+            0.015856538109832157
+          ],
+          [
+            1.0471904582070164,
+            0.2853385434698952,
+            -0.007085572737321088
+          ],
+          [
+            1.0270940256936405,
+            0.2798626658610351,
+            -0.03301803307559588
+          ],
+          [
+            1.00391324249926,
+            0.27354636412113864,
+            -0.06044337778147209
+          ],
+          [
+            0.9781135832077271,
+            0.2665164708036708,
+            -0.08820200301338486
+          ],
+          [
+            0.9509168605256733,
+            0.25910590553692947,
+            -0.11563070995926754
+          ],
+          [
+            0.9242725575266342,
+            0.25184586363153094,
+            -0.1425228559051131
+          ],
+          [
+            0.9006333833463673,
+            0.2454046594775345,
+            -0.1688991248268988
+          ],
+          [
+            0.8825709538079983,
+            0.24048300716909934,
+            -0.19466879397381773
+          ],
+          [
+            0.8723159903785551,
+            0.23768873387777806,
+            -0.21930608243593763
+          ],
+          [
+            0.8713332222930863,
+            0.23742094914780976,
+            -0.2416677736461415
+          ],
+          [
+            0.8800354972966784,
+            0.23979214576723937,
+            -0.2600349716917677
+          ],
+          [
+            0.8977057001713004,
+            0.24460692412159435,
+            -0.2723877277422723
+          ],
+          [
+            0.9226398732282062,
+            0.25140098967760166,
+            -0.2768416472692639
+          ],
+          [
+            0.9524674259099295,
+            0.2595284037222701,
+            -0.2721180467548098
+          ],
+          [
+            0.9845619228492709,
+            0.2682735149274949,
+            -0.25790393242788173
+          ],
+          [
+            1.0164407414217924,
+            0.2769598580733242,
+            -0.23499062522553363
+          ],
+          [
+            1.0460668173144283,
+            0.2850323737056832,
+            -0.20514928687584189
+          ],
+          [
+            1.0720038606806077,
+            0.2920997014472792,
+            -0.17078420816363754
+          ],
+          [
+            1.0934238305858845,
+            0.29793621663517106,
+            -0.13447238591316507
+          ],
+          [
+            1.1100060605024262,
+            0.3024545440270862,
+            -0.09852796413896873
+          ],
+          [
+            1.1217887367044355,
+            0.3056650886222071,
+            -0.06471319906681212
+          ],
+          [
+            1.1290306371649035,
+            0.30763836226421676,
+            -0.03416084006318409
+          ],
+          [
+            1.1119705735853656,
+            0.33347068443042394,
+            -0.037143827033287474
+          ],
+          [
+            1.1153305688032586,
+            0.33447831892328733,
+            -0.012487023249791071
+          ],
+          [
+            1.115117765342214,
+            0.3344145009433071,
+            0.008207470080365839
+          ],
+          [
+            1.1117858715795454,
+            0.33341529384207597,
+            0.024592687396984312
+          ],
+          [
+            1.1058016971784905,
+            0.33162068993737326,
+            0.03611073780929251
+          ],
+          [
+            1.0975944450438946,
+            0.32915940359434337,
+            0.042056153767704066
+          ],
+          [
+            1.0874722705123907,
+            0.32612384802378436,
+            0.04179056120498391
+          ],
+          [
+            1.0755331094158063,
+            0.32254339336340077,
+            0.03501676034389928
+          ],
+          [
+            1.0616148957341003,
+            0.3183694373678548,
+            0.021994875064702466
+          ],
+          [
+            1.0453294219877247,
+            0.3134855598575291,
+            0.0036034372487917785
+          ],
+          [
+            1.0262021003951118,
+            0.30774943592194376,
+            -0.01879343713663896
+          ],
+          [
+            1.003903086372576,
+            0.3010621479263251,
+            -0.04363699247007067
+          ],
+          [
+            0.9785164171663421,
+            0.293448897938679,
+            -0.0695241160776544
+          ],
+          [
+            0.9507677382956308,
+            0.2851273009874034,
+            -0.09549078775582164
+          ],
+          [
+            0.9221291197097018,
+            0.2765388185510394,
+            -0.12112187124431162
+          ],
+          [
+            0.8947448690708428,
+            0.2683265105816743,
+            -0.14644057854003753
+          ],
+          [
+            0.8711691008863606,
+            0.26125633468025344,
+            -0.17161087250570609
+          ],
+          [
+            0.853960250314846,
+            0.2560955441749431,
+            -0.19655709496330379
+          ],
+          [
+            0.845222517244341,
+            0.25347517103143746,
+            -0.22064115054619013
+          ],
+          [
+            0.8462046222563409,
+            0.2537696961189838,
+            -0.24252464160269152
+          ],
+          [
+            0.8570550032677061,
+            0.25702363472863987,
+            -0.2602846985893712
+          ],
+          [
+            0.8767925275232042,
+            0.2629427533445407,
+            -0.27176746606034696
+          ],
+          [
+            0.9034950397788598,
+            0.27095061366875245,
+            -0.2750814114665013
+          ],
+          [
+            0.9346519833371639,
+            0.2802943207235598,
+            -0.2690822660266244
+          ],
+          [
+            0.9675887947872569,
+            0.2901717952882005,
+            -0.2537002052770874
+          ],
+          [
+            0.9998606323015816,
+            0.2998498497254055,
+            -0.2300085468118922
+          ],
+          [
+            1.0295326450686177,
+            0.3087482384426068,
+            -0.20001520707889153
+          ],
+          [
+            1.0553052212385436,
+            0.31647721870438583,
+            -0.16624536659171357
+          ],
+          [
+            1.0764907770323082,
+            0.3228305898802133,
+            -0.131246574486369
+          ],
+          [
+            1.092887746018567,
+            0.32774790388142994,
+            -0.09716498522374262
+          ],
+          [
+            1.1046158212156671,
+            0.3312650556441948,
+            -0.06550868662490592
+          ],
+          [
+            1.1119705735853656,
+            0.33347068443042394,
+            -0.03714382703328752
+          ],
+          [
+            1.0940265856701357,
+            0.3585377027237284,
+            -0.03980355169662684
+          ],
+          [
+            1.0976020334483603,
+            0.35970945928742115,
+            -0.01703438813558822
+          ],
+          [
+            1.0977038412421338,
+            0.3597428240456245,
+            0.0020881267041570678
+          ],
+          [
+            1.0946956478798489,
+            0.35875696981539873,
+            0.017195003283810732
+          ],
+          [
+            1.0889313827319937,
+            0.3568678874008827,
+            0.027655205950119627
+          ],
+          [
+            1.0807180350591805,
+            0.3541761842513857,
+            0.03269761138614926
+          ],
+          [
+            1.0702499120653348,
+            0.3507455393116708,
+            0.03167428112505301
+          ],
+          [
+            1.057540631863556,
+            0.3465804155509655,
+            0.024353577576669446
+          ],
+          [
+            1.0423951437297345,
+            0.34161689035582266,
+            0.011118000809608192
+          ],
+          [
+            1.0244613056627532,
+            0.3357395586842013,
+            -0.0070235091548237535
+          ],
+          [
+            1.003377780508346,
+            0.32883000203065,
+            -0.028628674281959664
+          ],
+          [
+            0.9789991997009092,
+            0.32084057976902447,
+            -0.05216059897789033
+          ],
+          [
+            0.9516435210811108,
+            0.3118754940048762,
+            -0.07635330231084299
+          ],
+          [
+            0.9222843865567243,
+            0.30225382961005465,
+            -0.10046947539006428
+          ],
+          [
+            0.8926132110384206,
+            0.2925299021966008,
+            -0.12435029477733063
+          ],
+          [
+            0.8649238905268537,
+            0.283455474302221,
+            -0.14823032676079967
+          ],
+          [
+            0.8418203802101613,
+            0.27588392199965345,
+            -0.17237670010882056
+          ],
+          [
+            0.8257997479804846,
+            0.27063359193359604,
+            -0.19667971671654857
+          ],
+          [
+            0.8188038914975426,
+            0.26834088868046396,
+            -0.22034675300287518
+          ],
+          [
+            0.8218482822336137,
+            0.2693386056235451,
+            -0.24182259939557685
+          ],
+          [
+            0.8348200897573514,
+            0.27358976563250087,
+            -0.25898610242106274
+          ],
+          [
+            0.856495037069895,
+            0.28069314494511327,
+            -0.2695799039375869
+          ],
+          [
+            0.88476524133162,
+            0.28995794181960677,
+            -0.27174934502618214
+          ],
+          [
+            0.9170164768480603,
+            0.3005274143018348,
+            -0.26452638093534314
+          ],
+          [
+            0.9505588656258526,
+            0.3115200274373641,
+            -0.2481088770557502
+          ],
+          [
+            0.9830095239637477,
+            0.32215485537000965,
+            -0.22385017823192793
+          ],
+          [
+            1.0125492081754413,
+            0.3318356900546234,
+            -0.1939662763691162
+          ],
+          [
+            1.0380183005888406,
+            0.340182498079188,
+            -0.16105657867699605
+          ],
+          [
+            1.0588655227262505,
+            0.34701461279305457,
+            -0.1275890870958127
+          ],
+          [
+            1.0749999964336647,
+            0.352302251332633,
+            -0.0955037146134735
+          ],
+          [
+            1.0866129154997992,
+            0.3561080723048336,
+            -0.06603876367310953
+          ],
+          [
+            1.0940265856701354,
+            0.35853770272372837,
+            -0.03980355169662688
+          ],
+          [
+            1.075349821401072,
+            0.3828466287669774,
+            -0.04205668017791801
+          ],
+          [
+            1.0790840486141564,
+            0.3841760903720545,
+            -0.021039008338398637
+          ],
+          [
+            1.0794309451073942,
+            0.38429959265040536,
+            -0.0033439669780756433
+          ],
+          [
+            1.0766589729827722,
+            0.38331271362571284,
+            0.01061401064867072
+          ],
+          [
+            1.0710067564171164,
+            0.3813004084073023,
+            0.02012583978315759
+          ],
+          [
+            1.062661470179006,
+            0.37832931505816936,
+            0.024367836939185688
+          ],
+          [
+            1.051713031781501,
+            0.374431446060259,
+            0.02270564763470162
+          ],
+          [
+            1.0381083990116828,
+            0.3695879172960551,
+            0.01499418069732736
+          ],
+          [
+            1.0216443451634654,
+            0.3637263758830332,
+            0.0017454231352437473
+          ],
+          [
+            1.0020330244678899,
+            0.3567443428138439,
+            -0.015914615806860946
+          ],
+          [
+            0.9790520139247664,
+            0.3485626309308865,
+            -0.03649797125977223
+          ],
+          [
+            0.9527566062460513,
+            0.33920092557556974,
+            -0.05853217141746568
+          ],
+          [
+            0.923699465776354,
+            0.3288559866086965,
+            -0.08092728923699889
+          ],
+          [
+            0.8930845858995424,
+            0.3179564604101686,
+            -0.10319447178816019
+          ],
+          [
+            0.8627877615277691,
+            0.3071701685056736,
+            -0.125427386023745
+          ],
+          [
+            0.8352055861537814,
+            0.2973503474150517,
+            -0.1480425490296501
+          ],
+          [
+            0.8129416206172917,
+            0.2894239182856696,
+            -0.1713639403573733
+          ],
+          [
+            0.7983876928599121,
+            0.28424242100325847,
+            -0.19519917178904106
+          ],
+          [
+            0.7932942779762917,
+            0.28242906066386214,
+            -0.21856566992555454
+          ],
+          [
+            0.798434203300917,
+            0.2842589796757824,
+            -0.23968042234140532
+          ],
+          [
+            0.8134441140810538,
+            0.2896028162821635,
+            -0.25624037766663443
+          ],
+          [
+            0.8368834585318857,
+            0.2979477044524309,
+            -0.26592206999128065
+          ],
+          [
+            0.8664945014282317,
+            0.3084898440627487,
+            -0.2669525990426932
+          ],
+          [
+            0.8995960653689854,
+            0.3202746808753133,
+            -0.25857648737656136
+          ],
+          [
+            0.9335134559342048,
+            0.33234996872680406,
+            -0.2412740392875011
+          ],
+          [
+            0.9659456564055346,
+            0.34389649839262565,
+            -0.21666613799405512
+          ],
+          [
+            0.9951972828285146,
+            0.3543106783544523,
+            -0.18714071867438656
+          ],
+          [
+            1.0202471108450508,
+            0.36322893176042614,
+            -0.15532308810804557
+          ],
+          [
+            1.0406721870953637,
+            0.3705006785251696,
+            -0.12355640409822932
+          ],
+          [
+            1.0564816545652291,
+            0.37612917373945554,
+            -0.09354576988418643
+          ],
+          [
+            1.0679276002029419,
+            0.38020416553583586,
+            -0.0662553886415427
+          ],
+          [
+            1.075349821401072,
+            0.3828466287669774,
+            -0.04205668017791802
+          ],
+          [
+            1.0560905221604342,
+            0.4064188051202647,
+            -0.04382799726547083
+          ],
+          [
+            1.0599271336988978,
+            0.40789526101533624,
+            -0.024417690988261402
+          ],
+          [
+            1.0604493699491762,
+            0.40809623491707575,
+            -0.008011720505642975
+          ],
+          [
+            1.0578280634581294,
+            0.4070874688789469,
+            0.0049146055301276465
+          ],
+          [
+            1.0521866122879227,
+            0.4049164505849379,
+            0.013577817013390227
+          ],
+          [
+            1.0435968315856723,
+            0.40161081689540146,
+            0.017120507590413878
+          ],
+          [
+            1.0320549757916215,
+            0.3971691263942003,
+            0.01494569752148724
+          ],
+          [
+            1.017459111330332,
+            0.39155215164669527,
+            0.007011073293049144
+          ],
+          [
+            0.9996212752650321,
+            0.3846875582548714,
+            -0.00604312910327019
+          ],
+          [
+            0.9783431429365371,
+            0.37649902428484106,
+            -0.02299586976469735
+          ],
+          [
+            0.9535623641405115,
+            0.3669625553014556,
+            -0.042351519104883065
+          ],
+          [
+            0.9255455818581217,
+            0.35618076440418467,
+            -0.06274451798145714
+          ],
+          [
+            0.8950753206267673,
+            0.3444547930963311,
+            -0.08329371666995496
+          ],
+          [
+            0.8635635788479085,
+            0.3323280253881776,
+            -0.1037698354557036
+          ],
+          [
+            0.833032843986254,
+            0.32057878181336186,
+            -0.12450348462751808
+          ],
+          [
+            0.8059355381304821,
+            0.31015083606743066,
+            -0.1460547173937579
+          ],
+          [
+            0.7848276180318406,
+            0.3020278054322209,
+            -0.16875469834622647
+          ],
+          [
+            0.7719574690134777,
+            0.297074943460633,
+            -0.19228304320187972
+          ],
+          [
+            0.7688624050389972,
+            0.2958838597647904,
+            -0.21544058848947473
+          ],
+          [
+            0.7760709948565129,
+            0.29865796520249815,
+            -0.23621662630673862
+          ],
+          [
+            0.7929868869677626,
+            0.3051677638562475,
+            -0.25215211525542713
+          ],
+          [
+            0.8179847517112954,
+            0.3147877747420958,
+            -0.2608995192376349
+          ],
+          [
+            0.848694680855702,
+            0.32660597824482707,
+            -0.2608107889222947
+          ],
+          [
+            0.8824041913817704,
+            0.339578520561718,
+            -0.2513718579058874
+          ],
+          [
+            0.9164808511479936,
+            0.35269235413381245,
+            -0.23334975635807537
+          ],
+          [
+            0.9487205829158142,
+            0.3650992766348033,
+            -0.20861077362375066
+          ],
+          [
+            0.97755494220603,
+            0.37619569839338973,
+            -0.1796733104252385
+          ],
+          [
+            1.0020949593391737,
+            0.3856395142705366,
+            -0.14914115238646125
+          ],
+          [
+            1.0220347958991185,
+            0.39331302745803115,
+            -0.11919423030262376
+          ],
+          [
+            1.0374713200151129,
+            0.3992535160381186,
+            -0.09128486019297817
+          ],
+          [
+            1.0487068222377252,
+            0.4035773114821861,
+            -0.06610953338176545
+          ],
+          [
+            1.0560905221604342,
+            0.4064188051202647,
+            -0.043827997265470854
+          ],
+          [
+            1.0363940226527513,
+            0.42928846014517824,
+            -0.04505468198663655
+          ],
+          [
+            1.040276815636934,
+            0.4308967656591139,
+            -0.027107325881587017
+          ],
+          [
+            1.0409048087093737,
+            0.43115688890679477,
+            -0.011862734620412365
+          ],
+          [
+            1.0383513716652357,
+            0.43009922065244693,
+            0.00013587144302041425
+          ],
+          [
+            1.0326271971265102,
+            0.427728189925116,
+            0.008041927207345938
+          ],
+          [
+            1.0236951141384438,
+            0.42402840001121694,
+            0.010986996017387327
+          ],
+          [
+            1.0114694246291354,
+            0.41896435360709894,
+            0.008433834867204022
+          ],
+          [
+            0.9958167035427429,
+            0.41248078424507184,
+            0.0004529664287234844
+          ],
+          [
+            0.9765856661456654,
+            0.4045150277366982,
+            -0.012196877252329224
+          ],
+          [
+            0.953689009706058,
+            0.3950309221064155,
+            -0.02822913555994575
+          ],
+          [
+            0.9272405235937223,
+            0.3840756004544496,
+            -0.046181841152213986
+          ],
+          [
+            0.8977231595391043,
+            0.37184910793752274,
+            -0.06483627981019255
+          ],
+          [
+            0.866139119642369,
+            0.3587665702577621,
+            -0.08354477674215306
+          ],
+          [
+            0.8340822487177812,
+            0.3454881795535541,
+            -0.10233763698525897
+          ],
+          [
+            0.8036827075007478,
+            0.3328962772915389,
+            -0.12175625389919038
+          ],
+          [
+            0.7774035482625793,
+            0.32201109312732734,
+            -0.14245918563689758
+          ],
+          [
+            0.7577105042622008,
+            0.31385396721796044,
+            -0.16473468887514506
+          ],
+          [
+            0.7466771157961751,
+            0.3092837880764017,
+            -0.1880949300083302
+          ],
+          [
+            0.7456136097303256,
+            0.3088432694402608,
+            -0.21110758459348047
+          ],
+          [
+            0.7548100910605642,
+            0.31265257673335656,
+            -0.2315451350420693
+          ],
+          [
+            0.7734604382699886,
+            0.32037780349046735,
+            -0.24682621577901587
+          ],
+          [
+            0.7997891262955898,
+            0.33128350315016153,
+            -0.2546233478787695
+          ],
+          [
+            0.831351908079955,
+            0.344357235431468,
+            -0.253452204083681
+          ],
+          [
+            0.8654381609939334,
+            0.35847622367891735,
+            -0.24306001935199817
+          ],
+          [
+            0.8994804613377535,
+            0.3725770061757059,
+            -0.22449438521749546
+          ],
+          [
+            0.9313815951384777,
+            0.38579088845104464,
+            -0.1998366591666025
+          ],
+          [
+            0.9596981980220108,
+            0.3975200094057371,
+            -0.17169120529015847
+          ],
+          [
+            0.9836634824153331,
+            0.4074467552275795,
+            -0.14259612904208593
+          ],
+          [
+            1.0030750305020586,
+            0.41548728171175864,
+            -0.11453820695855231
+          ],
+          [
+            1.0181041932155974,
+            0.4217125647388185,
+            -0.0887097652662842
+          ],
+          [
+            1.0290931850434373,
+            0.42626435419071684,
+            -0.06555545004193439
+          ],
+          [
+            1.0363940226527513,
+            0.42928846014517824,
+            -0.04505468198663658
+          ],
+          [
+            1.0163968432568375,
+            0.451500903300661,
+            -0.04568965635006656
+          ],
+          [
+            1.0202696746486182,
+            0.45322128140230594,
+            -0.02906665910780399
+          ],
+          [
+            1.0209343751099418,
+            0.4535165527431243,
+            -0.014869139739436873
+          ],
+          [
+            1.0183695132584836,
+            0.4523771971356588,
+            -0.0037071286457773488
+          ],
+          [
+            1.012477911510147,
+            0.4497600466310016,
+            0.0035271945687417915
+          ],
+          [
+            1.0031215322822618,
+            0.44560378256835703,
+            0.005978879800220147
+          ],
+          [
+            0.990145132384913,
+            0.43983944326121194,
+            0.0031895393716192674
+          ],
+          [
+            0.9734003804965479,
+            0.4324011373934793,
+            -0.004654442466363607
+          ],
+          [
+            0.9527914807773238,
+            0.42324631081073766,
+            -0.016693621758269418
+          ],
+          [
+            0.9283593322107695,
+            0.41239313154265944,
+            -0.0316111788228693
+          ],
+          [
+            0.9004044073885124,
+            0.3999750746658715,
+            -0.048021061539857024
+          ],
+          [
+            0.8696251298164499,
+            0.38630239187575355,
+            -0.06488658302551202
+          ],
+          [
+            0.837228307021713,
+            0.3719111677658623,
+            -0.08180901986668378
+          ],
+          [
+            0.8049606440034651,
+            0.35757731864305586,
+            -0.09906745691250891
+          ],
+          [
+            0.7750210200657794,
+            0.3442776243926957,
+            -0.11737905164218813
+          ],
+          [
+            0.7498411351360452,
+            0.3330922878125929,
+            -0.13745191162439765
+          ],
+          [
+            0.7317598254233576,
+            0.3250602600447985,
+            -0.15948363722828404
+          ],
+          [
+            0.7226520255338713,
+            0.32101441918601736,
+            -0.18278730408479277
+          ],
+          [
+            0.7235948726212492,
+            0.3214332480267893,
+            -0.20569145480410594
+          ],
+          [
+            0.7346525478765376,
+            0.32634525695252586,
+            -0.2257723984393357
+          ],
+          [
+            0.7548367910366287,
+            0.33531144381121375,
+            -0.2403656868373795
+          ],
+          [
+            0.7822579192110349,
+            0.3474923790653969,
+            -0.24720756851673945
+          ],
+          [
+            0.8144337322611901,
+            0.3617854268576628,
+            -0.2450100739461862
+          ],
+          [
+            0.8486849104157943,
+            0.37700038741023895,
+            -0.233791884452198
+          ],
+          [
+            0.8825267844660517,
+            0.3920335280623861,
+            -0.21486521115682566
+          ],
+          [
+            0.9139737396892083,
+            0.4060028047120606,
+            -0.19048979508791927
+          ],
+          [
+            0.9417011757572876,
+            0.418319807184082,
+            -0.16331078302986665
+          ],
+          [
+            0.9650512682889651,
+            0.4286923186102537,
+            -0.13576167572479633
+          ],
+          [
+            0.9839096854157652,
+            0.4370695508144463,
+            -0.1096155111290593
+          ],
+          [
+            0.9985087672214926,
+            0.44355471324521994,
+            -0.08580768860489812
+          ],
+          [
+            1.0092212181656965,
+            0.4483133676133051,
+            -0.06455464492354626
+          ],
+          [
+            1.0163968432568375,
+            0.451500903300661,
+            -0.045689656350066575
+          ],
+          [
+            0.9962231178727943,
+            0.473110251793094,
+            -0.04570378180545049
+          ],
+          [
+            1.0000298269436896,
+            0.474918072807005,
+            -0.030276653269957102
+          ],
+          [
+            1.0006631495448162,
+            0.4752188401852255,
+            -0.01702607447197178
+          ],
+          [
+            0.998011803475059,
+            0.4739597055755691,
+            -0.006620502940818581
+          ],
+          [
+            0.9918777001133509,
+            0.4710465959177854,
+            2.415640741110278e-05
+          ],
+          [
+            0.9820315874516888,
+            0.4663706385373857,
+            0.0020907832439043365
+          ],
+          [
+            0.9682614868895331,
+            0.45983116396858775,
+            -0.0007856997029812617
+          ],
+          [
+            0.9504195240286671,
+            0.45135794608180396,
+            -0.008307310115845358
+          ],
+          [
+            0.9284811136142278,
+            0.44093930924342356,
+            -0.019538640282364413
+          ],
+          [
+            0.9026277652798983,
+            0.4286614530877998,
+            -0.03317157021346641
+          ],
+          [
+            0.8733514086734823,
+            0.41475799692707405,
+            -0.04793681695983853
+          ],
+          [
+            0.8415594309005249,
+            0.39965986244362506,
+            -0.06300840355822244
+          ],
+          [
+            0.808643880001031,
+            0.3840281386916007,
+            -0.0782423096432858
+          ],
+          [
+            0.7764735579270328,
+            0.36875032702106514,
+            -0.09414577391593631
+          ],
+          [
+            0.7472785187135612,
+            0.354885488808027,
+            -0.11157007100103866
+          ],
+          [
+            0.7234217132398396,
+            0.3435557986591456,
+            -0.13122274811858184
+          ],
+          [
+            0.707085427511237,
+            0.33579763272647145,
+            -0.15316776570429252
+          ],
+          [
+            0.6999303732584734,
+            0.3323996695007772,
+            -0.17649657440557365
+          ],
+          [
+            0.7028022944676529,
+            0.3337635561061253,
+            -0.1993029899492696
+          ],
+          [
+            0.715557804618073,
+            0.3398211977234976,
+            -0.21899592417137645
+          ],
+          [
+            0.7370571022102477,
+            0.3500312981665865,
+            -0.23287026014758788
+          ],
+          [
+            0.7653322102260152,
+            0.36345925745885904,
+            -0.23876684605718973
+          ],
+          [
+            0.7978964482871654,
+            0.37892414137106745,
+            -0.23561900416274426
+          ],
+          [
+            0.8321265144743206,
+            0.3951801335701634,
+            -0.223717156119651
+          ],
+          [
+            0.8656328583388347,
+            0.4110924272100209,
+            -0.2046136614572051
+          ],
+          [
+            0.8965412481276481,
+            0.42577094230684864,
+            -0.18070572637888133
+          ],
+          [
+            0.9236357736335492,
+            0.4386382383516169,
+            -0.15463561001201484
+          ],
+          [
+            0.9463521273792469,
+            0.449426323518117,
+            -0.12869997998103455
+          ],
+          [
+            0.9646479747299351,
+            0.4581150929228413,
+            -0.10444709959166623
+          ],
+          [
+            0.9788035632356301,
+            0.4648376372224647,
+            -0.08256765018093037
+          ],
+          [
+            0.9892138542869242,
+            0.46978152512483917,
+            -0.06307923104775766
+          ],
+          [
+            0.9962231178727943,
+            0.473110251793094,
+            -0.045703781805450504
+          ],
+          [
+            0.9759815870535722,
+            0.4941768243745056,
+            -0.04508678309794859
+          ],
+          [
+            0.9796660661930643,
+            0.49604241715287467,
+            -0.030739490248195257
+          ],
+          [
+            0.9802014580358522,
+            0.49631350653014833,
+            -0.018349015838606268
+          ],
+          [
+            0.977393593161564,
+            0.4948917770987177,
+            -0.008627924214326722
+          ],
+          [
+            0.9709523036720811,
+            0.49163030574821887,
+            -0.002491504127676951
+          ],
+          [
+            0.9605680509544898,
+            0.486372361234149,
+            -0.000696677424329363
+          ],
+          [
+            0.9459850278913742,
+            0.47898841862426134,
+            -0.0035063491200098868
+          ],
+          [
+            0.9270695928278437,
+            0.4694108100347618,
+            -0.010522151813130114
+          ],
+          [
+            0.9038806260294187,
+            0.45766934879719184,
+            -0.020762888980321966
+          ],
+          [
+            0.8767476059520587,
+            0.4439308624616054,
+            -0.03296958413413465
+          ],
+          [
+            0.8463528846210288,
+            0.42854085196923336,
+            -0.04602708401102212
+          ],
+          [
+            0.8138009598024809,
+            0.4120585668037196,
+            -0.05934110764828128
+          ],
+          [
+            0.7806462014904931,
+            0.3952710439724892,
+            -0.07301855207372124
+          ],
+          [
+            0.7488480522462837,
+            0.3791704242241911,
+            -0.08776594757802347
+          ],
+          [
+            0.7206328491970472,
+            0.36488398723919896,
+            -0.10452291991944024
+          ],
+          [
+            0.6982631125341546,
+            0.3535573335678573,
+            -0.12394782568001797
+          ],
+          [
+            0.6837426803518564,
+            0.3462050831160261,
+            -0.1459346751024054
+          ],
+          [
+            0.6785106954368787,
+            0.3435559289467712,
+            -0.16934044550404462
+          ],
+          [
+            0.6831903475113772,
+            0.34592541586335823,
+            -0.1920381084820254
+          ],
+          [
+            0.6974537029658836,
+            0.35314749853062666,
+            -0.21130406794133366
+          ],
+          [
+            0.72004147504403,
+            0.36458455187604066,
+            -0.2244357042554096
+          ],
+          [
+            0.7489415446044527,
+            0.37921776298270476,
+            -0.22941457639789406
+          ],
+          [
+            0.7816920694002414,
+            0.3958006069163096,
+            -0.2254116943330344
+          ],
+          [
+            0.8157450479102331,
+            0.41304293300502637,
+            -0.2129802093258656
+          ],
+          [
+            0.8488129579304899,
+            0.4297864812228222,
+            -0.1938813174776249
+          ],
+          [
+            0.8791282766894591,
+            0.4451362871545462,
+            -0.17060672477442013
+          ],
+          [
+            0.905570822014243,
+            0.45852515970124036,
+            -0.145755515001733
+          ],
+          [
+            0.9276531199256999,
+            0.46970627213361715,
+            -0.12146286120923831
+          ],
+          [
+            0.9453888612783597,
+            0.4786865566552185,
+            -0.09905031692161076
+          ],
+          [
+            0.9590941213478311,
+            0.4856260542730012,
+            -0.07898359842842251
+          ],
+          [
+            0.9691793418111597,
+            0.4907325873139887,
+            -0.061114398570922795
+          ],
+          [
+            0.9759815870535722,
+            0.4941768243745056,
+            -0.04508678309794864
+          ],
+          [
+            0.9557633511762725,
+            0.5147643730403023,
+            -0.04384689209407511
+          ],
+          [
+            0.9592698394624833,
+            0.5166529317949387,
+            -0.030476380939028536
+          ],
+          [
+            0.9596430358747653,
+            0.5168539315685257,
+            -0.018870251794520357
+          ],
+          [
+            0.9566145289989871,
+            0.5152228087165774,
+            -0.0097666021102387
+          ],
+          [
+            0.9498124691283523,
+            0.5115592887873182,
+            -0.004055267874589152
+          ],
+          [
+            0.9388589330990985,
+            0.5056598262271208,
+            -0.002414045940666125
+          ],
+          [
+            0.9234669733836338,
+            0.4973698740302286,
+            -0.005000793098621386
+          ],
+          [
+            0.9035290515418016,
+            0.4866315130918163,
+            -0.011334046354454575
+          ],
+          [
+            0.8791960442807883,
+            0.47352600406441436,
+            -0.020420563752376518
+          ],
+          [
+            0.8509476139876694,
+            0.45831168820755097,
+            -0.031090253856591935
+          ],
+          [
+            0.8196498761554066,
+            0.44145504647403344,
+            -0.04241424452004893
+          ],
+          [
+            0.7865877732735135,
+            0.42364813575659915,
+            -0.054042654185845085
+          ],
+          [
+            0.7534523907747515,
+            0.4058017573864371,
+            -0.06632079352038471
+          ],
+          [
+            0.7222627430958911,
+            0.3890033319048606,
+            -0.08011939931384993
+          ],
+          [
+            0.6952102960793964,
+            0.37443316041783564,
+            -0.09641914025286885
+          ],
+          [
+            0.6744320072729612,
+            0.3632421864208401,
+            -0.11578433789646457
+          ],
+          [
+            0.6617394791623369,
+            0.35640612049811893,
+            -0.1379107045969232
+          ],
+          [
+            0.6583509502877309,
+            0.3545810934770276,
+            -0.16141745425209905
+          ],
+          [
+            0.6646821690775686,
+            0.3579910232121663,
+            -0.18397861532492366
+          ],
+          [
+            0.680247020558789,
+            0.36637409314714037,
+            -0.2027768358710094
+          ],
+          [
+            0.7036987477495487,
+            0.37900495373538773,
+            -0.2151536697531235
+          ],
+          [
+            0.7330121663172007,
+            0.3947928613927324,
+            -0.2192612815798674
+          ],
+          [
+            0.7657744868194094,
+            0.4124383123842452,
+            -0.2145160429124203
+          ],
+          [
+            0.7995264921480942,
+            0.43061679750871723,
+            -0.20171663035801782
+          ],
+          [
+            0.8320843815303691,
+            0.44815214398832004,
+            -0.18279689142085884
+          ],
+          [
+            0.8617789311178502,
+            0.464145324917785,
+            -0.16030010446549695
+          ],
+          [
+            0.8875708214600485,
+            0.4780365734629254,
+            -0.13674670535114372
+          ],
+          [
+            0.9090324897381481,
+            0.48959560865921986,
+            -0.11409353247169564
+          ],
+          [
+            0.9262185982112272,
+            0.4988518710407595,
+            -0.09344157746234674
+          ],
+          [
+            0.9394704530722416,
+            0.5059891846349204,
+            -0.07505696475432522
+          ],
+          [
+            0.9492087993668653,
+            0.5112341584232873,
+            -0.0586598312138363
+          ],
+          [
+            0.9557633511762726,
+            0.5147643730403024,
+            -0.04384689209407512
+          ],
+          [
+            0.935640524433725,
+            0.5349373440641328,
+            -0.04200931451227216
+          ],
+          [
+            0.9389141703699466,
+            0.5368089982056512,
+            -0.029524437221733625
+          ],
+          [
+            0.9390641573331782,
+            0.5368947508271549,
+            -0.018634837916386645
+          ],
+          [
+            0.935757785865955,
+            0.535004386392335,
+            -0.010083176628479571
+          ],
+          [
+            0.9285531330945567,
+            0.530885242642369,
+            -0.00471030006011643
+          ],
+          [
+            0.9170164256202855,
+            0.5242893166490324,
+            -0.0031004330423714866
+          ],
+          [
+            0.9008417218747293,
+            0.5150416912665078,
+            -0.0053093547515685475
+          ],
+          [
+            0.8799572885033748,
+            0.50310135410901,
+            -0.010794572792606798
+          ],
+          [
+            0.854610679730919,
+            0.48860984030249077,
+            -0.018586102008916555
+          ],
+          [
+            0.8254289199239938,
+            0.47192564089195127,
+            -0.02763978348039384
+          ],
+          [
+            0.7934500161927986,
+            0.45364221966198526,
+            -0.03723873899321417
+          ],
+          [
+            0.7601186048786913,
+            0.4345855240864392,
+            -0.047281932678124895
+          ],
+          [
+            0.7272351593156946,
+            0.4157849456871728,
+            -0.058333207379240914
+          ],
+          [
+            0.6968486228752993,
+            0.39841193471314407,
+            -0.07138845225823395
+          ],
+          [
+            0.6710890564909008,
+            0.38368431906796485,
+            -0.08742296898855337
+          ],
+          [
+            0.6519497738480582,
+            0.3727417436269839,
+            -0.10686781312376553
+          ],
+          [
+            0.6410444185692615,
+            0.36650678304482454,
+            -0.1292006355184218
+          ],
+          [
+            0.6393783611018246,
+            0.3655542416216873,
+            -0.15280839133831772
+          ],
+          [
+            0.6471801559472152,
+            0.37001479169892176,
+            -0.17519423314600222
+          ],
+          [
+            0.6638337955227239,
+            0.3795362408996345,
+            -0.19348739340052704
+          ],
+          [
+            0.6879356125075713,
+            0.3933160651251801,
+            -0.20511188795352403
+          ],
+          [
+            0.7174742416881387,
+            0.41020429883086684,
+            -0.20841329583511162
+          ],
+          [
+            0.7501044501366901,
+            0.4288600930038388,
+            -0.2030527360100232
+          ],
+          [
+            0.7834634805121631,
+            0.44793257933122455,
+            -0.19005055759639514
+          ],
+          [
+            0.8154682624599265,
+            0.4662307960131603,
+            -0.17147427049931302
+          ],
+          [
+            0.8445366272371614,
+            0.4828501636486446,
+            -0.14987766344356
+          ],
+          [
+            0.8696943877968584,
+            0.4972337065424827,
+            -0.1276727816582287
+          ],
+          [
+            0.8905576753501685,
+            0.5091619539203618,
+            -0.10662877733523751
+          ],
+          [
+            0.9072086689779179,
+            0.5186818903432182,
+            -0.08763884827750912
+          ],
+          [
+            0.9200051368433612,
+            0.5259980639746299,
+            -0.07079845127975763
+          ],
+          [
+            0.929374576623105,
+            0.5313548897001706,
+            -0.05572999888822706
+          ],
+          [
+            0.9356405244337251,
+            0.534937344064133,
+            -0.04200931451227224
+          ],
+          [
+            0.9156658623031179,
+            0.554758363194396,
+            -0.0396137203546246
+          ],
+          [
+            0.9186535682178386,
+            0.5565684720028513,
+            -0.02793292686263122
+          ],
+          [
+            0.918523735268572,
+            0.556489812398525,
+            -0.017696399961906042
+          ],
+          [
+            0.9148902399391196,
+            0.5542884505212005,
+            -0.009629851975777034
+          ],
+          [
+            0.907253514597991,
+            0.549661722120784,
+            -0.004504400123993881
+          ],
+          [
+            0.8951367280308496,
+            0.5423207378601543,
+            -0.002801285570834028
+          ],
+          [
+            0.8782262278405519,
+            0.5320754706807358,
+            -0.004482410255636643
+          ],
+          [
+            0.8564934197697367,
+            0.5189085966829888,
+            -0.008969509077348378
+          ],
+          [
+            0.8302833802451953,
+            0.503029181249369,
+            -0.01535072900846342
+          ],
+          [
+            0.8003629428828688,
+            0.48490181236894003,
+            -0.022740545180302753
+          ],
+          [
+            0.7679255510802153,
+            0.4652495405921219,
+            -0.030652662701647335
+          ],
+          [
+            0.7345516010587905,
+            0.4450298527677349,
+            -0.039231665054715745
+          ],
+          [
+            0.7021229387593348,
+            0.4253828697814079,
+            -0.0492343795048097
+          ],
+          [
+            0.6726911739774731,
+            0.40755156435822604,
+            -0.06174111990129686
+          ],
+          [
+            0.6483036949631157,
+            0.3927763515896583,
+            -0.07767843302121616
+          ],
+          [
+            0.630799287477582,
+            0.3821712642481496,
+            -0.0973117387274615
+          ],
+          [
+            0.6215955357414771,
+            0.37659514914047626,
+            -0.1198894136869711
+          ],
+          [
+            0.6214993641930414,
+            0.37653688337673813,
+            -0.14357917587331498
+          ],
+          [
+            0.6305761619767927,
+            0.38203608312728365,
+            -0.16574547713819968
+          ],
+          [
+            0.6481087882119577,
+            0.39265826686607147,
+            -0.18350395208631104
+          ],
+          [
+            0.6726645124003581,
+            0.4075354113776581,
+            -0.1943945507088893
+          ],
+          [
+            0.7022676631992937,
+            0.4254705514311571,
+            -0.19697172521696607
+          ],
+          [
+            0.7346531178263449,
+            0.4450913569453217,
+            -0.19113340362645853
+          ],
+          [
+            0.7675567838401238,
+            0.46502612207349514,
+            -0.1780929238846161
+          ],
+          [
+            0.798989434062225,
+            0.4840696687491518,
+            -0.16001166303614006
+          ],
+          [
+            0.8274429023777499,
+            0.5013082709071722,
+            -0.13941617039976856
+          ],
+          [
+            0.8519925663586254,
+            0.5161817438274661,
+            -0.11858645814191579
+          ],
+          [
+            0.8722835732574385,
+            0.5284750991202349,
+            -0.09910128838873183
+          ],
+          [
+            0.8884142885611989,
+            0.5382479317521743,
+            -0.08166370218193797
+          ],
+          [
+            0.9007521936960006,
+            0.5457228812284108,
+            -0.06622892708038096
+          ],
+          [
+            0.9097295272143102,
+            0.5511618203147072,
+            -0.052353362025155635
+          ],
+          [
+            0.9156658623031179,
+            0.554758363194396,
+            -0.03961372035462462
+          ],
+          [
+            0.8958733591655268,
+            0.5742861246122203,
+            -0.03671103552854191
+          ],
+          [
+            0.898524883660354,
+            0.5759858444564034,
+            -0.025759266877266988
+          ],
+          [
+            0.8980643168617315,
+            0.5756906050465026,
+            -0.01611313160689568
+          ],
+          [
+            0.894063476399811,
+            0.5731259265229575,
+            -0.008461040840847762
+          ],
+          [
+            0.8859779833900799,
+            0.5679428430004574,
+            -0.003487535800866908
+          ],
+          [
+            0.8733006061618185,
+            0.5598162012556387,
+            -0.0015665702069968832
+          ],
+          [
+            0.8557200946147997,
+            0.5485464790993262,
+            -0.002578601390438383
+          ],
+          [
+            0.8332558349600927,
+            0.5341461037701603,
+            -0.0059363263176670684
+          ],
+          [
+            0.8063475904989807,
+            0.5168969789093828,
+            -0.010818674716383016
+          ],
+          [
+            0.7758902191115132,
+            0.4973727396840126,
+            -0.016525905785497084
+          ],
+          [
+            0.7432123866667711,
+            0.4764251073390808,
+            -0.022813640330774765
+          ],
+          [
+            0.710004171660694,
+            0.45513748124102005,
+            -0.030062225865688068
+          ],
+          [
+            0.6782011456105258,
+            0.43475063036032763,
+            -0.039192167833738446
+          ],
+          [
+            0.6498335329606293,
+            0.41656599950091217,
+            -0.05132795010135828
+          ],
+          [
+            0.6268504279427912,
+            0.40183302616577005,
+            -0.06730866466681783
+          ],
+          [
+            0.6109321918943837,
+            0.3916288806831791,
+            -0.08720921267345684
+          ],
+          [
+            0.6033090621513618,
+            0.38674218816939115,
+            -0.11004541721766614
+          ],
+          [
+            0.604609048818229,
+            0.387575525043766,
+            -0.13378466421061022
+          ],
+          [
+            0.6147606915703525,
+            0.3940830827414245,
+            -0.1556869162535465
+          ],
+          [
+            0.6329735385928824,
+            0.405758154031039,
+            -0.17289171886250715
+          ],
+          [
+            0.657809891347632,
+            0.4216791239171318,
+            -0.18308272588171234
+          ],
+          [
+            0.687346155938277,
+            0.4406129015027075,
+            -0.18503167668954526
+          ],
+          [
+            0.7194040532751694,
+            0.46116313378327106,
+            -0.17885940920606758
+          ],
+          [
+            0.7518155462732926,
+            0.48194003323714707,
+            -0.16594065057112156
+          ],
+          [
+            0.7826754561355629,
+            0.5017223136893679,
+            -0.1484918129618787
+          ],
+          [
+            0.8105358406516606,
+            0.5195817935927098,
+            -0.12897875505453982
+          ],
+          [
+            0.8345071920402283,
+            0.5349482673803456,
+            -0.10953176457777473
+          ],
+          [
+            0.8542512120277257,
+            0.5476048740389561,
+            -0.09154192896808738
+          ],
+          [
+            0.8698735882346602,
+            0.5576193630259613,
+            -0.075542771617814
+          ],
+          [
+            0.8817468218927974,
+            0.5652305206459382,
+            -0.06137940137867074
+          ],
+          [
+            0.8903072296946869,
+            0.5707180411435078,
+            -0.048570621871642565
+          ],
+          [
+            0.8958733591655268,
+            0.5742861246122203,
+            -0.03671103552854192
+          ],
+          [
+            0.8762797360675747,
+            0.5935738300279398,
+            -0.03335986104874842
+          ],
+          [
+            0.878548996475257,
+            0.5951109802507254,
+            -0.02306511259917469
+          ],
+          [
+            0.8777138313899785,
+            0.5945452566376255,
+            -0.013944294076675712
+          ],
+          [
+            0.8733154624226859,
+            0.5915658921649195,
+            -0.006630719409377756
+          ],
+          [
+            0.8647775161499902,
+            0.585782463356672,
+            -0.0017100440965043806
+          ],
+          [
+            0.85157448798623,
+            0.5768390042390398,
+            0.0005506275461140362
+          ],
+          [
+            0.8334061972450717,
+            0.5645321786028723,
+            0.00033686771823789014
+          ],
+          [
+            0.810342319562112,
+            0.5489091832874647,
+            -0.0017815210357351907
+          ],
+          [
+            0.782911087351456,
+            0.5303278320414178,
+            -0.005103205825355975
+          ],
+          [
+            0.752120037566331,
+            0.5094706096279941,
+            -0.009135128943679769
+          ],
+          [
+            0.7194100705424652,
+            0.4873135522326302,
+            -0.013879275894757489
+          ],
+          [
+            0.6865538544010639,
+            0.4650574286997525,
+            -0.019936640903741688
+          ],
+          [
+            0.6555144360837836,
+            0.4440319665623892,
+            -0.028360264952354778
+          ],
+          [
+            0.6282804813786256,
+            0.42558424703198866,
+            -0.04028085234135442
+          ],
+          [
+            0.6066929180964851,
+            0.4109612766597027,
+            -0.056417145490423856
+          ],
+          [
+            0.5922762274704023,
+            0.4011957076079132,
+            -0.07663614934758925
+          ],
+          [
+            0.5860876992270011,
+            0.3970037261430029,
+            -0.09972470375817714
+          ],
+          [
+            0.5885995783989193,
+            0.39870522131546215,
+            -0.12347284307502653
+          ],
+          [
+            0.599630607492769,
+            0.40617741303561977,
+            -0.14507038365076588
+          ],
+          [
+            0.6183426206772481,
+            0.41885254504687525,
+            -0.16171463811914197
+          ],
+          [
+            0.6433125217282739,
+            0.4357666413020157,
+            -0.17125470526255504
+          ],
+          [
+            0.6726795529301197,
+            0.45565926288111996,
+            -0.17268176755821907
+          ],
+          [
+            0.7043536673810613,
+            0.47711465509612244,
+            -0.16632131607081105
+          ],
+          [
+            0.7362563785551867,
+            0.49872489401923326,
+            -0.1536767903582551
+          ],
+          [
+            0.7665549743479944,
+            0.519248538249457,
+            -0.13698318586591485
+          ],
+          [
+            0.7938483026481379,
+            0.5377364762292037,
+            -0.11861701203042359
+          ],
+          [
+            0.8172694661064416,
+            0.5536014895639224,
+            -0.10054649502043944
+          ],
+          [
+            0.8364869626785295,
+            0.5666190256021669,
+            -0.08398171520286447
+          ],
+          [
+            0.8516075521048071,
+            0.576861401191397,
+            -0.06930850880143061
+          ],
+          [
+            0.8630060018218032,
+            0.5845824760678523,
+            -0.056290134835757455
+          ],
+          [
+            0.8711231178766758,
+            0.5900808431613264,
+            -0.044432234107188155
+          ],
+          [
+            0.8762797360675747,
+            0.5935738300279398,
+            -0.03335986104874833
+          ],
+          [
+            0.8568866685395737,
+            0.6126682756161557,
+            -0.029622863349460373
+          ],
+          [
+            0.858733156329412,
+            0.6139885021194745,
+            -0.019912868974578782
+          ],
+          [
+            0.8574878894598605,
+            0.613098144580186,
+            -0.011247456374226547
+          ],
+          [
+            0.8526726701977332,
+            0.6096552947957806,
+            -0.004190610219740803
+          ],
+          [
+            0.843691519215477,
+            0.6032338315062125,
+            0.0007784914398623438
+          ],
+          [
+            0.8300118808836023,
+            0.5934529809742203,
+            0.003495133017694751
+          ],
+          [
+            0.8113516386718602,
+            0.5801110317548063,
+            0.004193874385379259
+          ],
+          [
+            0.7878305884540463,
+            0.5632936371019175,
+            0.00340215935271309
+          ],
+          [
+            0.7600562622745946,
+            0.5434351783914241,
+            0.001677368560391025
+          ],
+          [
+            0.7291307870483518,
+            0.5213236690458948,
+            -0.0007085878918892807
+          ],
+          [
+            0.6965826305943859,
+            0.4980519534021881,
+            -0.004002418459978604
+          ],
+          [
+            0.6642401023792637,
+            0.47492726058324425,
+            -0.009006917557109896
+          ],
+          [
+            0.6340698190160814,
+            0.453355708402983,
+            -0.01687644667055306
+          ],
+          [
+            0.6080030649094385,
+            0.4347181523809643,
+            -0.028713677315102812
+          ],
+          [
+            0.5877683025437148,
+            0.420250431711159,
+            -0.04509044616467944
+          ],
+          [
+            0.5747422725903526,
+            0.4109369068278129,
+            -0.06565547331210539
+          ],
+          [
+            0.5698280316618448,
+            0.4074232572097571,
+            -0.08897563906510715
+          ],
+          [
+            0.573367209167309,
+            0.4099537456150299,
+            -0.11268888266136272
+          ],
+          [
+            0.5850950205052724,
+            0.41833905281257067,
+            -0.13394776239653586
+          ],
+          [
+            0.6041478559211639,
+            0.4319617035649129,
+            -0.15003672867571033
+          ],
+          [
+            0.6291317928808882,
+            0.4498250525201547,
+            -0.15898623339943868
+          ],
+          [
+            0.6582542482247654,
+            0.4706474146274463,
+            -0.16000393962168885
+          ],
+          [
+            0.689510223773147,
+            0.492995229507756,
+            -0.15359904766033322
+          ],
+          [
+            0.7209014958832961,
+            0.51543978053094,
+            -0.14137156341144944
+          ],
+          [
+            0.7506556259001183,
+            0.5367137858331048,
+            -0.1255419754202195
+          ],
+          [
+            0.7774061559258054,
+            0.5558402370948438,
+            -0.10837359768645459
+          ],
+          [
+            0.8002988962297323,
+            0.572208394333233,
+            -0.09166467817806304
+          ],
+          [
+            0.8190023635314824,
+            0.5855812492048539,
+            -0.07645336724747391
+          ],
+          [
+            0.8336207116671059,
+            0.5960332710105771,
+            -0.06299923747264631
+          ],
+          [
+            0.8445299126068093,
+            0.6038332772114783,
+            -0.05100903337902301
+          ],
+          [
+            0.8521764097874087,
+            0.6093004718991095,
+            -0.03999546300812799
+          ],
+          [
+            0.8568866685395736,
+            0.6126682756161556,
+            -0.02962286334946038
+          ],
+          [
+            0.8376835476252643,
+            0.631609624629124,
+            -0.025563463636271537
+          ],
+          [
+            0.8390737491910667,
+            0.632657830352663,
+            -0.016362891003336995
+          ],
+          [
+            0.8373923957168643,
+            0.6313900974006187,
+            -0.008076628344109282
+          ],
+          [
+            0.8321524100633964,
+            0.6274391718022453,
+            -0.001189221445593305
+          ],
+          [
+            0.8227497854717819,
+            0.620349635179885,
+            0.0039297450444601666
+          ],
+          [
+            0.8086548964815472,
+            0.6097221523201,
+            0.007210417528051444
+          ],
+          [
+            0.7896088548748015,
+            0.5953615226718157,
+            0.008918986999821401
+          ],
+          [
+            0.765779083626554,
+            0.5773939824046448,
+            0.009518526962295722
+          ],
+          [
+            0.7378408420230931,
+            0.5563286739812142,
+            0.009403551582237712
+          ],
+          [
+            0.7069709355305804,
+            0.5330529034263956,
+            0.00861650002194269
+          ],
+          [
+            0.6747602016886078,
+            0.5087661550849347,
+            0.006672583991543895
+          ],
+          [
+            0.6430669132733877,
+            0.4848695582663058,
+            0.0025882494117476632
+          ],
+          [
+            0.6138405082716036,
+            0.4628329804383579,
+            -0.004862357521349935
+          ],
+          [
+            0.5889436688533507,
+            0.44406087557370694,
+            -0.016724192351981103
+          ],
+          [
+            0.5699932278513197,
+            0.4297723283510944,
+            -0.033401940890527025
+          ],
+          [
+            0.5582308312577272,
+            0.42090353426020066,
+            -0.05432170248187079
+          ],
+          [
+            0.5544268024312297,
+            0.4180353136463499,
+            -0.07784333788904564
+          ],
+          [
+            0.5588176613982355,
+            0.4213460015449149,
+            -0.10147860230931569
+          ],
+          [
+            0.5710791867822524,
+            0.4305911364972894,
+            -0.12237307066119285
+          ],
+          [
+            0.5903404116783628,
+            0.44511401337724893,
+            -0.13792290631606224
+          ],
+          [
+            0.6152459980177108,
+            0.4638927133810371,
+            -0.14635061993406237
+          ],
+          [
+            0.644071966862181,
+            0.48562736414866975,
+            -0.14707361128554178
+          ],
+          [
+            0.6748916185133103,
+            0.5088652427792741,
+            -0.14076272826530525
+          ],
+          [
+            0.7057761438533655,
+            0.5321520358793428,
+            -0.1290841819707872
+          ],
+          [
+            0.7350017227082768,
+            0.5541879907962669,
+            -0.11421473700184141
+          ],
+          [
+            0.761226687641987,
+            0.5739614963218911,
+            -0.09828508696675045
+          ],
+          [
+            0.7836027063527615,
+            0.5908329137189161,
+            -0.08291887189505447
+          ],
+          [
+            0.8017945819424988,
+            0.6045495060348414,
+            -0.06899234057965603
+          ],
+          [
+            0.8159025408532667,
+            0.6151868435558827,
+            -0.056658558666556336
+          ],
+          [
+            0.826304036415649,
+            0.6230295243944428,
+            -0.04558953499900395
+          ],
+          [
+            0.8334526617702871,
+            0.628419555737015,
+            -0.03532128479477313
+          ],
+          [
+            0.8376835476252643,
+            0.631609624629124,
+            -0.025563463636271547
+          ],
+          [
+            0.8186505292737388,
+            0.6504318380851409,
+            -0.021243107948749694
+          ],
+          [
+            0.819559234781427,
+            0.6511538201428183,
+            -0.012471557972145164
+          ],
+          [
+            0.8174262220590593,
+            0.6494591050769166,
+            -0.004481342425783348
+          ],
+          [
+            0.8117651322598233,
+            0.6449612724706777,
+            0.0023283141915625663
+          ],
+          [
+            0.801974364860198,
+            0.6371823404254594,
+            0.007696647786231743
+          ],
+          [
+            0.7875356924593566,
+            0.6257105684136341,
+            0.011639134694876615
+          ],
+          [
+            0.7682167150947425,
+            0.6103613106927129,
+            0.014437056884249958
+          ],
+          [
+            0.7442279209512659,
+            0.591301803723323,
+            0.01647071252858636
+          ],
+          [
+            0.7162989660319765,
+            0.5691117716713482,
+            0.01795820779047095
+          ],
+          [
+            0.6856605809163041,
+            0.5447690510180966,
+            0.018709640850608205
+          ],
+          [
+            0.6539413816806317,
+            0.5195676050729627,
+            0.018012544921684987
+          ],
+          [
+            0.6230062231551292,
+            0.49498909287307674,
+            0.014724456329762181
+          ],
+          [
+            0.5947704036488545,
+            0.47255525166173673,
+            0.007575423691692123
+          ],
+          [
+            0.5710213997923037,
+            0.4536862621738642,
+            -0.004397013513483607
+          ],
+          [
+            0.5532697110277047,
+            0.43958224203413904,
+            -0.02141594225121974
+          ],
+          [
+            0.5426377781605893,
+            0.43113498964759195,
+            -0.04268535113782424
+          ],
+          [
+            0.5397858849535337,
+            0.4288691117493228,
+            -0.066373432687205
+          ],
+          [
+            0.544869737316906,
+            0.432908319346483,
+            -0.08989101966051277
+          ],
+          [
+            0.5575263937198015,
+            0.4429642491892825,
+            -0.11040369201256298
+          ],
+          [
+            0.5768908654530606,
+            0.45834965296369307,
+            -0.12543927745962435
+          ],
+          [
+            0.6016507954254249,
+            0.47802184052957847,
+            -0.1334187876125447
+          ],
+          [
+            0.6301470993066963,
+            0.5006626410291167,
+            -0.13396020252197727
+          ],
+          [
+            0.6605222165110557,
+            0.5247961908269899,
+            -0.12787415829700538
+          ],
+          [
+            0.6909055865109645,
+            0.548936297611986,
+            -0.11686531596788156
+          ],
+          [
+            0.7196119380865689,
+            0.5717439845948589,
+            -0.1030414280548261
+          ],
+          [
+            0.7453173478607588,
+            0.5921673720236691,
+            -0.08838486296980778
+          ],
+          [
+            0.7671757726598438,
+            0.6095342641361405,
+            -0.07434212592817338
+          ],
+          [
+            0.784847476948044,
+            0.6235747352422524,
+            -0.06163731387373472
+          ],
+          [
+            0.7984294350934665,
+            0.6343658331349756,
+            -0.050334239578005265
+          ],
+          [
+            0.8083017718884785,
+            0.6422095734590328,
+            -0.0400882425371913
+          ],
+          [
+            0.8149267270510995,
+            0.6474732135711061,
+            -0.030471449220105286
+          ],
+          [
+            0.8186505292737388,
+            0.6504318380851409,
+            -0.021243107948749822
+          ],
+          [
+            0.7997616116064974,
+            0.6691636712845639,
+            -0.016719327612813036
+          ],
+          [
+            0.8001729966545487,
+            0.6695078787647312,
+            -0.008290309380579092
+          ],
+          [
+            0.797583696941541,
+            0.6673414015584398,
+            -0.0005066429155104474
+          ],
+          [
+            0.7915164769164756,
+            0.6622649348119194,
+            0.0063197320198175935
+          ],
+          [
+            0.7813811605097972,
+            0.653784675897391,
+            0.012033032832406308
+          ],
+          [
+            0.7666776814794367,
+            0.6414822174324895,
+            0.0167235569998789
+          ],
+          [
+            0.7472015068660818,
+            0.6251864258894663,
+            0.020672791953229852
+          ],
+          [
+            0.7231999106017539,
+            0.6051041963352551,
+            0.024163771222338003
+          ],
+          [
+            0.6954425686543205,
+            0.581879519665247,
+            0.027229649676628886
+          ],
+          [
+            0.6651935282886139,
+            0.5565700291743348,
+            0.02944980107473793
+          ],
+          [
+            0.6340962606841591,
+            0.5305508236321788,
+            0.02989699155286123
+          ],
+          [
+            0.6040019832894332,
+            0.5053708239249419,
+            0.02729140194156907
+          ],
+          [
+            0.5767790875111338,
+            0.4825933204568624,
+            0.020343370471733423
+          ],
+          [
+            0.5541376362755964,
+            0.4636491295728453,
+            0.008192979206948453
+          ],
+          [
+            0.5374906845874782,
+            0.44972055992702076,
+            -0.00919172656771259
+          ],
+          [
+            0.527859243507023,
+            0.44166189547048074,
+            -0.030796667662397068
+          ],
+          [
+            0.5258158909885045,
+            0.43995221441905624,
+            -0.054614814890122126
+          ],
+          [
+            0.5314572075549719,
+            0.4446723260744693,
+            -0.07797980006629797
+          ],
+          [
+            0.5443979537627897,
+            0.45549989908612043,
+            -0.09810072717347072
+          ],
+          [
+            0.5637874494971344,
+            0.4717231660717512,
+            -0.11265297983961366
+          ],
+          [
+            0.5883561325695739,
+            0.49227987937830286,
+            -0.12025934676145755
+          ],
+          [
+            0.6165029278171882,
+            0.5158304131491782,
+            -0.12072806028371211
+          ],
+          [
+            0.6464290683527358,
+            0.5408697320881296,
+            -0.11498884467912755
+          ],
+          [
+            0.6763119348700333,
+            0.5658728434866048,
+            -0.10476001845130012
+          ],
+          [
+            0.7044971970751602,
+            0.5894555627114189,
+            -0.0920586233152543
+          ],
+          [
+            0.7296749263454793,
+            0.6105218673559899,
+            -0.07870583382373939
+          ],
+          [
+            0.751001087172687,
+            0.6283655496063464,
+            -0.06596950814877721
+          ],
+          [
+            0.7681331722733986,
+            0.6427000322776557,
+            -0.05443017240128474
+          ],
+          [
+            0.781167109808437,
+            0.6536055788376115,
+            -0.04407676435708716
+          ],
+          [
+            0.790487339852332,
+            0.6614038518015534,
+            -0.03456257087776955
+          ],
+          [
+            0.7965658709603429,
+            0.6664897825754542,
+            -0.025505978348135522
+          ],
+          [
+            0.7997616116064974,
+            0.6691636712845639,
+            -0.01671932761281306
+          ],
+          [
+            0.7809874877246031,
+            0.6878300865766237,
+            -0.012044709325684586
+          ],
+          [
+            0.7808958663336166,
+            0.6877493939275288,
+            -0.003865628679417646
+          ],
+          [
+            0.7778566973003485,
+            0.6850727416992526,
+            0.0038061469757628406
+          ],
+          [
+            0.7714088930270471,
+            0.6793940415392087,
+            0.010744647309369628
+          ],
+          [
+            0.7609811116346883,
+            0.670210102115537,
+            0.016893097029417627
+          ],
+          [
+            0.7460964103597506,
+            0.6571008711386922,
+            0.02240600046761546
+          ],
+          [
+            0.7265777462478031,
+            0.639910423612963,
+            0.027552289676892012
+          ],
+          [
+            0.7027016171755219,
+            0.6188822763186329,
+            0.03250702269859121
+          ],
+          [
+            0.6752630407481949,
+            0.5947166159256168,
+            0.037114122040049234
+          ],
+          [
+            0.6455398574268915,
+            0.5685388600990927,
+            0.04072723130052605
+          ],
+          [
+            0.6151700606920804,
+            0.5417916199118266,
+            0.04221865738024561
+          ],
+          [
+            0.5859748231222541,
+            0.5160788356471445,
+            0.04019174827568008
+          ],
+          [
+            0.5597672119645505,
+            0.4929973090735379,
+            0.03335841746183081
+          ],
+          [
+            0.538181614124567,
+            0.4739864748867557,
+            0.020977202636574276
+          ],
+          [
+            0.5225451119246436,
+            0.4602151189675153,
+            0.0032130042227626727
+          ],
+          [
+            0.513795578763182,
+            0.4525092437178528,
+            -0.018708351054775682
+          ],
+          [
+            0.5124384405937895,
+            0.45131398709822446,
+            -0.042621152412714455
+          ],
+          [
+            0.5185290958924332,
+            0.45667813956829806,
+            -0.06580358025769753
+          ],
+          [
+            0.5316715399285102,
+            0.4682529324571067,
+            -0.0855285693721588
+          ],
+          [
+            0.5510327946396123,
+            0.48530474661992895,
+            -0.09963172150699294
+          ],
+          [
+            0.5753820022372376,
+            0.5067495428979618,
+            -0.10693880959649021
+          ],
+          [
+            0.6031671197304742,
+            0.5312204084000399,
+            -0.10743779516564125
+          ],
+          [
+            0.6326378432502708,
+            0.5571758182224895,
+            -0.10215847459084332
+          ],
+          [
+            0.6620110748820536,
+            0.5830453651408247,
+            -0.09281090692458256
+          ],
+          [
+            0.6896589288677345,
+            0.6073953401398284,
+            -0.08130267739704328
+          ],
+          [
+            0.7142852129441571,
+            0.6290841627837058,
+            -0.06928280649653303
+          ],
+          [
+            0.7350506975684362,
+            0.6473727081335643,
+            -0.057839143942833515
+          ],
+          [
+            0.7516140041847965,
+            0.6619603177982452,
+            -0.04741557892742746
+          ],
+          [
+            0.7640732214199898,
+            0.672933380240677,
+            -0.037937753886164285
+          ],
+          [
+            0.7728187463349957,
+            0.6806357253537496,
+            -0.02906866403786532
+          ],
+          [
+            0.7783327905649137,
+            0.6854920458193974,
+            -0.02048132417574834
+          ],
+          [
+            0.7809874877246034,
+            0.6878300865766239,
+            -0.012044709325684477
+          ],
+          [
+            0.7622979527565567,
+            0.7064538887583127,
+            -0.007266794193229135
+          ],
+          [
+            0.7617081242946585,
+            0.7059072696717712,
+            0.0007601360964372539
+          ],
+          [
+            0.7582361796124604,
+            0.7026896710760737,
+            0.008418081827684543
+          ],
+          [
+            0.7514427037863906,
+            0.6963938684989346,
+            0.015563308386609817
+          ],
+          [
+            0.740780884435944,
+            0.6865131076833969,
+            0.02223084681110623
+          ],
+          [
+            0.7258000713329558,
+            0.6726297519232283,
+            0.028629301467251598
+          ],
+          [
+            0.706348804787832,
+            0.6546034370913615,
+            0.03500448285332911
+          ],
+          [
+            0.6827244627437344,
+            0.6327097559578124,
+            0.04141600882375172
+          ],
+          [
+            0.6557331636475333,
+            0.6076957727243569,
+            0.047517570920411485
+          ],
+          [
+            0.6266489431256275,
+            0.5807421903161849,
+            0.052444346320971294
+          ],
+          [
+            0.5970873052572724,
+            0.5533461649764266,
+            0.054883023917626665
+          ],
+          [
+            0.5688271773650634,
+            0.5271563042086461,
+            0.05333929056375941
+          ],
+          [
+            0.5436221294857086,
+            0.5037977158426137,
+            0.046545161131790865
+          ],
+          [
+            0.5230359050042529,
+            0.4847195872877802,
+            0.03389030679566753
+          ],
+          [
+            0.5083225760600076,
+            0.4710841204579726,
+            0.015739560378851488
+          ],
+          [
+            0.5003543883942626,
+            0.46369966252723044,
+            -0.006477049259240239
+          ],
+          [
+            0.4995871882367574,
+            0.46298866555712764,
+            -0.03045115833728346
+          ],
+          [
+            0.5060485740977656,
+            0.4689767062592846,
+            -0.05342529194166783
+          ],
+          [
+            0.5193381796113058,
+            0.48129274811818573,
+            -0.07275391257107529
+          ],
+          [
+            0.538639561858785,
+            0.4991801588056141,
+            -0.08644322156798694
+          ],
+          [
+            0.5627534448813122,
+            0.5215275183554142,
+            -0.09352206099098698
+          ],
+          [
+            0.5901668771909551,
+            0.5469327103663978,
+            -0.0941480143410652
+          ],
+          [
+            0.6191687985413703,
+            0.5738100226369802,
+            -0.08943369163824688
+          ],
+          [
+            0.6480099152549986,
+            0.6005383104210376,
+            -0.08106138622315415
+          ],
+          [
+            0.6750877882112455,
+            0.6256325253275193,
+            -0.07081262613546033
+          ],
+          [
+            0.6991231384417089,
+            0.6479071052035086,
+            -0.0601543913772839
+          ],
+          [
+            0.7192870266909926,
+            0.6665938368347342,
+            -0.04999277131581037
+          ],
+          [
+            0.7352446781229832,
+            0.6813824701621802,
+            -0.040640262536744215
+          ],
+          [
+            0.747100000734629,
+            0.692369301139747,
+            -0.03196846578314059
+          ],
+          [
+            0.7552505716255329,
+            0.6999227813513332,
+            -0.02365979807318297
+          ],
+          [
+            0.7601883050857627,
+            0.7044987886618833,
+            -0.015449328195987167
+          ],
+          [
+            0.7622979527565567,
+            0.7064538887583127,
+            -0.007266794193229144
+          ],
+          [
+            0.7436636946292281,
+            0.725057363527557,
+            -0.0024288254078464796
+          ],
+          [
+            0.7425908392767705,
+            0.7240113508219251,
+            0.005547308801464557
+          ],
+          [
+            0.7387130504941049,
+            0.7202305836130618,
+            0.013290924737411062
+          ],
+          [
+            0.7316165617964719,
+            0.7133116477788012,
+            0.020735322003404586
+          ],
+          [
+            0.7207830567510171,
+            0.7027491950696687,
+            0.02799967488196109
+          ],
+          [
+            0.7057896650654122,
+            0.6881309353315478,
+            0.035337376709810984
+          ],
+          [
+            0.686507390191797,
+            0.6693310994868686,
+            0.0429624293916227
+          ],
+          [
+            0.6632459039689752,
+            0.6466516114410515,
+            0.05081395680007639
+          ],
+          [
+            0.6368093160321449,
+            0.6208764621516952,
+            0.05835661787594776
+          ],
+          [
+            0.6084528786452289,
+            0.5932294976981699,
+            0.06451568343588907
+          ],
+          [
+            0.5797564120722241,
+            0.5652510115272763,
+            0.06780706805279281
+          ],
+          [
+            0.5524487222604672,
+            0.538626555174311,
+            0.06665671155803658
+          ],
+          [
+            0.5282235916993353,
+            0.5150075329971932,
+            0.05983318542020525
+          ],
+          [
+            0.5085816331655382,
+            0.4958570127124386,
+            0.046867790528294644
+          ],
+          [
+            0.4947172519524376,
+            0.48233951580905193,
+            0.02832679225121852
+          ],
+          [
+            0.4874526417611922,
+            0.47525666485053375,
+            0.0058363863686432295
+          ],
+          [
+            0.4872077453093821,
+            0.47501789566364316,
+            -0.01816775086871663
+          ],
+          [
+            0.4939907322861236,
+            0.4816311735333528,
+            -0.04091074095623375
+          ],
+          [
+            0.5073982722991057,
+            0.4947032593207998,
+            -0.05984447892233283
+          ],
+          [
+            0.5266253833068212,
+            0.5134493114895241,
+            -0.07315477885207879
+          ],
+          [
+            0.5504952210201054,
+            0.5367219301815707,
+            -0.0800731851825937
+          ],
+          [
+            0.5775241168620782,
+            0.5630745679394384,
+            -0.08091740285424379
+          ],
+          [
+            0.6060330681355015,
+            0.5908702304096224,
+            -0.07686700972513559
+          ],
+          [
+            0.6343041237278995,
+            0.6184339493056819,
+            -0.06955870070468019
+          ],
+          [
+            0.660762897748607,
+            0.6442307295871105,
+            -0.06063264920848193
+          ],
+          [
+            0.6841533451265324,
+            0.6670359522032611,
+            -0.05136436028962798
+          ],
+          [
+            0.7036644428084609,
+            0.6860588857509865,
+            -0.04247585991752967
+          ],
+          [
+            0.7189744551319274,
+            0.7009858443358903,
+            -0.034152176228066586
+          ],
+          [
+            0.7301966957495499,
+            0.7119273065235018,
+            -0.02621856601795964
+          ],
+          [
+            0.7377363793430042,
+            0.7192783485974699,
+            -0.01838542372335144
+          ],
+          [
+            0.7420935232648412,
+            0.7235264775666437,
+            -0.01045703410638288
+          ],
+          [
+            0.7436636946292281,
+            0.725057363527557,
+            -0.002428825407846383
+          ],
+          [
+            0.725057363527557,
+            0.743663694629228,
+            0.002428825407846469
+          ],
+          [
+            0.7235264775666437,
+            0.742093523264841,
+            0.01045703410638285
+          ],
+          [
+            0.7192783485974699,
+            0.7377363793430041,
+            0.018385423723351377
+          ],
+          [
+            0.7119273065235018,
+            0.7301966957495498,
+            0.02621856601795959
+          ],
+          [
+            0.7009858443358901,
+            0.7189744551319271,
+            0.034152176228066385
+          ],
+          [
+            0.6860588857509865,
+            0.7036644428084609,
+            0.04247585991752958
+          ],
+          [
+            0.6670359522032612,
+            0.6841533451265324,
+            0.05136436028962789
+          ],
+          [
+            0.6442307295871105,
+            0.6607628977486069,
+            0.06063264920848186
+          ],
+          [
+            0.6184339493056819,
+            0.6343041237278993,
+            0.06955870070468013
+          ],
+          [
+            0.5908702304096225,
+            0.6060330681355016,
+            0.07686700972513553
+          ],
+          [
+            0.5630745679394384,
+            0.577524116862078,
+            0.08091740285424374
+          ],
+          [
+            0.5367219301815708,
+            0.5504952210201054,
+            0.0800731851825936
+          ],
+          [
+            0.5134493114895241,
+            0.5266253833068211,
+            0.07315477885207876
+          ],
+          [
+            0.49470325932079984,
+            0.5073982722991057,
+            0.05984447892233292
+          ],
+          [
+            0.4816311735333528,
+            0.49399073228612356,
+            0.04091074095623378
+          ],
+          [
+            0.47501789566364316,
+            0.487207745309382,
+            0.018167750868716633
+          ],
+          [
+            0.47525666485053375,
+            0.48745264176119213,
+            -0.005836386368643221
+          ],
+          [
+            0.48233951580905193,
+            0.4947172519524375,
+            -0.028326792251218483
+          ],
+          [
+            0.49585701271243837,
+            0.5085816331655378,
+            -0.046867790528294526
+          ],
+          [
+            0.5150075329971932,
+            0.5282235916993352,
+            -0.059833185420205263
+          ],
+          [
+            0.538626555174311,
+            0.552448722260467,
+            -0.0666567115580366
+          ],
+          [
+            0.5652510115272762,
+            0.5797564120722238,
+            -0.06780706805279282
+          ],
+          [
+            0.5932294976981698,
+            0.6084528786452286,
+            -0.0645156834358891
+          ],
+          [
+            0.6208764621516953,
+            0.6368093160321449,
+            -0.05835661787594773
+          ],
+          [
+            0.6466516114410515,
+            0.6632459039689751,
+            -0.05081395680007639
+          ],
+          [
+            0.6693310994868685,
+            0.6865073901917969,
+            -0.04296242939162273
+          ],
+          [
+            0.6881309353315477,
+            0.705789665065412,
+            -0.035337376709811026
+          ],
+          [
+            0.7027491950696685,
+            0.7207830567510168,
+            -0.027999674881961114
+          ],
+          [
+            0.7133116477788012,
+            0.7316165617964718,
+            -0.0207353220034046
+          ],
+          [
+            0.7202305836130618,
+            0.7387130504941047,
+            -0.013290924737411062
+          ],
+          [
+            0.7240113508219251,
+            0.7425908392767704,
+            -0.005547308801464582
+          ],
+          [
+            0.725057363527557,
+            0.743663694629228,
+            0.0024288254078463512
+          ]
+        ]
+      }
+    }
+  }
+}}
+  }
+}

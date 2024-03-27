@@ -26,23 +26,24 @@ if args.type == 1: QA_or_QH = 'simple'
 elif args.type == 2: QA_or_QH = 'QA'
 elif args.type == 3: QA_or_QH = 'QH'
 elif args.type == 4: QA_or_QH = 'QI'
+elif args.type == 5: QA_or_QH = 'QI_nfp2'
 else: raise ValueError('Invalid type')
 
 ncoils = args.ncoils
-R1_mean = 0.2
-R1_std = 0.4
-extend_distance = 0.02
-MAXITER = 400
+R1_mean = 0.75
+R1_std = 0.15
+extend_distance = 0.01
+MAXITER = 800
 use_nfp3 = True
 opt_method = 'L-BFGS-B'
-min_length_per_coil = 2.6
-max_length_per_coil = 3.6
-min_curvature = 8
-max_curvature = 25
-CC_min = 0.06
-CC_max = 0.13
-order_min = 1
-order_max = 2
+min_length_per_coil = 2.8
+max_length_per_coil = 3.8
+min_curvature = 10
+max_curvature = 30
+CC_min = 0.1
+CC_max = 0.2
+order_min = 3
+order_max = 9
 nphi = 26
 ntheta = 26
 nquadpoints = 80
@@ -165,7 +166,7 @@ def run_optimization(
         iteration += 1
         return J, grad
 
-    res = minimize( fun, JF.x, jac=True, method="L-BFGS-B", options={"maxiter": MAXITER, "maxcor": 300}, tol=1e-7)
+    res = minimize( fun, JF.x, jac=True, method="L-BFGS-B", options={"maxiter": MAXITER, "maxcor": 300}, tol=1e-8)
     JF.x = res.x
     print(res.message)
     curves_to_vtk(curves, new_OUT_DIR + "curves_opt", close=True)
@@ -236,15 +237,15 @@ for index in range(10000):
 
     # Target length (per coil!) and weight for the length term in the objective function:
     length_target = rand(min_length_per_coil, max_length_per_coil)
-    length_weight = 10.0 ** rand(-3, 1)
+    length_weight = 10.0 ** rand(-4, 0)
 
     # Threshold and weight for the curvature penalty in the objective function:
     max_curvature_threshold = rand(min_curvature, max_curvature)
-    max_curvature_weight = 10.0 ** rand(-6, -2)
+    max_curvature_weight = 10.0 ** rand(-6, -1)
 
     # Threshold and weight for the mean squared curvature penalty in the objective function:
     msc_threshold = rand(min_curvature, max_curvature)
-    msc_weight = 10.0 ** rand(-6, -3)
+    msc_weight = 10.0 ** rand(-6, -2)
 
     # Threshold and weight for the coil-to-coil distance penalty in the objective function:
     cc_threshold = rand(CC_min, CC_max)

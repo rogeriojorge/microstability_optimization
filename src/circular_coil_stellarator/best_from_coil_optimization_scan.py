@@ -19,9 +19,11 @@ args = parser.parse_args()
 
 print_coil_currents = False
 
-if args.type == 1: QA_or_QH = 'QA'
-elif args.type == 2: QA_or_QH = 'QH'
-elif args.type == 3: QA_or_QH = 'QI'
+if args.type == 1: QA_or_QH = 'simple'
+elif args.type == 2: QA_or_QH = 'QA'
+elif args.type == 3: QA_or_QH = 'QH'
+elif args.type == 4: QA_or_QH = 'QI'
+elif args.type == 5: QA_or_QH = 'QI_nfp2'
 else: raise ValueError('Invalid type')
 
 nphi = 60
@@ -55,9 +57,9 @@ df = df[df["max_max_curvature"] < 50]
 #########################################################
 
 succeeded = df["linking_number"] < 0.1
-succeeded = np.logical_and(succeeded, df["coil_coil_distance"] > 0.3)
-succeeded = np.logical_and(succeeded, df["Jf"] < 3e-2)
-# succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 10)
+succeeded = np.logical_and(succeeded, df["coil_coil_distance"] > 0.05)
+succeeded = np.logical_and(succeeded, df["Jf"] < 1e-2)
+succeeded = np.logical_and(succeeded, df["max_max_curvature"] < 25)
 # succeeded = np.logical_and(succeeded, df["coil_surface_distance1"] > 0.049)
 # succeeded = np.logical_and(succeeded, df["coil_surface_distance2"] > 0.049)
 # succeeded = np.logical_and(succeeded, df["length"] < 17)
@@ -83,6 +85,7 @@ print(
             "length",
             "coil_coil_distance",
             "BdotN",
+            "order",
         ]
     ]
 )

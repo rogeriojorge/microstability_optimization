@@ -46,6 +46,6 @@ for j, (variable, title) in enumerate(zip(variables, titles)):
     plt.xlabel('Standard toroidal angle $\phi$')
     plt.title(title)
 
-plt.figtext(0.5, 0.995, f'surface s={surface}, field line alpha={alpha}', ha='center', va='top')
+plt.figtext(0.5, 0.995, f'surface s={surface}, field line alpha={alpha} from file {vmec_output_file}', ha='center', va='top')
 plt.tight_layout()
 plt.show()

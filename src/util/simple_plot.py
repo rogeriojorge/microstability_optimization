@@ -7,7 +7,7 @@ from simsopt.mhd import Vmec
 from neat.fields import Simple
 from neat.tracing import ChargedParticleEnsemble, ParticleEnsembleOrbit_Simple
 
-def main(file, OUT_DIR=".", tfinal=5e-3, nparticles=3500):
+def main(file, OUT_DIR=".", tfinal=1e-2, nparticles=3500):
     start_time = time.time()
     v = Vmec(file, verbose=False)
     g_particle = ChargedParticleEnsemble(r_initial=0.25)

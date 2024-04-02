@@ -6,23 +6,25 @@ import numpy as np
 from pathlib import Path
 from simsopt import load
 from simsopt.mhd.vmec import Vmec
+from simsopt.util import MpiPartition, proc0_print, comm_world
 from simsopt.field import (InterpolatedField, SurfaceClassifier, particles_to_vtk, 
                            compute_fieldlines, LevelsetStoppingCriterion, plot_poincare_data,
                            coils_to_focus, coils_to_makegrid)
 from simsopt.geo import SurfaceRZFourier
 from simsopt.util import proc0_print, comm_world
 this_path = os.path.dirname(os.path.abspath(__file__))
+mpi = MpiPartition()
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_QA_asymcoils'
-coils_file = f'biot_savart_maxmode4.json'
+results_folder = f'optimization_QA_asymcoils_order4_l02_Rmajor0.209_Aminor0.0982'
+coils_file = f'biot_savart_maxmode3.json'
 ncoils = 2# int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
 nfieldlines = 24
-tmax_fl = 5000 # 20000
+tmax_fl = 9000 # 20000
 degree = 4
-extend_distance = 0.013 # 0.04
+extend_distance = 0.043 # 0.04
 nfieldlines_to_plot = 20
 
 interpolate_field = False
@@ -41,8 +43,15 @@ surf.extend_via_normal(extend_distance)
 R_max = np.max(surf.gamma()[0,:,0])
 
 vmec_file_wout = os.path.join(out_dir,filename_wout)
-#R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
-R_axis = 0.195
+try:
+    R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
+except Exception as e:
+    proc0_print(f"Error: {e}")
+    vmec = Vmec(vmec_file_input, mpi=mpi)
+    vmec.run()
+    R_axis = np.sum(vmec.wout.raxis_cc)
+# R_axis = 0.22910
+# exit()
 
 proc0_print('Loading coils file')
 coils_filename = os.path.join(OUT_DIR,coils_file)
@@ -57,7 +66,7 @@ coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,
 proc0_print('Computing surface classifier')
 start_time = time.time()
 # surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
-sc_fieldline = SurfaceClassifier(surf, h=0.2*R_axis, p=2)
+sc_fieldline = SurfaceClassifier(surf, h=0.15*R_axis, p=2)
 # sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.04*R_axis)
 proc0_print(f"Time for surface classifier={time.time()-start_time:.3f}s", flush=True)
 

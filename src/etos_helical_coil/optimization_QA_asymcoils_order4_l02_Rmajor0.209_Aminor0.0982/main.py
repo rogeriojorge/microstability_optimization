@@ -67,15 +67,15 @@ Aminor_helical_coil = 0.0982
 coils_dofs_1 = [np.pi/2, 0.2841]
 nquadpoints = 1000
 aspect_ratio_target = 7
-JACOBIAN_THRESHOLD = 5
-aspect_ratio_weight = 1e-2 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
+JACOBIAN_THRESHOLD = 10
+aspect_ratio_weight = 5e-3 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
 nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.65; nfp_min_iota_QA = 0.21 # 0.41
 iota_min_QA = nfp_min_iota_QA if QA_or_QH=='QA' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
 coils_objective_weight = 1e5 # 3e+3 if 'QI' in QA_or_QH else 3e+4
 CC_THRESHOLD = 0.03
-quasisymmetry_weight = 1e+0 # 5e-1 # 1e-0 if 'QI' in QA_or_QH else 1e+2
+quasisymmetry_weight = 1e+2 # 5e-1 # 1e-0 if 'QI' in QA_or_QH else 1e+2
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 CURVATURE_THRESHOLD = 20

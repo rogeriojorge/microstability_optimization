@@ -55,20 +55,20 @@ if args.extra==1: use_extra_coils = True
 else:             use_extra_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 300
-MAXITER_single_stage = 25
-MAXFEV_single_stage  = 40
+MAXITER_single_stage = 20
+MAXFEV_single_stage  = 35
 LENGTH_THRESHOLD = 33
-max_mode_array = [1]*2 + [2]*2 + [3]*2 + [4]*1 + [5]*0 + [6]*0
+max_mode_array = [1]*2 + [2]*4 + [3]*4 + [4]*3 + [5]*2 + [6]*0
 extra_coil_R1 = 0.368
 order_coils = 4
 l0_coil = 2
-Rmajor_helical_coil = 0.209 # 0.2
+Rmajor_helical_coil = 0.21 # 0.2
 Aminor_helical_coil = 0.0982
 coils_dofs_1 = [np.pi/2, 0.2841]
 nquadpoints = 1000
 aspect_ratio_target = 7
 JACOBIAN_THRESHOLD = 5
-aspect_ratio_weight = 1e-2 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
+aspect_ratio_weight = 1e-1 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
 nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.65; nfp_min_iota_QA = 0.21 # 0.41
 iota_min_QA = nfp_min_iota_QA if QA_or_QH=='QA' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))

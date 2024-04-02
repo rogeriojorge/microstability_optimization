@@ -58,7 +58,7 @@ MAXITER_stage_2 = 300
 MAXITER_single_stage = 20
 MAXFEV_single_stage  = 35
 LENGTH_THRESHOLD = 33
-max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
+max_mode_array = [1]*2 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 extra_coil_R1 = 0.368
 order_coils = 3
 l0_coil = 1
@@ -73,9 +73,9 @@ nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_m
 iota_min_QA = nfp_min_iota_QA if QA_or_QH=='QA' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
-coils_objective_weight = 1e+3 if 'QI' in QA_or_QH else 1e+4
+coils_objective_weight = 3e+3 if 'QI' in QA_or_QH else 3e+4
 CC_THRESHOLD = 0.03
-quasisymmetry_weight = 5e+0 # 1e-0 if 'QI' in QA_or_QH else 1e+2
+quasisymmetry_weight = 1e+0 # 1e-0 if 'QI' in QA_or_QH else 1e+2
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 CURVATURE_THRESHOLD = 20

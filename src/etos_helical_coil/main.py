@@ -73,9 +73,9 @@ nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_m
 iota_min_QA = nfp_min_iota_QA if QA_or_QH=='QA' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
-coils_objective_weight = 3e+3 if 'QI' in QA_or_QH else 1e+4
+coils_objective_weight = 3e+3 if 'QI' in QA_or_QH else 3e+4
 CC_THRESHOLD = 0.03
-quasisymmetry_weight = 5e+0 # 1e-0 if 'QI' in QA_or_QH else 1e+2
+quasisymmetry_weight = 1e+0 # 1e-0 if 'QI' in QA_or_QH else 1e+2
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
 CURVATURE_THRESHOLD = 20
@@ -160,16 +160,16 @@ bs = BiotSavart(coils)#+Btoroidal
 # Save initial surface and coil data
 bs.set_points(surf.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
-BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
+BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)/ np.linalg.norm(Bbs, axis=2)
 if comm_world.rank == 0:
     curves_to_vtk(curves, os.path.join(coils_results_path, "curves_init"))
-    pointData = {"B_N": BdotN_surf[:, :, None]}
+    pointData = {"B.n/B": BdotN_surf[:, :, None]}
     surf.to_vtk(os.path.join(coils_results_path, "surf_init"), extra_data=pointData)
 bs.set_points(surf_big.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
-BdotN_surf = np.sum(Bbs * surf_big.unitnormal(), axis=2)
+BdotN_surf = np.sum(Bbs * surf_big.unitnormal(), axis=2)/ np.linalg.norm(Bbs, axis=2)
 if comm_world.rank == 0:
-    pointData = {"B_N": BdotN_surf[:, :, None]}
+    pointData = {"B.n/B": BdotN_surf[:, :, None]}
     surf_big.to_vtk(os.path.join(coils_results_path, "surf_init_big"), extra_data=pointData)
 bs.set_points(surf.gamma().reshape((-1, 3)))
 ##########################################################################################
@@ -371,18 +371,18 @@ for iteration, max_mode in enumerate(max_mode_array):
     JF.x = dofs[:-number_vmec_dofs]
     bs.set_points(surf.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
-    BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
+    BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)/ np.linalg.norm(Bbs, axis=2)
 
     if comm_world.rank == 0:
         curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_after_stage2_maxmode{max_mode}"))
         curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_after_stage2_maxmode{max_mode}"))
-        pointData = {"B_N": BdotN_surf[:, :, None]}
+        pointData = {"B.n/B": BdotN_surf[:, :, None]}
         surf.to_vtk(os.path.join(coils_results_path, f"surf_after_stage2_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
-    BdotN_surf = np.sum(Bbs * surf_big.unitnormal(), axis=2)
+    BdotN_surf = np.sum(Bbs * surf_big.unitnormal(), axis=2)/ np.linalg.norm(Bbs, axis=2)
     if comm_world.rank == 0:
-        pointData = {"B_N": BdotN_surf[:, :, None]}
+        pointData = {"B.n/B": BdotN_surf[:, :, None]}
         surf_big.to_vtk(os.path.join(coils_results_path, f"surf_big_after_stage2_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf.gamma().reshape((-1, 3)))
     proc0_print(f'  Performing single stage optimization with ~{MAXITER_single_stage} iterations')
@@ -394,17 +394,17 @@ for iteration, max_mode in enumerate(max_mode_array):
             res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'maxfev': MAXFEV_single_stage, 'gtol': ftol, 'ftol': ftol}, tol=ftol)
     mpi.comm_world.Bcast(dofs, root=0)
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
-    BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)
+    BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2)/ np.linalg.norm(Bbs, axis=2)
     if comm_world.rank == 0:
         curves_to_vtk(base_curves, os.path.join(coils_results_path, f"base_curves_opt_maxmode{max_mode}"))
         curves_to_vtk(curves, os.path.join(coils_results_path, f"curves_opt_maxmode{max_mode}"))
-        pointData = {"B_N": BdotN_surf[:, :, None]}
+        pointData = {"B.n/B": BdotN_surf[:, :, None]}
         surf.to_vtk(os.path.join(coils_results_path, f"surf_opt_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf_big.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_big, ntheta_big, 3))
-    BdotN_surf = np.sum(Bbs * surf_big.unitnormal(), axis=2)
+    BdotN_surf = np.sum(Bbs * surf_big.unitnormal(), axis=2)/ np.linalg.norm(Bbs, axis=2)
     if comm_world.rank == 0:
-        pointData = {"B_N": BdotN_surf[:, :, None]}
+        pointData = {"B.n/B": BdotN_surf[:, :, None]}
         surf_big.to_vtk(os.path.join(coils_results_path, f"surf_big_opt_maxmode{max_mode}"), extra_data=pointData)
     bs.set_points(surf.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))

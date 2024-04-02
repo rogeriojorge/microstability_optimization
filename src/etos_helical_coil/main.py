@@ -59,26 +59,27 @@ MAXITER_single_stage = 20
 MAXFEV_single_stage  = 35
 LENGTH_THRESHOLD = 33
 max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
-extra_coil_R1 = 1.84
+extra_coil_R1 = 0.368
 order_coils = 2
-l0_coil = 2
-ro_coil = 0.491
+l0_coil = 1
+Rmajor_helical_coil = 0.2
+Aminor_helical_coil = 0.0982
 coils_dofs_1 = [np.pi/2, 0.2841]
-nquadpoints = 500
-aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 110
-aspect_ratio_weight = 1e-1 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
-nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.65; nfp_min_iota_QA = 0.41
+nquadpoints = 1000
+aspect_ratio_target = 7
+JACOBIAN_THRESHOLD = 70
+aspect_ratio_weight = 6e-1 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
+nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.65; nfp_min_iota_QA = 0.21 # 0.41
 iota_min_QA = nfp_min_iota_QA if QA_or_QH=='QA' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
 coils_objective_weight = 1e+3 if 'QI' in QA_or_QH else 1e+4
-CC_THRESHOLD = 0.1
-quasisymmetry_weight = 1e-0 # 1e-0 if 'QI' in QA_or_QH else 1e+2
+CC_THRESHOLD = 0.03
+quasisymmetry_weight = 1e+1 # 1e-0 if 'QI' in QA_or_QH else 1e+2
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
-CURVATURE_THRESHOLD = 30
-MSC_THRESHOLD = 30
+CURVATURE_THRESHOLD = 20
+MSC_THRESHOLD = 100
 nphi_VMEC = 128 if use_extra_coils else (32 if stellsym_coils else 64)
 ntheta_VMEC = 32
 ftol = 1e-3
@@ -129,14 +130,14 @@ surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=s
 ##########################################################################################
 #Stage 2
 base_curves = [
-                CurveHelical(nquadpoints, order_coils, surf.nfp, l0_coil, 1., ro_coil),
-                CurveXYZFourier(128, 1)
+                CurveHelical(nquadpoints, order_coils, surf.nfp, l0_coil, Rmajor_helical_coil, Aminor_helical_coil),
+                CurveXYZFourier(nquadpoints, 1)
                ]
 base_curves[0].set_dofs(np.concatenate((coils_dofs_1 + [0]*(order_coils-2), [0]*(order_coils))))
 base_curves[1].set_dofs(np.concatenate(([       0, 0, extra_coil_R1],[0, extra_coil_R1, 0],[0, 0, 0])))
 base_curves[1].fix_all()
-base_currents = [3.07e5, -3.07e5]
-Btoroidal = ToroidalField(1.0, 1.0)
+base_currents = [1.00e4, -1.00e4]
+#Btoroidal = ToroidalField(1.0, 1.0)
 coils = [Coil(base_curves[0], Current(base_currents[0])),
          Coil(base_curves[1], Current(base_currents[1]))]
 
@@ -153,7 +154,7 @@ if use_extra_coils:
         coils += coils_via_symmetries([new_base_curve], [new_base_current], surf.nfp, stellsym=stellsym_coils)
 
 curves = [c.curve for c in coils]
-bs = BiotSavart(coils)+Btoroidal
+bs = BiotSavart(coils)#+Btoroidal
 ##########################################################################################
 ##########################################################################################
 # Save initial surface and coil data
@@ -304,7 +305,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     vmec.indata.ntor = maxmodes_mpol_mapping[max_mode]
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
-    surf.fix("rc(0,0)")
+    # surf.fix("rc(0,0)")
     number_vmec_dofs = int(len(surf.x))
     
     def aspect_ratio_max_objective(vmec): return np.max((vmec.aspect()-aspect_ratio_target,0))
@@ -319,23 +320,18 @@ for iteration, max_mode in enumerate(max_mode_array):
 
     # if QA_or_QH in ['QA', 'simple']:
     #     objective_tuple.append((vmec.mean_iota, iota_QA_simple, weight_iota))
-    if QA_or_QH in ['QA', 'QH']:
-        qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if QA_or_QH == 'QH' else 0)
-        objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
-    elif 'QI' in QA_or_QH:
-        print('No QI functions')
-        exit()
-    else:
-        optMirror = make_optimizable(partial_MirrorRatioPen, vmec)
-        objective_tuple.append((optMirror.J, 0, mirror_weight))
-        proc0_print(f"Mirror before optimization: {optMirror.J()}")
+    qs = QuasisymmetryRatioResidual(vmec, quasisymmetry_target_surfaces, helicity_m=1, helicity_n=-1 if QA_or_QH == 'QH' else 0)
+    objective_tuple.append((qs.residuals, 0, quasisymmetry_weight))
+    optMirror = make_optimizable(partial_MirrorRatioPen, vmec)
+    objective_tuple.append((optMirror.J, 0, mirror_weight))
+    proc0_print(f"Mirror before optimization: {optMirror.J()}")
     prob = LeastSquaresProblem.from_tuples(objective_tuple)
     dofs = np.concatenate((JF.x, vmec.x))
     bs.set_points(surf.gamma().reshape((-1, 3)))
     Jf = SquaredFlux(surf, bs, definition="local")
     proc0_print(f"Aspect ratio before optimization: {vmec.aspect()}")
     proc0_print(f"Mean iota before optimization: {vmec.mean_iota()}")
-    if QA_or_QH in ['QA', 'QH']: proc0_print(f"Quasisymmetry objective before optimization: {qs.total()}")
+    proc0_print(f"Quasisymmetry objective before optimization: {qs.total()}")
     proc0_print(f"Magnetic well before optimization: {vmec.vacuum_well()}")
     proc0_print(f"Squared flux before optimization: {Jf.J()}")
     
@@ -345,9 +341,9 @@ for iteration, max_mode in enumerate(max_mode_array):
         res = minimize(fun_coils, dofs[:-number_vmec_dofs], jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-12)
         dofs[:-number_vmec_dofs] = res.x
         if max_mode_previous==1:
-            res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.02, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-12)
+            res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.001, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-12)
             dofs[:-number_vmec_dofs] = res.x
-            res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.01, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-12)
+            res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.001, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-12)
             dofs[:-number_vmec_dofs] = res.x
     mpi.comm_world.Bcast(dofs, root=0)
     JF.x = dofs[:-number_vmec_dofs]
@@ -392,6 +388,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     proc0_print(f'  Performing single stage optimization with ~{MAXITER_single_stage} iterations')
     x0 = np.copy(np.concatenate((JF.x, vmec.x)))
     dofs = np.concatenate((JF.x, vmec.x))
+    # exit()
     with MPIFiniteDifference(prob.objective, mpi, diff_method=diff_method, abs_step=finite_difference_abs_step, rel_step=finite_difference_rel_step) as prob_jacobian:
         if mpi.proc0_world:
             res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'maxfev': MAXFEV_single_stage, 'gtol': ftol, 'ftol': ftol}, tol=ftol)

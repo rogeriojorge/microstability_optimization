@@ -9,7 +9,7 @@ from simsopt import load
 
 curves=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_circular_coil/circurves_opt.json')
 curves_to_vtk(curves, "curves")
-currents = [Current(1) * 1e5, Current(-1) * 1e5, Current(1) * 1e5, Current(-1) * 1e5, Current(1) * 1e5, Current(-1) * 1e5]
+currents = [Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5]
 coils = [Coil(curv, curr) for (curv, curr) in zip(curves, currents)]
 bs = BiotSavart(coils)
 
@@ -18,29 +18,31 @@ ntor = 5
 stellsym = True
 nfp = 3
 constraint_weight = 1e0
-nphi=25
-ntheta=25
+nphi=64
+ntheta=64
 
-phis = np.linspace(0, 1, nphi, endpoint=True)
-thetas = np.linspace(0, 1, ntheta, endpoint=True)
-s = SurfaceRZFourier(mpol=mpol, ntor=ntor, stellsym=stellsym, nfp=nfp, quadpoints_phi=phis, quadpoints_theta=thetas)
-s.set_rc(0, 0, 0.35)
-s.set_rc(1, 0, 0.05)
-s.set_zs(1, 0, 0.05)
-s.set_rc(0, 1, 0.05)
-s.set_zs(0, 1, 0.05)
+# phis = np.linspace(0, 1, nphi, endpoint=True)
+# thetas = np.linspace(0, 1, ntheta, endpoint=True)
+# s = SurfaceRZFourier(mpol=mpol, ntor=ntor, stellsym=stellsym, nfp=nfp, quadpoints_phi=phis, quadpoints_theta=thetas)
+# s.set_rc(0, 0, 0.35)
+# s.set_rc(1, 0, 0.05)
+# s.set_zs(1, 0, 0.05)
+# s.set_rc(0, 1, 0.05)
+# s.set_zs(0, 1, 0.05)
+s=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_circular_coil/qfmsurf_opt.json')
 
 bs.set_points(s.gamma().reshape((-1, 3)))
 Bbs = bs.B().reshape((nphi, ntheta, 3))
-BdotN_surf = np.sum(Bbs * s.unitnormal(), axis=2)
-pointData = {"B_N": BdotN_surf[:, :, None]}
+BdotN_surf = np.sum(Bbs * s.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
+pointData = {"B.n/B": BdotN_surf[:, :, None]}
 s.to_vtk("initial_surface", extra_data=pointData)
 # exit()
 
-s_volume = SurfaceRZFourier(mpol=mpol, ntor=ntor, stellsym=stellsym, nfp=nfp, quadpoints_phi=phis, quadpoints_theta=thetas)
-s.set_rc(0, 0, 0.35)
-s.set_rc(1, 0, 0.1)
-s.set_zs(1, 0, 0.1)
+# s_volume = SurfaceRZFourier(mpol=mpol, ntor=ntor, stellsym=stellsym, nfp=nfp, quadpoints_phi=phis, quadpoints_theta=thetas)
+# s.set_rc(0, 0, 0.35)
+# s.set_rc(1, 0, 0.1)
+# s.set_zs(1, 0, 0.1)
+s_volume = s
 
 qfm = QfmResidual(s, bs)
 qfm.J()

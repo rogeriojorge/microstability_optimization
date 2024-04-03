@@ -13,23 +13,60 @@ from simsopt.geo import SurfaceRZFourier
 from simsopt.util import proc0_print, comm_world
 this_path = os.path.dirname(os.path.abspath(__file__))
 
-curves=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_circular_coil/circurves_opt.json')
-currents = [Current(-1) * 1e5 for c in curves]
-coils = [Coil(curv, curr) for (curv, curr) in zip(curves, currents)]
-bs = BiotSavart(coils)
+# nphi=64
+# ntheta=64
+# curves=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_circular_coil/circurves_opt.json')
+# currents = [Current(1) * 1e5 for c in curves]
+# coils = [Coil(curv, curr) for (curv, curr) in zip(curves, currents)]
+# bs = BiotSavart(coils)
+# surf=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_circular_coil/qfmsurf_opt.json')
+# OUT_DIR = '.'
+# R_axis = surf.get_rc(0,0)
+# R_axis = 0.411
+# R_max = np.max(surf.gamma()[0,:,0])
 
-nfieldlines = 24
-tmax_fl = 14000 # 20000
+nfieldlines = 7
+tmax_fl = 800 # 20000
 degree = 4
-extend_distance = 0.1 # 0.2
-nfieldlines_to_plot = 10
-
+extend_distance = 0.02 # 0.2
+nfieldlines_to_plot = 5
 interpolate_field = True
+print_surface = False
+
+filename_wout = f'wout_final.nc'
+filename_input = f'input.final'
+results_folder = f'optimization_simple_nfp3_planar'
+coils_file = f'biot_savart_maxmode2.json'
+ncoils = 2#int(re.search(r'ncoils(\d+)', results_folder).group(1))
+out_dir = os.path.join(this_path,results_folder)
+os.makedirs(out_dir, exist_ok=True)
+os.chdir(out_dir)
+OUT_DIR = Path("coils")
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+vmec_file_input = os.path.join(out_dir,filename_input)
+nphi=200
+ntheta=30
+surf_vmec = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=nphi, ntheta=ntheta, range="full torus")
+R_max_vmec = np.max(surf_vmec.gamma()[0,:,0])
+surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=nphi, ntheta=ntheta, range="full torus")
+surf.extend_via_normal(extend_distance)
+R_max = np.max(surf.gamma()[0,:,0])
+vmec_file_wout = os.path.join(out_dir,filename_wout)
+R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
+proc0_print('Loading coils file')
+coils_filename = os.path.join(OUT_DIR,coils_file)
+bs = load(coils_filename)
+coils = bs.coils
+base_curves = [coils[i]._curve for i in range(ncoils)]
+base_currents = [coils[i]._current for i in range(ncoils)]
+coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,base_currents,nfp=surf.nfp, stellsym=True)
+# coils_to_focus(os.path.join(OUT_DIR,"coils_focus_format.txt"),curves=[coil._curve for coil in coils],currents=[coil._current for coil in coils],nfp=surf.nfp,stellsym=True)
 
 proc0_print('Computing surface classifier')
 # surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
-sc_fieldline = SurfaceClassifier(surf, h=0.03*R_axis, p=2)
+sc_fieldline = SurfaceClassifier(surf, h=0.06*R_axis, p=2)
 # sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.04*R_axis)
+
 
 def trace_fieldlines(bfield, label):
     t1 = time.time()
@@ -39,14 +76,14 @@ def trace_fieldlines(bfield, label):
     phis = [(i/4)*(2*np.pi/surf.nfp) for i in range(4)]
     fieldlines_tys, fieldlines_phi_hits = compute_fieldlines(
         bfield, R0, Z0, tmax=tmax_fl, tol=1e-16, comm=comm_world,
-        phis=phis, stopping_criteria=[LevelsetStoppingCriterion(sc_fieldline.dist)])
+        phis=phis)#, stopping_criteria=[LevelsetStoppingCriterion(sc_fieldline.dist)])
     t2 = time.time()
     proc0_print(f"Time for fieldline tracing={t2-t1:.3f}s. Num steps={sum([len(l) for l in fieldlines_tys])//nfieldlines}", flush=True)
     if comm_world is None or comm_world.rank == 0:
         for i, fieldline_tys in enumerate(fieldlines_tys[-nfieldlines_to_plot:]):
             particles_to_vtk([fieldline_tys], os.path.join(OUT_DIR,f'fieldlines_{label}_{i}'))
         # particles_to_vtk(fieldlines_tys[-6:], os.path.join(OUT_DIR,f'fieldlines_{label}'))
-        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=300, s=1.5, surf=surf_vmec)
+        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=300, s=1.5, surf=surf)
 
 if interpolate_field:
     n = 30
@@ -75,6 +112,12 @@ if interpolate_field:
     proc0_print("Mean(|B|) on plasma surface =", np.mean(bs.AbsB()))
 
     proc0_print("|B-Bh| on surface:", np.sort(np.abs(B-Bh).flatten()))
+
+    if print_surface:
+        Bbs = bs.B().reshape((nphi, ntheta, 3))
+        BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
+        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        surf.to_vtk("surf_assess_coils", extra_data=pointData)
 
     proc0_print('Beginning field line tracing')
     trace_fieldlines(bsh, 'bsh')

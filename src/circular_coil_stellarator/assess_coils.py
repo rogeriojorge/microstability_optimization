@@ -15,14 +15,14 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_QI_ncoils2_nonplanar_ok'
-coils_file = f'biot_savart_maxmode5.json'
+results_folder = f'optimization_simple_nfp3_ncoils2_planar_verygood'
+coils_file = f'biot_savart_opt.json'
 ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
-nfieldlines = 24
-tmax_fl = 14000 # 20000
+nfieldlines = 15
+tmax_fl = 12000 # 20000
 degree = 4
-extend_distance = 0.1 # 0.2
+extend_distance = 0.13 # 0.2
 nfieldlines_to_plot = 10
 
 interpolate_field = True

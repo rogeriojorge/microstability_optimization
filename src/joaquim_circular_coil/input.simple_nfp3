@@ -1,0 +1,51 @@
+&INDATA
+!----- Runtime Parameters -----
+  DELT =   9.00E-01
+  NITER = 10000
+  NSTEP =  200
+  TCON0 =   2.00E+00
+  NS_ARRAY    = 5!5        16    35
+  NITER_ARRAY = 1500!500     800  4500
+  FTOL_ARRAY  = 1e-10!1e-11 1e-12 1e-12
+  PRECON_TYPE = 'none'
+  PREC2D_THRESHOLD =   1.000000E-19
+!----- Grid Parameters -----
+  LASYM = F
+  NFP = 3
+  MPOL = 5
+  NTOR = 5
+  PHIEDGE =    0.01138
+!----- Free Boundary Parameters -----
+  LFREEB = F
+  NVACSKIP =    6
+!----- Pressure Parameters -----
+  GAMMA =    0.000000000000E+000
+  BLOAT =    1.000000000000E+000
+  SPRES_PED =    1.000000000000E+000
+  PRES_SCALE =    1.000000000000E+000
+  PMASS_TYPE = 'power_series'
+  AM =   000000000E+00
+!----- Current/Iota Parameters -----
+  CURTOR =  0
+  NCURR = 1
+  PIOTA_TYPE = 'power_series'
+  PCURR_TYPE = 'power_series'
+!----- Axis Parameters ----- 
+  RAXIS_CC = 0
+  ZAXIS_CS = 0
+!----- Boundary Parameters -----
+! n comes before m!
+RBC(   0,   0) =  3.865570882436703e-01,    ZBS(   0,   0) =  0.000000000000000e+00
+RBC(   1,   0) =  2.745894443420084e-02,    ZBS(   1,   0) =  7.150887848834137e-02
+RBC(   2,   0) = -1.409499159294812e-02,    ZBS(   2,   0) = -3.284996897626539e-04
+RBC(  -2,   1) = -4.244018757923864e-03,    ZBS(  -2,   1) = -2.800396521843564e-03
+RBC(  -1,   1) =  1.757860774366984e-03,    ZBS(  -1,   1) = -6.600044078689776e-04
+RBC(   0,   1) =  6.720082419258448e-02,    ZBS(   0,   1) =  5.961087718131214e-02
+RBC(   1,   1) = -7.361497080061396e-03,    ZBS(   1,   1) = -1.680733409744352e-03
+RBC(   2,   1) = -1.383829661178196e-02,    ZBS(   2,   1) = -1.317096859568691e-02
+RBC(  -2,   2) =  4.143673255117071e-04,    ZBS(  -2,   2) =  3.493965122777153e-04
+RBC(  -1,   2) = -6.369737598910620e-04,    ZBS(  -1,   2) = -6.556149001916336e-04
+RBC(   0,   2) = -1.930302134102637e-03,    ZBS(   0,   2) = -1.703877532848358e-03
+RBC(   1,   2) =  2.202027883099699e-04,    ZBS(   1,   2) =  4.127818046657846e-04
+RBC(   2,   2) =  1.182331154163478e-03,    ZBS(   2,   2) =  1.155295346130826e-03
+/

@@ -62,6 +62,7 @@ LENGTH_THRESHOLD = 4.5 if ncoils==1 else (4.2 if ncoils==2 else 3.9)
 max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
 # max_mode_array = [1]*0 + [2]*0 + [3]*0 + [4]*4 + [5]*4 + [6]*4
 nmodes_coils = 5
+# turn this into an nmodes_coils_array, keep increasing the number of modes of the coils
 aspect_ratio_target = 6
 JACOBIAN_THRESHOLD = 28
 aspect_ratio_weight = 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))

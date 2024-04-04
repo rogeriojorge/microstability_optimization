@@ -15,7 +15,7 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_simple_nfp3_ncoils2_planar_verygood'
+results_folder = f'optimization_QA_ncoils2_nonplanar_symcoils_extracoils_extragood'
 coils_file = f'biot_savart_opt.json'
 ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
@@ -24,19 +24,22 @@ tmax_fl = 12000 # 20000
 degree = 4
 extend_distance = 0.13 # 0.2
 nfieldlines_to_plot = 10
+print_surface = True
 
 interpolate_field = True
 
+nphi = 200
+ntheta = 64
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
 os.chdir(out_dir)
 OUT_DIR = Path("coils")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 vmec_file_input = os.path.join(out_dir,filename_input)
-surf_vmec = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=200, ntheta=30, range="full torus")
+surf_vmec = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=nphi, ntheta=ntheta, range="full torus")
 R_max_vmec = np.max(surf_vmec.gamma()[0,:,0])
 
-surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=200, ntheta=30, range="full torus")
+surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=nphi, ntheta=ntheta, range="full torus")
 surf.extend_via_normal(extend_distance)
 R_max = np.max(surf.gamma()[0,:,0])
 
@@ -102,6 +105,18 @@ if interpolate_field:
     proc0_print("Mean(|B|) on plasma surface =", np.mean(bs.AbsB()))
 
     proc0_print("|B-Bh| on surface:", np.sort(np.abs(B-Bh).flatten()))
+    
+    if print_surface:
+        bs.set_points(surf_vmec.gamma().reshape((-1, 3)))
+        Bbs = bs.B().reshape((nphi, ntheta, 3))
+        BdotN_surf = np.sum(Bbs * surf_vmec.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
+        pointData = {"B.n/B": BdotN_surf[:, :, None]}
+        surf_vmec.to_vtk("surf_assess_coils", extra_data=pointData)
+        proc0_print("Printed surface. Exiting.")
+        exit()
+        
+    bsh.set_points(surf.gamma().reshape((-1, 3)))
+    bs.set_points(surf.gamma().reshape((-1, 3)))
 
     proc0_print('Beginning field line tracing')
     trace_fieldlines(bsh, 'bsh')

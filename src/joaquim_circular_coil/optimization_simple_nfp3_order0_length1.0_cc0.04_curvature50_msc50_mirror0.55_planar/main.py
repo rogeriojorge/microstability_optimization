@@ -46,32 +46,32 @@ use_joaquim_coils = False
 MAXITER_stage_1 = 10
 MAXITER_stage_2 = 1000
 MAXITER_single_stage = 15
-MAXFEV_single_stage  = 23
-LENGTH_THRESHOLD = 1.3
-# max_mode_array = [1]*3 + [2]*2 + [3]*0 + [4]*0 + [5]*0 + [6]*0
-max_mode_array = [2,1]*2
-nmodes_coils = 6
+MAXFEV_single_stage  = 25
+LENGTH_THRESHOLD = 1.0
+# max_mode_array = [1]*0 + [2]*1 + [3]*0 + [4]*0 + [5]*0 + [6]*0
+max_mode_array = [2]#[1,1,2,2,1,2,1,2]
+nmodes_coils = 0
 aspect_ratio_target = 6
 JACOBIAN_THRESHOLD = 500
 aspect_ratio_weight = 5e-1
-min_iota = 0.41
+min_iota = 0.11
 iota_min_QA = min_iota
 iota_min_QH = min_iota
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
+maxmodes_mpol_mapping = {1: 3, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
 coils_objective_weight = 2e+5
 CC_THRESHOLD = 0.04
-CURVATURE_THRESHOLD = 100
-MSC_THRESHOLD = 100
+CURVATURE_THRESHOLD = 50
+MSC_THRESHOLD = 50
 quasisymmetry_weight = 1e-0
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
-nphi_VMEC = 140# if use_extra_coils else 64
+nphi_VMEC = 128# if use_extra_coils else 64
 ntheta_VMEC = 32
 ftol = 1e-3
 diff_method = "forward"
 R0 = 0.411
 R1 = 0.15
 mirror_weight = 1e+2
-maximum_mirror = 0.33
+maximum_mirror = 0.55
 weight_iota = 1e4
 elongation_weight = 1
 nquadpoints = 120
@@ -352,11 +352,11 @@ for iteration, max_mode in enumerate(max_mode_array):
         JF.full_unfix(free_coil_dofs_all)
         res = minimize(fun_coils, dofs[:-number_vmec_dofs], jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
         dofs[:-number_vmec_dofs] = res.x
-        # if max_mode_previous==1:
-        #     res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.05, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
-        #     dofs[:-number_vmec_dofs] = res.x
-        #     res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.02, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
-        #     dofs[:-number_vmec_dofs] = res.x
+        if max_mode_previous==1:
+            res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.05, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
+            dofs[:-number_vmec_dofs] = res.x
+            res = minimize(fun_coils, dofs[:-number_vmec_dofs]*1.02, jac=True, args=({'Nfeval': 0}), method='L-BFGS-B', options={'maxiter': MAXITER_stage_2, 'maxcor': 300}, tol=1e-9)
+            dofs[:-number_vmec_dofs] = res.x
     mpi.comm_world.Bcast(dofs, root=0)
     JF.x = dofs[:-number_vmec_dofs]
     bs.set_points(surf.gamma().reshape((-1, 3)))

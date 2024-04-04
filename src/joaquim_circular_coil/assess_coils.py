@@ -20,23 +20,24 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 # coils = [Coil(curv, curr) for (curv, curr) in zip(curves, currents)]
 # bs = BiotSavart(coils)
 # surf=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_circular_coil/qfmsurf_opt.json')
+# surf_vmec=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_circular_coil/qfmsurf_opt.json')
 # OUT_DIR = '.'
 # R_axis = surf.get_rc(0,0)
 # R_axis = 0.411
 # R_max = np.max(surf.gamma()[0,:,0])
 
-nfieldlines = 7
-tmax_fl = 800 # 20000
+nfieldlines = 13
+tmax_fl = 5000 # 5000
 degree = 4
-extend_distance = 0.02 # 0.2
-nfieldlines_to_plot = 5
-interpolate_field = True
+extend_distance = 0.044 # 0.048 # 0.075
+nfieldlines_to_plot = 12
+interpolate_field = False
 print_surface = False
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_simple_nfp3_planar'
-coils_file = f'biot_savart_maxmode2.json'
+results_folder = f'optimization_simple_nfp3_order6_length1.3_cc0.04_curvature100_msc100_mirror0.33_nonplanar'
+coils_file = f'biot_savart_opt.json'
 ncoils = 2#int(re.search(r'ncoils(\d+)', results_folder).group(1))
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
@@ -45,14 +46,18 @@ OUT_DIR = Path("coils")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 vmec_file_input = os.path.join(out_dir,filename_input)
 nphi=200
-ntheta=30
+ntheta=64
 surf_vmec = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=nphi, ntheta=ntheta, range="full torus")
 R_max_vmec = np.max(surf_vmec.gamma()[0,:,0])
 surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=nphi, ntheta=ntheta, range="full torus")
 surf.extend_via_normal(extend_distance)
 R_max = np.max(surf.gamma()[0,:,0])
 vmec_file_wout = os.path.join(out_dir,filename_wout)
-R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
+try: R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
+except:
+    v = Vmec(vmec_file_input)
+    v.run()
+    R_axis = np.sum(v.wout.raxis_cc)
 proc0_print('Loading coils file')
 coils_filename = os.path.join(OUT_DIR,coils_file)
 bs = load(coils_filename)
@@ -64,7 +69,7 @@ coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,
 
 proc0_print('Computing surface classifier')
 # surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
-sc_fieldline = SurfaceClassifier(surf, h=0.06*R_axis, p=2)
+sc_fieldline = SurfaceClassifier(surf, h=0.08*R_axis, p=2)
 # sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.04*R_axis)
 
 
@@ -83,7 +88,7 @@ def trace_fieldlines(bfield, label):
         for i, fieldline_tys in enumerate(fieldlines_tys[-nfieldlines_to_plot:]):
             particles_to_vtk([fieldline_tys], os.path.join(OUT_DIR,f'fieldlines_{label}_{i}'))
         # particles_to_vtk(fieldlines_tys[-6:], os.path.join(OUT_DIR,f'fieldlines_{label}'))
-        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=300, s=1.5, surf=surf)
+        plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=300, s=1.5, surf=surf_vmec)
 
 if interpolate_field:
     n = 30

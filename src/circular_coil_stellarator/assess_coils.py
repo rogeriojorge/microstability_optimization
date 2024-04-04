@@ -15,16 +15,16 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_QA_ncoils2_nonplanar_symcoils_extracoils_extragood'
-coils_file = f'biot_savart_opt.json'
+results_folder = f'optimization_simple_nfp4_ncoils1_nonplanar_verygood'
+coils_file = f'biot_savart_maxmode5.json'
 ncoils = int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
-nfieldlines = 15
-tmax_fl = 12000 # 20000
+nfieldlines = 25
+tmax_fl = 10000 # 20000
 degree = 4
-extend_distance = 0.13 # 0.2
+extend_distance = 0.2 # 0.2
 nfieldlines_to_plot = 10
-print_surface = True
+print_surface = False
 
 interpolate_field = True
 
@@ -79,7 +79,7 @@ def trace_fieldlines(bfield, label):
         plot_poincare_data(fieldlines_phi_hits, phis, os.path.join(OUT_DIR,f'poincare_fieldline_{label}.png'), dpi=300, s=1.5, surf=surf_vmec)
 
 if interpolate_field:
-    n = 30
+    n = 35
     rs = np.linalg.norm(surf.gamma()[:, :, 0:2], axis=2)
     zs = surf.gamma()[:, :, 2]
     rrange = (0.8*np.min(rs), 1.2*np.max(rs), n)

@@ -19,10 +19,10 @@ results_folder = f'optimization_QA_asymcoils'
 coils_file = f'biot_savart_opt.json'
 ncoils = 1# int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
-nfieldlines = 24
-tmax_fl = 10500 # 20000
+nfieldlines = 25
+tmax_fl = 14000 # 20000
 degree = 4
-extend_distance = 0.02 # 0.04
+extend_distance = 0.03 # 0.04
 nfieldlines_to_plot = 10
 print_surface = False
 
@@ -58,7 +58,7 @@ coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,
 
 proc0_print('Computing surface classifier')
 # surf.to_vtk(os.path.join(OUT_DIR,'surface_for_Poincare'))
-sc_fieldline = SurfaceClassifier(surf, h=0.02*R_axis, p=2)
+sc_fieldline = SurfaceClassifier(surf, h=0.035*R_axis, p=2)
 # sc_fieldline.to_vtk(os.path.join(OUT_DIR,'levelset'), h=0.04*R_axis)
 
 def trace_fieldlines(bfield, label):

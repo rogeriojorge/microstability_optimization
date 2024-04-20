@@ -53,34 +53,33 @@ if args.symcoils==1: stellsym_coils = True
 else: stellsym_coils = False
 if args.extra==1: use_extra_coils = True
 else:             use_extra_coils = False
-MAXITER_stage_1 = 10
+MAXITER_stage_1 = 30
 MAXITER_stage_2 = 300
 MAXITER_single_stage = 20
-MAXFEV_single_stage  = 35
-LENGTH_THRESHOLD = 15
-max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*4 + [5]*4 + [6]*0
-order_coils = 6
-l0_coil = 2
+MAXFEV_single_stage  = 30
+max_mode_array = [1]*1 + [2]*1 + [3]*2 + [4]*4 + [5]*0 + [6]*0
+ncoils = 1
+l0_coil = 6
+order_coils = l0_coil*2+3
+LENGTH_THRESHOLD = 8.5*l0_coil
 ro_coil = 0.6
-coils_dofs_1 = [np.pi/2, 0.2841]
-coil_dofs_2 = [0, 0.2933]
-nquadpoints = 600
-aspect_ratio_target = 6
-JACOBIAN_THRESHOLD = 300
-aspect_ratio_weight = 1e-1 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
+nquadpoints = int(LENGTH_THRESHOLD*20)
+aspect_ratio_target = 8
+JACOBIAN_THRESHOLD = 30
+aspect_ratio_weight = 1e+1 # 3e-2 if 'QA' in QA_or_QH else (8e-3 if 'QI' in QA_or_QH else (4e-2 if QA_or_QH=='simple_nfp4' else (3e-2 if QA_or_QH=='simple_nfp3' else 2e-2)))
 nfp_min_iota_nfp4 = 0.252; nfp_min_iota_nfp3 = 0.175; nfp_min_iota = 0.11; nfp_min_iota_QH = 0.65; nfp_min_iota_QA = 0.41
 iota_min_QA = nfp_min_iota_QA if QA_or_QH=='QA' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
 iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or_QH=='simple_nfp4' else (nfp_min_iota_nfp3 if QA_or_QH=='simple_nfp3' else nfp_min_iota))
-maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 6, 5: 6, 6: 7}
-coils_objective_weight = 1e+3 if 'QI' in QA_or_QH else 1e+4
+maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
+coils_objective_weight = 1e+3 if 'QI' in QA_or_QH else 2e+4
 CC_THRESHOLD = 0.12
-CS_THRESHOLD = 0.05
-CS_WEIGHT = 1e5
-quasisymmetry_weight = 1e-0 # 1e-0 if 'QI' in QA_or_QH else 1e+2
+CS_THRESHOLD = 0.02
+CS_WEIGHT = 1e4
+quasisymmetry_weight = 5e+4 # 1e-0 if 'QI' in QA_or_QH else 1e+2
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
-CURVATURE_THRESHOLD = 3.0
-MSC_THRESHOLD = 3.0
+CURVATURE_THRESHOLD = 8
+MSC_THRESHOLD = 8
 nphi_VMEC = 128 if use_extra_coils else (32 if stellsym_coils else 64)
 ntheta_VMEC = 32
 ftol = 1e-3
@@ -130,26 +129,25 @@ surf_big = SurfaceRZFourier(dofs=surf.dofs, nfp=surf.nfp, mpol=surf.mpol, ntor=s
 ##########################################################################################
 ##########################################################################################
 #Stage 2
-base_curves = [CurveXYZHelical(np.linspace(0, 1, nquadpoints, endpoint=False), order_coils, surf.nfp, surf.stellsym),
-               CurveXYZHelical(np.linspace(0, 1, nquadpoints, endpoint=False), order_coils, surf.nfp, surf.stellsym)]
-base_curves[0].set('xc(0)', 1)
-base_curves[1].set('xc(0)', 1)
-
-# base_curves[0].set('xc(2)',    ro_coil)
-# base_curves[0].set('ys(2)', -  ro_coil)
-# base_curves[0].set('zs(1)', -2*ro_coil)
-# base_curves[0].set('zs(2)',    ro_coil)
-
-# base_curves[0].set('xc(1)',  ro_coil)
-# base_curves[0].set('ys(1)', -ro_coil)
-# base_curves[0].set('zs(1)', -ro_coil)
-
-base_curves[0].set(f'xc({int(l0_coil)})', ro_coil)
-base_curves[0].set(f'zs({int(l0_coil)})', ro_coil)
-base_curves[1].set(f'xc({int(l0_coil)})', 1.4*ro_coil)
-base_curves[1].set(f'zs({int(l0_coil)})', 1.4*ro_coil)
-coils = [Coil(base_curves[0], Current(1)*1e5),
-         Coil(base_curves[1], Current(-1)*1e5)]
+if ncoils == 1:
+    base_curves = [CurveXYZHelical(np.linspace(0, 1, nquadpoints, endpoint=False), order_coils, surf.nfp, surf.stellsym)]
+    base_curves[0].set('xc(0)', 1)
+    base_curves[0].set(f'xc({int(l0_coil)})', ro_coil)
+    base_curves[0].set(f'zs({int(l0_coil)})', ro_coil)
+    coils = [Coil(base_curves[0], Current(1)*1e5)]
+elif ncoils==2:
+    base_curves = [CurveXYZHelical(np.linspace(0, 1, nquadpoints, endpoint=False), order_coils, surf.nfp, surf.stellsym),
+                   CurveXYZHelical(np.linspace(0, 1, nquadpoints, endpoint=False), order_coils, surf.nfp, surf.stellsym)]
+    base_curves[1].set('xc(0)', 1)
+    base_curves[1].set(f'xc({int(l0_coil)})', 1.4*ro_coil)
+    base_curves[1].set(f'zs({int(l0_coil)})', 1.4*ro_coil)
+    base_curves[0].set('xc(0)', 1)
+    base_curves[0].set(f'xc({int(l0_coil)})', ro_coil)
+    base_curves[0].set(f'zs({int(l0_coil)})', ro_coil)
+    coils = [Coil(base_curves[0], Current(1)*1e5),
+            Coil(base_curves[1], Current(-1)*1e5)]
+else:
+    raise ValueError('Invalid number of coils')
 # base_curves = [CurveHelical(nquadpoints, order_coils, surf.nfp, l0_coil, 1., ro_coil) for i in range(2)]
 # base_curves[0].set_dofs(np.concatenate((coils_dofs_1 + [0]*(order_coils-2), [0]*(order_coils))))
 # base_curves[1].set_dofs(np.concatenate(([0]*(order_coils), coil_dofs_2 + [0]*(order_coils-2))))
@@ -171,7 +169,7 @@ if use_extra_coils:
         coils += coils_via_symmetries([new_base_curve], [new_base_current], surf.nfp, stellsym=stellsym_coils)
 
 curves = [c.curve for c in coils]
-bs = BiotSavart(coils)+Btoroidal
+bs = BiotSavart(coils)#+Btoroidal
 ##########################################################################################
 ##########################################################################################
 # Save initial surface and coil data

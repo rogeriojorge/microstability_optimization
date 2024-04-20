@@ -16,13 +16,13 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
 results_folder = f'optimization_QA_asymcoils'
-coils_file = f'biot_savart_maxmode4.json'
-ncoils = 2# int(re.search(r'ncoils(\d+)', results_folder).group(1))
+coils_file = f'biot_savart_opt.json'
+ncoils = 1# int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
-nfieldlines = 12
-tmax_fl = 4500 # 20000
+nfieldlines = 24
+tmax_fl = 10500 # 20000
 degree = 4
-extend_distance = 0.01 # 0.04
+extend_distance = 0.02 # 0.04
 nfieldlines_to_plot = 10
 print_surface = False
 
@@ -50,7 +50,7 @@ proc0_print('Loading coils file')
 coils_filename = os.path.join(OUT_DIR,coils_file)
 bs = load(coils_filename)
 
-coils = bs.Bfields[0].coils
+coils = bs.coils
 base_curves = [coils[i]._curve for i in range(ncoils)]
 base_currents = [coils[i]._current for i in range(ncoils)]
 coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,base_currents,nfp=surf.nfp, stellsym=True)

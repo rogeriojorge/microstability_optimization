@@ -62,7 +62,7 @@ max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*3 + [5]*0 + [6]*0
 ncoils = 1
 l0_coil = args.l0
 order_coils = l0_coil*3+2
-LENGTH_THRESHOLD = 9.5*l0_coil if QA_or_QH=='QA' else 12.0*l0_coil
+LENGTH_THRESHOLD = 10.0*l0_coil if QA_or_QH=='QA' else (12.0*l0_coil if l0_coil>4 else 13.5*l0_coil)
 ro_coil = 0.6
 nquadpoints = int(LENGTH_THRESHOLD*26)
 aspect_ratio_target = 8.5
@@ -74,7 +74,7 @@ iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
 MAXITER_single_stage_mpol_mapping = {1: 22, 2: 25, 3: 30, 4: 40}
 MAXFEV_single_stage_mpol_mapping  = {1: 30, 2: 35, 3: 40, 4: 60}
-quasisymmetry_weight_mpol_mapping = {1: 2e+1, 2: 7e+1, 3: 1e+2, 4: 2e+2}
+quasisymmetry_weight_mpol_mapping = {1: 2e+1, 2: 7e+1, 3: 1e+2, 4: 2e+2} if QA_or_QH=='QA' else {1: 3e+2, 2: 8e+2, 3: 3e+3, 4: 1e+4}
 coils_objective_weight = 1e+3 if 'QI' in QA_or_QH else 5e+4
 CC_THRESHOLD = 0.12
 CS_THRESHOLD = 0.02

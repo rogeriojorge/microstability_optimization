@@ -15,14 +15,14 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 
 filename_wout = f'wout_final.nc'
 filename_input = f'input.final'
-results_folder = f'optimization_QA_asymcoils'
+results_folder = f'optimization_QH_asymcoils_l05'
 coils_file = f'biot_savart_opt.json'
 ncoils = 1# int(re.search(r'ncoils(\d+)', results_folder).group(1))
 
 nfieldlines = 25
 tmax_fl = 14000 # 20000
 degree = 4
-extend_distance = 0.03 # 0.04
+extend_distance = 0.04 # 0.04
 nfieldlines_to_plot = 10
 print_surface = False
 

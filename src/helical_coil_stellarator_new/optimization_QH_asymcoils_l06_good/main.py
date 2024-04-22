@@ -62,7 +62,7 @@ max_mode_array = [1]*4 + [2]*4 + [3]*4 + [4]*3 + [5]*0 + [6]*0
 ncoils = 1
 l0_coil = args.l0
 order_coils = l0_coil*3+2
-LENGTH_THRESHOLD = 9.5*l0_coil if QA_or_QH=='QA' else 12.0*l0_coil
+LENGTH_THRESHOLD = 9.5*l0_coil if QA_or_QH=='QA' else 12.4*l0_coil
 ro_coil = 0.6
 nquadpoints = int(LENGTH_THRESHOLD*26)
 aspect_ratio_target = 8.5
@@ -74,16 +74,15 @@ iota_min_QH = nfp_min_iota_QH if QA_or_QH=='QH' else (nfp_min_iota_nfp4 if QA_or
 maxmodes_mpol_mapping = {1: 5, 2: 5, 3: 5, 4: 5, 5: 6, 6: 7}
 MAXITER_single_stage_mpol_mapping = {1: 22, 2: 25, 3: 30, 4: 40}
 MAXFEV_single_stage_mpol_mapping  = {1: 30, 2: 35, 3: 40, 4: 60}
-quasisymmetry_weight_mpol_mapping = {1: 2e+1, 2: 7e+1, 3: 1e+2, 4: 2e+2}
 coils_objective_weight = 1e+3 if 'QI' in QA_or_QH else 5e+4
 CC_THRESHOLD = 0.12
 CS_THRESHOLD = 0.02
 CS_WEIGHT = 1e5
-# quasisymmetry_weight = 5e+4 if QA_or_QH=='QA' else 2e+2 # 1e-0 if 'QI' in QA_or_QH else 1e+2
+quasisymmetry_weight = 5e+4 if QA_or_QH=='QA' else 2e+2 # 1e-0 if 'QI' in QA_or_QH else 1e+2
 # QA_or_QH = 'simple' # QA, QH, QI or simple
 vmec_input_filename = os.path.join(parent_path, 'input.'+ QA_or_QH)
-CURVATURE_THRESHOLD = 10
-MSC_THRESHOLD = 10
+CURVATURE_THRESHOLD = 8
+MSC_THRESHOLD = 8
 nphi_VMEC = 128 if use_extra_coils else (32 if stellsym_coils else 64)
 ntheta_VMEC = 32
 ftol = 1e-3
@@ -327,7 +326,6 @@ for iteration, max_mode in enumerate(max_mode_array):
     vmec.indata.ntor = maxmodes_mpol_mapping[max_mode]
     MAXITER_single_stage = MAXITER_single_stage_mpol_mapping[max_mode]
     MAXFEV_single_stage = MAXFEV_single_stage_mpol_mapping[max_mode]
-    quasisymmetry_weight = quasisymmetry_weight_mpol_mapping[max_mode]
     surf.fix_all()
     surf.fixed_range(mmin=0, mmax=max_mode, nmin=-max_mode, nmax=max_mode, fixed=False)
     surf.fix("rc(0,0)")

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+import os
 import sys
 import netCDF4
 import numpy as np
 import matplotlib.pyplot as plt
 
-def quasilinear_estimate(gs2File, fractionToConsider = 0.3,show=False,savefig=False):
+def quasilinear_estimate(gs2File, fractionToConsider = 0.3, show=False, savefig=False, out_folder=''):
     # Read GS2 output file
     file2read = netCDF4.Dataset(gs2File,'r')
     # Index for the start of the fitting domain (fraction of time to consider)
@@ -62,8 +63,10 @@ def quasilinear_estimate(gs2File, fractionToConsider = 0.3,show=False,savefig=Fa
         ax[1].set_xlabel('$z$', fontsize=14)
         ax[1].legend(fontsize=10)
         plt.tight_layout()
-        if savefig: plt.savefig(gs2File+'_quasilinear.png')
-        else: plt.show()
+        if savefig: 
+            plt.savefig(os.path.join(out_folder,gs2File.split("/")[-1]+'_quasilinear.png'))
+        else:
+            plt.show()
         plt.close()
     return weighted_gamma
 

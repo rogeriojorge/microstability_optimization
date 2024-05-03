@@ -21,10 +21,14 @@ import matplotlib
 import warnings
 import matplotlib.cbook
 import argparse
-
+from configurations import CONFIG
+#########
+## To run this file with 8 cores, use the following command:
+## python3 check2_scan_s_alpha.py --type 2 --wfQ 10
+## where type 1 is QA nfp2, type 2 is QH nfp4, type 3 is QI nfp1, type 4 is QA nfp3, type 5 is QH nfp3, type 6 is QI nfp2, type 7 is QI nfp3, type 8 is QI nfp4
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=-2)
-parser.add_argument("--wfQ", type=float, default=0.0)
+parser.add_argument("--type", type=int, default=2)
+parser.add_argument("--wfQ", type=float, default=10)
 args = parser.parse_args()
 matplotlib.use('Agg')
 warnings.filterwarnings("ignore", category=matplotlib.MatplotlibDeprecationWarning)
@@ -32,76 +36,43 @@ this_path = Path(__file__).parent.resolve()
 sys.path.insert(1, os.path.join(this_path, '..', 'util'))
 from to_gs2 import to_gs2  # pylint: disable=import-error
 ######## INPUT PARAMETERS ########
-gs2_executable = '/Users/rogeriojorge/local/gs2/bin/gs2'
+home_directory = os.path.expanduser("~")
+gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
 # gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
-prefix_save = 'scan_s_alpha'
-results_folder = 'results'
-if args.type == -3:
-    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp1_QI.nc')
-    output_dir = 'nfp1_QI_initial'
-elif args.type == -2:
-    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
-    output_dir = 'nfp4_QH_initial'
-elif args.type == -1:
-    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp2_QA.nc')
-    output_dir = 'nfp2_QA_initial'
-elif args.type == 1:
-    vmec_file = os.path.join(this_path, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
-    output_dir = 'nfp2_QA'
-elif args.type == 2:
-    vmec_file = os.path.join(this_path, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
-    output_dir = 'nfp4_QH'
+prefix_save = 'optimization'
+results_folder = 'results_March1_2024'
+config = CONFIG[args.type]
+PARAMS = config['params']
+weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
+weight_optTurbulence = args.wfQ
+optimizer = 'least_squares'
+n_processes_parallel = 14
 n_points = 8
 
-# Define the desired values
-desired_s_radius = 0.25
-desired_alpha = 0
+plot_extent_fix_gamma = True
+plot_gamma_max = 0.5
+plot_extent_fix_weighted_gamma = True
+plot_weighted_gamma_max = 0.5
 
-# Create arrays without the desired values
 s_radius_array = np.linspace(0.1, 1, n_points)
 alpha_fieldline_array = np.linspace(-2 * np.pi, 2 * np.pi, n_points)
+# # Add the desired values to the arrays
+desired_s_radius = 0.25
+desired_alpha = 0
+# s_radius_array = np.sort(np.append(s_radius_array, desired_s_radius))
+# alpha_fieldline_array = np.sort(np.append(alpha_fieldline_array, desired_alpha))
 
-# Add the desired values to the arrays
-s_radius_array = np.sort(np.append(s_radius_array, desired_s_radius))
-alpha_fieldline_array = np.sort(np.append(alpha_fieldline_array, desired_alpha))
-
-LN = 1.0
-LT = 3.0
-nphi= 121#141
-nlambda = 25#33
-nperiod = 3.0#5.0
-nstep = 350
-dt = 0.4
-aky_min = 0.3
-aky_max = 3.0
-naky = 6
-ngauss = 3
-negrid = 8
-vnewk = 0.01
-phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
-
-## Ln, Lt, plotting options
-n_processes_parallel = 8
-plot_extent_fix_gamma = False
-plot_gamma_min = 0
-if 'QA' in output_dir:
-    plot_gamma_max = 0.41
-else:
-    plot_gamma_max = 0.46
-plot_extent_fix_weighted_gamma = False
-plot_weighted_gamma_min = 0
-if 'QA' in output_dir:
-    plot_weighted_gamma_max = 0.54
-else:
-    plot_weighted_gamma_max = 0.42
-
+phi_GS2 = np.linspace(-PARAMS['nperiod']*np.pi, PARAMS['nperiod']*np.pi, PARAMS['nphi'])
 ########################################
 # Go into the output directory
-OUT_DIR = os.path.join(this_path,results_folder,output_dir,f'{prefix_save}_{output_dir}_wFQ{args.wfQ:.3f}')
+OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
+OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)
-output_csv = os.path.join(OUT_DIR, f'{prefix_save}_{output_dir}.csv')
-vmec = Vmec(vmec_file)
+output_csv = os.path.join(OUT_DIR,f'scan_s_alpha_{OUT_DIR_APPENDIX}.csv')
+vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
 
 #### Auxiliary functions
 # Get growth rates
@@ -239,7 +210,7 @@ def run_gs2(s_radius, alpha):
     try:
         grid_file_name = f'grid_gs2_s{s_radius:.3f}-alpha{alpha:.3f}.out'
         gridout_file = os.path.join(OUT_DIR, grid_file_name)
-        to_gs2(gridout_file, vmec, s_radius, alpha, phi1d=phi_GS2, nlambda=nlambda)
+        to_gs2(gridout_file, vmec, s_radius, alpha, phi1d=phi_GS2, nlambda=PARAMS["nlambda"])
         fl1 = vmec_fieldlines(vmec, s_radius, alpha, phi1d=phi_GS2, plot=False, show=False)
         # plt.savefig(f'geometry_profiles_s{s_radius}_alpha{alpha}.png')
         # plt.close()
@@ -247,32 +218,33 @@ def run_gs2(s_radius, alpha):
         gs2_input_file = os.path.join(OUT_DIR, f'{gs2_input_name}.in')
         shutil.copy(os.path.join(this_path, '..', 'GK_inputs', 'gs2Input-linear.in'), gs2_input_file)
         replace(gs2_input_file, ' gridout_file = "grid.out"', f' gridout_file = "{grid_file_name}"')
-        replace(gs2_input_file, ' nstep = 150', f' nstep = {nstep}')
-        replace(gs2_input_file, ' delt = 0.4 ! Time step', f' delt = {dt} ! Time step')
-        replace(gs2_input_file, ' fprim = 1.0 ! -1/n (dn/drho)', f' fprim = {LN} ! -1/n (dn/drho)')
-        replace(gs2_input_file, ' tprim = 3.0 ! -1/T (dT/drho)', f' tprim = {LT} ! -1/T (dT/drho)')
-        replace(gs2_input_file, ' aky_min = 0.4', f' aky_min = {aky_min}')
-        replace(gs2_input_file, ' aky_max = 5.0', f' aky_max = {aky_max}')
-        replace(gs2_input_file, ' naky = 4', f' naky = {naky}')
-        replace(gs2_input_file,' vnewk = 0.01 ! collisionality parameter',f' vnewk = {vnewk} ! collisionality parameter')
-        replace(gs2_input_file, ' ngauss = 3 ! Number of untrapped pitch-angles moving in one direction along field line.',
-                f' ngauss = {ngauss} ! Number of untrapped pitch-angles moving in one direction along field line.')
-        replace(gs2_input_file, ' negrid = 10 ! Total number of energy grid points',
-                f' negrid = {negrid} ! Total number of energy grid points')
+        replace(gs2_input_file,' nstep = 150',f' nstep = {PARAMS["nstep"]}')
+        replace(gs2_input_file,' delt = 0.4 ! Time step',f' delt = {PARAMS["dt"]} ! Time step')
+        replace(gs2_input_file,' fprim = 1.0 ! -1/n (dn/drho)',f' fprim = {PARAMS["LN"]} ! -1/n (dn/drho)')
+        replace(gs2_input_file,' tprim = 3.0 ! -1/T (dT/drho)',f' tprim = {PARAMS["LT"]} ! -1/T (dT/drho)')
+        replace(gs2_input_file,' aky_min = 0.4',f' aky_min = {PARAMS["aky_min"]}')
+        replace(gs2_input_file,' aky_max = 5.0',f' aky_max = {PARAMS["aky_max"]}')
+        replace(gs2_input_file,' naky = 4',f' naky = {PARAMS["naky"]}')
+        replace(gs2_input_file,' vnewk = 0.01 ! collisionality parameter',f' vnewk = {PARAMS["vnewk"]} ! collisionality parameter')
+        replace(gs2_input_file,' ngauss = 3 ! Number of untrapped pitch-angles moving in one direction along field line.',
+            f' ngauss = {PARAMS["ngauss"]} ! Number of untrapped pitch-angles moving in one direction along field line.')
+        replace(gs2_input_file,' negrid = 10 ! Total number of energy grid points',
+            f' negrid = {PARAMS["negrid"]} ! Total number of energy grid points')
         bashCommand = f"{gs2_executable} {gs2_input_file}"
         p = subprocess.Popen(bashCommand.split(), stderr=subprocess.STDOUT, stdout=subprocess.DEVNULL)
         p.wait()
         file2read = os.path.join(OUT_DIR, f"{gs2_input_name}.out.nc")
-        if s_radius == desired_s_radius and alpha == desired_alpha:
+        if abs(s_radius-desired_s_radius)<0.05 and abs(alpha-desired_alpha)<0.1:
+            show_fig=True
+            save_fig=True
             eigenPlot(file2read)
-            growth_rate, omega, ky = getgamma(file2read, savefig=True)
-            kyX, growthRateX, realFrequencyX = gammabyky(file2read, savefig=True)
-            weighted_growth_rate = np.sum(quasilinear_estimate(file2read, show=True, savefig=True)) / naky
         else:
-            growth_rate, omega, ky = getgamma(file2read, savefig=False)
-            kyX, growthRateX, realFrequencyX = gammabyky(file2read, savefig=False)
-            weighted_growth_rate = np.sum(quasilinear_estimate(file2read, show=False, savefig=False)) / naky
-        output_to_csv(growth_rate, omega, ky, weighted_growth_rate, LN, LT, s_radius, alpha)
+            show_fig=False
+            save_fig=False
+        growth_rate, omega, ky = getgamma(file2read,savefig=save_fig)
+        kyX, growthRateX, realFrequencyX = gammabyky(file2read,savefig=save_fig)
+        weighted_growth_rate = np.sum(quasilinear_estimate(file2read,show=show_fig,savefig=save_fig))/PARAMS["naky"]
+        output_to_csv(growth_rate, omega, ky, weighted_growth_rate, PARAMS["LN"], PARAMS["LT"], s_radius, alpha)
     except Exception as e:
         print(e)
         exit()

@@ -23,7 +23,7 @@ import matplotlib.cbook
 import argparse
 from configurations import CONFIG
 #########
-## To run this file with 4 cores, use the following command:
+## To run this file with 8 cores, use the following command:
 ## python3 check1_scan_ln_lt.py --type 2 --wfQ 10
 ## where type 1 is QA nfp2, type 2 is QH nfp4, type 3 is QI nfp1, type 4 is QA nfp3, type 5 is QH nfp3, type 6 is QI nfp2, type 7 is QI nfp3, type 8 is QI nfp4
 parser = argparse.ArgumentParser()
@@ -43,18 +43,17 @@ prefix_save = 'optimization'
 results_folder = 'results_March1_2024'
 config = CONFIG[args.type]
 PARAMS = config['params']
-opt_quasisymmetry = True if (config['output_dir'][-2:] == 'QA' or config['output_dir'][-2:] == 'QH') else False
 weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
 weight_optTurbulence = args.wfQ
 optimizer = 'least_squares'
-n_processes_parallel = 1
+n_processes_parallel = 14
+n_points = 8
 
 plot_extent_fix_gamma = True
 plot_gamma_max = 0.5
 plot_extent_fix_weighted_gamma = True
 plot_weighted_gamma_max = 0.5
 
-n_points = 8
 s_radius = 0.25
 alpha_fieldline = 0
 phi_GS2 = np.linspace(-PARAMS['nperiod']*np.pi, PARAMS['nperiod']*np.pi, PARAMS['nphi'])
@@ -219,19 +218,19 @@ def run_gs2(ln, lt):
         gs2_input_name = f"gs2Input-LN{ln:.1f}-LT{lt:.1f}"
         gs2_input_file = os.path.join(OUT_DIR,f'{gs2_input_name}.in')
         shutil.copy(os.path.join(this_path,'..','GK_inputs','gs2Input-linear.in'),gs2_input_file)
-        replace(gs2_input_file,' gridout_file = "grid.out"',f' gridout_file = "grid_{gs2_input_name}.out"')
+        replace(gs2_input_file,' gridout_file = "grid.out"',f' gridout_file = "grid_gs2.out"')
         replace(gs2_input_file,' nstep = 150',f' nstep = {PARAMS["nstep"]}')
         replace(gs2_input_file,' delt = 0.4 ! Time step',f' delt = {PARAMS["dt"]} ! Time step')
-        replace(gs2_input_file,' fprim = 1.0 ! -1/n (dn/drho)',f' fprim = {PARAMS["LN"]} ! -1/n (dn/drho)')
-        replace(gs2_input_file,' tprim = 3.0 ! -1/T (dT/drho)',f' tprim = {PARAMS["LT"]} ! -1/T (dT/drho)')
+        replace(gs2_input_file,' fprim = 1.0 ! -1/n (dn/drho)',f' fprim = {ln} ! -1/n (dn/drho)')
+        replace(gs2_input_file,' tprim = 3.0 ! -1/T (dT/drho)',f' tprim = {lt} ! -1/T (dT/drho)')
         replace(gs2_input_file,' aky_min = 0.4',f' aky_min = {PARAMS["aky_min"]}')
         replace(gs2_input_file,' aky_max = 5.0',f' aky_max = {PARAMS["aky_max"]}')
         replace(gs2_input_file,' naky = 4',f' naky = {PARAMS["naky"]}')
         replace(gs2_input_file,' vnewk = 0.01 ! collisionality parameter',f' vnewk = {PARAMS["vnewk"]} ! collisionality parameter')
         replace(gs2_input_file,' ngauss = 3 ! Number of untrapped pitch-angles moving in one direction along field line.',
-        f' ngauss = {PARAMS["ngauss"]} ! Number of untrapped pitch-angles moving in one direction along field line.')
+            f' ngauss = {PARAMS["ngauss"]} ! Number of untrapped pitch-angles moving in one direction along field line.')
         replace(gs2_input_file,' negrid = 10 ! Total number of energy grid points',
-        f' negrid = {PARAMS["negrid"]} ! Total number of energy grid points')
+            f' negrid = {PARAMS["negrid"]} ! Total number of energy grid points')
 
         bashCommand = f"{gs2_executable} {gs2_input_file}"
         p = subprocess.Popen(bashCommand.split(),stderr=subprocess.STDOUT,stdout=subprocess.DEVNULL)#stdout=fp)
@@ -239,15 +238,16 @@ def run_gs2(ln, lt):
         file2read = os.path.join(OUT_DIR,f"{gs2_input_name}.out.nc")
         # omega_average = netCDF4.Dataset(file2read,'r').variables['omega_average'][()]
         # growth_rate = np.max(np.array(omega_average)[-1,:,0,1])
-        if ln==1 and lt==3:
+        if abs(ln-PARAMS['LN'])<0.3 and abs(lt-PARAMS['LT'])<0.3:
+            show_fig=True
+            save_fig=True
             eigenPlot(file2read)
-            growth_rate, omega, ky = getgamma(file2read,savefig=True)
-            kyX, growthRateX, realFrequencyX = gammabyky(file2read,savefig=True)
-            weighted_growth_rate = np.sum(quasilinear_estimate(file2read,show=True,savefig=True))/PARAMS["naky"]
         else:
-            growth_rate, omega, ky = getgamma(file2read,savefig=False)
-            kyX, growthRateX, realFrequencyX = gammabyky(file2read,savefig=False)
-            weighted_growth_rate = np.sum(quasilinear_estimate(file2read,show=False,savefig=False))/PARAMS["naky"]
+            show_fig=False
+            save_fig=False
+        growth_rate, omega, ky = getgamma(file2read,savefig=save_fig)
+        kyX, growthRateX, realFrequencyX = gammabyky(file2read,savefig=save_fig)
+        weighted_growth_rate = np.sum(quasilinear_estimate(file2read,show=show_fig,savefig=save_fig))/PARAMS["naky"]
         output_to_csv(growth_rate, omega, ky, weighted_growth_rate, ln, lt)
     except Exception as e:
         print(e)

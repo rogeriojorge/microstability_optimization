@@ -15,74 +15,44 @@ from quasilinear_gs2 import quasilinear_estimate
 from concurrent.futures import ProcessPoolExecutor
 import matplotlib
 import warnings
+from configurations import CONFIG
 matplotlib.use('Agg') 
 warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
 matplotlib.rc('font', family='serif', serif='cm10')
 matplotlib.rc('text', usetex=True)
+#########
+## To run this file with 8 cores, use the following command:
+## python3 check3_test_parameters.py --type 2 --wfQ 10 --nprocessors 8
+## where type 1 is QA nfp2, type 2 is QH nfp4, type 3 is QI nfp1, type 4 is QA nfp3, type 5 is QH nfp3, type 6 is QI nfp2, type 7 is QI nfp3, type 8 is QI nfp4
 # Constants and Configurations
-THIS_PATH = Path(__file__).parent.resolve()
-sys.path.insert(1, os.path.join(THIS_PATH, '..', 'util'))
+this_path = Path(__file__).parent.resolve()
+sys.path.insert(1, os.path.join(this_path, '..', 'util'))
 from to_gs2 import to_gs2 # pylint: disable=import-error
-GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
-n_processors_default = 4
+home_directory = os.path.expanduser("~")
+gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
+# gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=-2)
-parser.add_argument("--wfQ", type=float, default=0.0)
-parser.add_argument("--nprocessors", type=int, default=n_processors_default, help="Number of processors to use for parallel execution")
+parser.add_argument("--type", type=int, default=2)
+parser.add_argument("--wfQ", type=float, default=10)
+parser.add_argument("--nprocessors", type=int, default=8, help="Number of processors to use for parallel execution")
 args = parser.parse_args()
-results_folder = 'results'
-CONFIG = {
-    -3: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp1_QI.nc',
-        "output_dir": 'nfp1_QI_initial',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.5,
-                    'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    -2: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp4_QH.nc',
-        "output_dir": 'nfp4_QH_initial',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    -1: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/wout_nfp2_QA.nc',
-        "output_dir": 'nfp2_QA_initial',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    1: {
-        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc'),
-        "output_dir": 'nfp2_QA',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    2: {
-        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc'),
-        "output_dir": 'nfp4_QH',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    }
-}
-prefix_save = 'test_convergence'
-results_folder = 'results'
-
+results_folder = 'results_March1_2024'
 config = CONFIG[args.type]
 PARAMS = config['params']
-OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}_wFQ{args.wfQ:.3f}")
-OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{prefix_save}_{config['output_dir']}.csv")
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-os.chdir(OUTPUT_DIR)
-vmec = Vmec(config['vmec_file'])
+weight_optTurbulence = args.wfQ
+optimizer = 'least_squares'
+prefix_save = 'optimization'
+
+OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
+OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
+os.makedirs(OUT_DIR, exist_ok=True)
+os.chdir(OUT_DIR)
+OUTPUT_CSV = os.path.join(OUT_DIR, f"test_convergence_{config['output_dir']}.csv")
+vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
+figures_dir = 'figures_convergence'
+os.makedirs(os.path.join(OUT_DIR,figures_dir), exist_ok=True)
 
 def getgamma(stellFile, fractionToConsider=0.3):
     f = netCDF4.Dataset(stellFile,'r',mmap=False)
@@ -113,7 +83,7 @@ def getgamma(stellFile, fractionToConsider=0.3):
     plt.legend(loc=0,fontsize=14)
     plt.xlabel(r'$t$');plt.ylabel(r'$\ln |\hat \phi|^2$')
     plt.subplots_adjust(left=0.16, bottom=0.19, right=0.98, top=0.97)
-    plt.savefig(stellFile+'_phi2.png')
+    plt.savefig(os.path.join(OUT_DIR,figures_dir,stellFile.split('/')[-1]+'_phi2.png'))
     plt.close()
     return GrowthRate, abs(omega)
 # Save final eigenfunction
@@ -137,7 +107,7 @@ def eigenPlot(stellFile):
     plt.xlabel(r'$\theta$');plt.ylabel(r'$\hat \phi$')
     plt.legend(loc="upper right")
     plt.subplots_adjust(left=0.16, bottom=0.19, right=0.98, top=0.93)
-    plt.savefig(stellFile+'_eigenphi.png')
+    plt.savefig(os.path.join(OUT_DIR,figures_dir,stellFile.split('/')[-1]+'_eigenphi.png'))
     plt.close()
     return 0
 ##### Function to obtain gamma and omega for each ky
@@ -189,7 +159,7 @@ def gammabyky(stellFile,fractionToConsider=0.3):
 
     plt.tight_layout()
     #plt.subplots_adjust(left=0.14, bottom=0.15, right=0.98, top=0.96)
-    plt.savefig(stellFile+"_GammaOmegaKy.png")
+    plt.savefig(os.path.join(OUT_DIR,figures_dir,stellFile.split('/')[-1]+"_GammaOmegaKy.png"))
     plt.close()
     return np.array(kyX), np.array(growthRateX), np.array(realFrequencyX)
 
@@ -203,12 +173,12 @@ def replace(file_path, pattern, subst):
 def create_gs2_inputs(p):
     nphi, nperiod, nlambda, nstep, dt, negrid, ngauss, aky_min, aky_max, naky, vnewk = p
     nphi=int(nphi); nlambda=int(nlambda); nstep=int(nstep); negrid=int(negrid); ngauss=int(ngauss); naky=int(naky)
-    gridout_file = str(os.path.join(OUTPUT_DIR,f"grid_gs2_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}vnewk{vnewk}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.out"))
+    gridout_file = str(os.path.join(OUT_DIR,f"grid_gs2_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}vnewk{vnewk}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}.out"))
     phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
     to_gs2(gridout_file, vmec, PARAMS['s_radius'], PARAMS['alpha_fieldline'], phi1d=phi_GS2, nlambda=nlambda)
     gs2_input_name = f"gs2Input_nphi{nphi}_nperiod{nperiod}_nlambda{nlambda}negrid{negrid}ngauss{ngauss}vnewk{vnewk}_nstep{nstep}_dt{dt}_kymin{aky_min}_kymax{aky_max}_nky{naky}_ln{PARAMS['LN']}_lt{PARAMS['LT']}"
-    gs2_input_file = str(os.path.join(OUTPUT_DIR,f"{gs2_input_name}.in"))
-    shutil.copy(THIS_PATH / '..' / 'GK_inputs' / 'gs2Input-linear.in', gs2_input_file)
+    gs2_input_file = str(os.path.join(OUT_DIR,f"{gs2_input_name}.in"))
+    shutil.copy(os.path.join(this_path, '..', 'GK_inputs', 'gs2Input-linear.in'), gs2_input_file)
     replace_dict = {
         ' gridout_file = "grid.out"': f' gridout_file = "{gridout_file}"',
         ' nstep = 150 ! Maximum number of timesteps': f' nstep = {nstep} ! Maximum number of timesteps"',
@@ -239,13 +209,13 @@ def run_gs2(p):
     nphi=int(nphi); nlambda=int(nlambda); nstep=int(nstep); negrid=int(negrid); ngauss=int(ngauss); naky=int(naky)
     gs2_input_name = create_gs2_inputs(p)
     # subprocess.run([GS2_EXECUTABLE, f"{gs2_input_name}.in"], stdout=subprocess.DEVNULL)
-    proc = subprocess.Popen(f"{GS2_EXECUTABLE} {gs2_input_name}.in".split(),stderr=subprocess.STDOUT,stdout=subprocess.DEVNULL)
+    proc = subprocess.Popen(f"{gs2_executable} {gs2_input_name}.in".split(),stderr=subprocess.STDOUT,stdout=subprocess.DEVNULL)
     proc.wait()
-    output_file = os.path.join(OUTPUT_DIR,f"{gs2_input_name}.out.nc")
+    output_file = os.path.join(OUT_DIR,f"{gs2_input_name}.out.nc")
     eigenPlot(output_file)
     growth_rate, omega = getgamma(output_file)
     _, growthRateX, _ = gammabyky(output_file)
-    weighted_growth_rate = np.sum(quasilinear_estimate(output_file, show=True, savefig=True)) / naky
+    weighted_growth_rate = np.sum(quasilinear_estimate(output_file, show=True, savefig=True, out_folder=os.path.join(OUT_DIR,figures_dir))) / naky
     data = {
         'ln': PARAMS['LN'],
         'lt': PARAMS['LT'],
@@ -291,9 +261,9 @@ def main():
         results = list(executor.map(run_gs2, param_list))
 
     for ext in ['amoments', 'eigenfunc', 'error', 'fields', 'g', 'lpc', 'mom2', 'moments', 'vres', 'vres2', 'exit_reason', 'optim', 'out', 'in', 'vspace_integration_error', 'gs2Input', 'out.nc']:
-        for f in Path(OUTPUT_DIR).glob(f"*.{ext}"):
+        for f in Path(OUT_DIR).glob(f"*.{ext}"):
             f.unlink()
-        for f in Path(OUTPUT_DIR).glob(f".*"):
+        for f in Path(OUT_DIR).glob(f".*"):
             f.unlink()
 
 if __name__ == "__main__":

@@ -10,57 +10,37 @@ import warnings
 import matplotlib.ticker as ticker
 import matplotlib.cbook
 import argparse
+from configurations import CONFIG
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=0)
-parser.add_argument("--wfQ", type=float, default=0.0)
+parser.add_argument("--type", type=int, default=2)
+parser.add_argument("--wfQ", type=float, default=10)
 args = parser.parse_args()
 matplotlib.use('Agg') 
 warnings.filterwarnings("ignore",category=matplotlib.MatplotlibDeprecationWarning)
 this_path = Path(__file__).parent.resolve()
-prefix_save = 'geometry'
-results_folder = 'results'
-figures_directory = 'figures'
-if args.type == -3:
-    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp1_QI.nc')
-    config = 'nfp1_QI_initial'
-elif args.type == -2:
-    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp4_QH.nc')
-    config = 'nfp4_QH_initial'
-elif args.type == -1:
-    vmec_file = os.path.join(this_path, '..', 'vmec_inputs', 'wout_nfp2_QA.nc')
-    config = 'nfp2_QA_initial'
-elif args.type == 1:
-    vmec_file = os.path.join(this_path, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
-    config = 'nfp2_QA'
-elif args.type == 2:
-    vmec_file = os.path.join(this_path, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'wout_final.nc')
-    config = 'nfp4_QH'
 
+prefix_save = 'optimization'
+results_folder = 'results_March1_2024'
+config = CONFIG[args.type]
+PARAMS = config['params']
+weight_optTurbulence = args.wfQ
+optimizer = 'least_squares'
 
 s_radius = 0.25
 alpha_fieldline = 0
-nphi= 121#141
-nlambda = 25#33
-nperiod = 3.0#5.0
-nstep = 350
-dt = 0.4
-aky_min = 0.3
-aky_max = 3.0
-naky = 6
-ngauss = 3
-negrid = 8
-vnewk = 0.01
-phi_GS2 = np.linspace(-nperiod * np.pi, nperiod * np.pi, nphi)
+phi_GS2 = np.linspace(-PARAMS['nperiod']*np.pi, PARAMS['nperiod']*np.pi, PARAMS['nphi'])
 
-# Define output directories and create them if they don't exist
-OUT_DIR = os.path.join(this_path,results_folder,config,f"{config}_wFQ{args.wfQ:.3f}_figures")
-os.makedirs(OUT_DIR, exist_ok=True)
-os.chdir(OUT_DIR)
+OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
+OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
+figures_directory = os.path.join(OUT_DIR, f'figures')
+os.makedirs(figures_directory, exist_ok=True)
 
 # START
-vmec = Vmec(vmec_file)
+vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
 fl1 = vmec_fieldlines(vmec, s_radius, alpha_fieldline, phi1d=phi_GS2, plot=True, show=False)
-plt.savefig(os.path.join(OUT_DIR,f'{config}_geometry_profiles_s{s_radius}_alpha{alpha_fieldline}.pdf'))
+plt.savefig(os.path.join(figures_directory,f'{config["output_dir"]}_wFQ{weight_optTurbulence:.1f}_geometry_profiles_s{s_radius}_alpha{alpha_fieldline}.pdf'))
 plt.close()
 
 matplotlib.rc('font', family='serif', serif='cm10')
@@ -80,5 +60,5 @@ for parameter, d, save_name in zip(parameters, data, save_names):
     ax.xaxis.set_major_locator(ticker.MultipleLocator(base=np.pi))
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda val, pos: '{:.0g}$\pi$'.format(val/np.pi) if val != 0 else '0'))
     plt.tight_layout()
-    plt.savefig(os.path.join(OUT_DIR,f'{config}_{save_name}_s{s_radius}_alpha{alpha_fieldline}.pdf'))
+    plt.savefig(os.path.join(figures_directory,f'{config["output_dir"]}_wFQ{weight_optTurbulence:.1f}_{save_name}_s{s_radius}_alpha{alpha_fieldline}.pdf'))
     plt.close()

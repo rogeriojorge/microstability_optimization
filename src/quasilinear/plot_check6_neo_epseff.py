@@ -67,7 +67,7 @@ linestoken=token.readlines()
 eps_eff=[]
 s_radial=[]
 for x in linestoken:
-    s_radial.append(float(x.split()[0])/150)
+    s_radial.append(float(x.split()[0])/100)
     eps_eff.append(float(x.split()[1])**(2/3))
 token.close()
 s_radial = np.array(s_radial)
@@ -80,6 +80,7 @@ plt.plot(s_radial,eps_eff, label=f'eps eff wFQ{weight_optTurbulence:.1f}')
 ax.set_yscale('log')
 plt.xlabel(r'$s=\psi/\psi_b$', fontsize=12)
 plt.ylabel(r'$\epsilon_{eff}$', fontsize=14)
+plt.xlim([0,1])
 
 plt.tight_layout()
 fig.savefig(os.path.join(figures_directory,f'neo_out_{config["output_dir"]}_wFQ{weight_optTurbulence:.1f}.pdf'), dpi=fig.dpi)#, bbox_inches = 'tight', pad_inches = 0)

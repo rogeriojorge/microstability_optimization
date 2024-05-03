@@ -94,7 +94,7 @@ else:
     qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=-1)    
 surf = vmec.boundary
 surf.fix_all()
-surf.fixed_range(mmin=0, mmax=1, nmin=-1, nmax=1, fixed=False)
+surf.fixed_range(mmin=0, mmax=4, nmin=-4, nmax=4, fixed=False)
 surf.fix("rc(0,0)")
 output_to_csv = True
 

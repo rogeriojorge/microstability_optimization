@@ -47,7 +47,7 @@ start_time = time.time()
 #########
 #########
 ## To run this file with 4 cores, use the following command:
-## mpirun -n 4 python3 main.py --type 1
+## mpirun -n 4 python3 main.py --type 1 --wfQ 10
 ## where type 1 is QA nfp2, type 2 is QH nfp4, type 3 is QI nfp1, type 4 is QA nfp3, type 5 is QH nfp3, type 6 is QI nfp2, type 7 is QI nfp3, type 8 is QI nfp4
 ############################################################################
 #### Input Parameters
@@ -181,6 +181,7 @@ def CalculateGrowthRate(v: Vmec):
         replace(gs2_input_file,' aky_min = 0.4',f' aky_min = {PARAMS["aky_min"]}')
         replace(gs2_input_file,' aky_max = 5.0',f' aky_max = {PARAMS["aky_max"]}')
         replace(gs2_input_file,' naky = 4',f' naky = {PARAMS["naky"]}')
+        replace(gs2_input_file,' vnewk = 0.01 ! collisionality parameter',f' vnewk = {PARAMS["vnewk"]} ! collisionality parameter')
         replace(gs2_input_file,' ngauss = 3 ! Number of untrapped pitch-angles moving in one direction along field line.',
         f' ngauss = {PARAMS["ngauss"]} ! Number of untrapped pitch-angles moving in one direction along field line.')
         replace(gs2_input_file,' negrid = 10 ! Total number of energy grid points',

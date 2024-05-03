@@ -16,8 +16,6 @@ from tempfile import mkstemp
 from os import fdopen, remove
 import matplotlib.pyplot as plt
 from shutil import move, copymode
-from scipy.optimize import dual_annealing
-from matplotlib.animation import FuncAnimation
 from simsopt.mhd import Vmec
 from simsopt.util import MpiPartition
 from quasilinear_gs2 import quasilinear_estimate
@@ -26,92 +24,70 @@ mpi = MpiPartition()
 comm = MPI.COMM_WORLD
 size = comm.Get_size()   # Total number of processes
 rank = comm.Get_rank()   # Rank of this process
-THIS_PATH = Path(__file__).parent.resolve()
-sys.path.insert(1, os.path.join(THIS_PATH, '..', 'util'))
+this_path = Path(__file__).parent.resolve()
+sys.path.insert(1, os.path.join(this_path, '..', 'util'))
 from to_gs2 import to_gs2 # pylint: disable=import-error
 from simsopt.mhd import QuasisymmetryRatioResidual
 import argparse
+from configurations import CONFIG
 parser = argparse.ArgumentParser()
-parser.add_argument("--type", type=int, default=-2)
-parser.add_argument("--wfQ", type=float, default=0.0)
+parser.add_argument("--type", type=int, default=5)
+parser.add_argument("--wfQ", type=float, default=10)
 parser.add_argument("--npoints", type=int, default=4)
 args = parser.parse_args()
-GS2_EXECUTABLE = '/Users/rogeriojorge/local/gs2/bin/gs2'
-results_folder = 'results'
-CONFIG = {
-    -3: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp1_QI',
-        "output_dir": 'nfp1_QI_initial',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.5,
-                    'aky_min': 0.3,'aky_max': 4.0,'naky': 8,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    -2: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp4_QH',
-        "output_dir": 'nfp4_QH_initial',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    -1: {
-        "vmec_file": '/Users/rogeriojorge/local/microstability_optimization/src/vmec_inputs/input.nfp2_QA',
-        "output_dir": 'nfp2_QA_initial',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    1: {
-        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp2_QA', f'optimization_nfp2_QA_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
-        "output_dir": 'nfp2_QA',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.4,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    },
-    2: {
-        "vmec_file": os.path.join(THIS_PATH, results_folder, 'nfp4_QH', f'optimization_nfp4_QH_least_squares_wFQ{args.wfQ:.3f}', 'input.final'),
-        "output_dir": 'nfp4_QH',
-        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 3.0,'nstep': 350,'dt': 0.4,
-                    'aky_min': 0.3,'aky_max': 3.0,'naky': 6,'LN': 1.0,'LT': 3.0,
-                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
-                  },
-    }
-}
-prefix_save = 'rbc_variation'
-results_folder = 'results'
+home_directory = os.path.expanduser("~")
+gs2_executable = f'{home_directory}/local/gs2/bin/gs2'
+# gs2_executable = '/marconi/home/userexternal/rjorge00/gs2/bin/gs2'
+
+results_folder = 'results_March1_2024'
 config = CONFIG[args.type]
 PARAMS = config['params']
-OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}_wFQ{args.wfQ:.3f}")
-OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{prefix_save}_{config['output_dir']}.csv")
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-os.chdir(OUTPUT_DIR)
-weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
-npoints_scan = args.npoints
-min_bound = -0.15
-max_bound = 0.20
-run_scan = True
-run_optimization = False
-plot_result = True
-vmec_index_scan_opt = 0
-ftol = 1e-2
+weight_optTurbulence = args.wfQ
+optimizer = 'least_squares'
+prefix_save = 'optimization'
+
+OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
+OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
+os.makedirs(OUT_DIR, exist_ok=True)
+os.chdir(OUT_DIR)
+
+vmec = Vmec(os.path.join(OUT_DIR, 'input.final'),verbose=False,mpi=mpi)
 phi_GS2 = np.linspace(-PARAMS['nperiod']*np.pi, PARAMS['nperiod']*np.pi, PARAMS['nphi'])
+
+# prefix_save = 'rbc_variation'
+# results_folder = 'results'
+# config = CONFIG[args.type]
+# PARAMS = config['params']
+# OUTPUT_DIR = os.path.join(THIS_PATH,results_folder,config['output_dir'],f"{prefix_save}_{config['output_dir']}_wFQ{args.wfQ:.3f}")
+# OUTPUT_CSV = os.path.join(OUTPUT_DIR, f"{prefix_save}_{config['output_dir']}.csv")
+# os.makedirs(OUTPUT_DIR, exist_ok=True)
+# os.chdir(OUTPUT_DIR)
+# weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
+npoints_scan = args.npoints
+min_bound = -0.20
+max_bound = 0.20
+# run_scan = True
+# run_optimization = False
+# plot_result = True
+vmec_index_scan_opt = 0
+# ftol = 1e-2
+# phi_GS2 = np.linspace(-PARAMS['nperiod']*np.pi, PARAMS['nperiod']*np.pi, PARAMS['nphi'])
 
 HEATFLUX_THRESHOLD = 1e18
 GROWTHRATE_THRESHOLD = 10
 
-MAXITER = 10
-MAXFUN = 50
-MAXITER_LOCAL = 2
-MAXFUN_LOCAL = 5
+# MAXITER = 10
+# MAXFUN = 50
+# MAXITER_LOCAL = 2
+# MAXFUN_LOCAL = 5
 
 output_path_parameters_opt = f'opt_dofs_loss_{prefix_save}_{config["output_dir"]}.csv'
 output_path_parameters_scan = f'scan_dofs_{prefix_save}_{config["output_dir"]}.csv'
-output_path_parameters_min = f'min_dofs_{prefix_save}_{config["output_dir"]}.csv'
+# output_path_parameters_min = f'min_dofs_{prefix_save}_{config["output_dir"]}.csv'
 
-vmec = Vmec(config['vmec_file'], verbose=False, mpi=mpi)
+# vmec = Vmec(config['vmec_file'], verbose=False, mpi=mpi)
 if 'QA' in config['output_dir']:
     qs = QuasisymmetryRatioResidual(vmec, np.arange(0, 1.01, 0.1), helicity_m=1, helicity_n=0)
 else:
@@ -153,9 +129,9 @@ def CalculateGrowthRate(v: Vmec):
         v.run()
         f_wout = v.output_file.split('/')[-1]
         gs2_input_name = f"gs2-{f_wout}"
-        gs2_input_file = os.path.join(OUTPUT_DIR,f'{gs2_input_name}.in')
-        shutil.copy(THIS_PATH / '..' / 'GK_inputs' / 'gs2Input-linear.in', gs2_input_file)
-        gridout_file = str(os.path.join(OUTPUT_DIR,f"grid_gs2-{f_wout}.out"))
+        gs2_input_file = str(os.path.join(OUT_DIR,f"{gs2_input_name}.in"))
+        shutil.copy(os.path.join(this_path, '..', 'GK_inputs', 'gs2Input-linear.in'), gs2_input_file)
+        gridout_file = str(os.path.join(OUT_DIR,f"grid_gs2-{f_wout}.out"))
         replace(gs2_input_file,' gridout_file = "grid.out"',f' gridout_file = "grid_{gs2_input_name}.out"')
         replace(gs2_input_file,' nstep = 150',f' nstep = {PARAMS["nstep"]}')
         replace(gs2_input_file,' delt = 0.4 ! Time step',f' delt = {PARAMS["dt"]} ! Time step')
@@ -170,14 +146,14 @@ def CalculateGrowthRate(v: Vmec):
         replace(gs2_input_file,' negrid = 10 ! Total number of energy grid points',
         f' negrid = {PARAMS["negrid"]} ! Total number of energy grid points')
         to_gs2(gridout_file, v, PARAMS['s_radius'], PARAMS['alpha_fieldline'], phi1d=phi_GS2, nlambda=PARAMS["nlambda"])
-        bashCommand = f"{GS2_EXECUTABLE} {gs2_input_file}"
+        bashCommand = f"{gs2_executable} {gs2_input_file}"
         # f_log = os.path.join(OUT_DIR,f"{gs2_input_name}.log")
         # with open(f_log, 'w') as fp:
         p = subprocess.Popen(bashCommand.split(),stderr=subprocess.STDOUT,stdout=subprocess.DEVNULL)#stdout=fp)
         p.wait()
         # subprocess.call(bashCommand, shell=True)
         fractionToConsider = 0.3 # fraction of time from the simulation period to consider
-        file2read = netCDF4.Dataset(os.path.join(OUTPUT_DIR,f"{gs2_input_name}.out.nc"),'r')
+        file2read = netCDF4.Dataset(os.path.join(OUT_DIR,f"{gs2_input_name}.out.nc"),'r')
         tX = file2read.variables['t'][()]
         qparflux2_by_ky = file2read.variables['qparflux2_by_ky'][()]
         startIndexX  = int(len(tX)*(1-fractionToConsider))
@@ -203,7 +179,7 @@ def CalculateGrowthRate(v: Vmec):
             fitX  = np.polyfit(data_xX[startIndexX:], np.log(data_yX[startIndexX:]), 1)
             thisGrowthRateX  = fitX[0]/2
             growthRateX.append(thisGrowthRateX)
-        weighted_growth_rate = np.sum(quasilinear_estimate(os.path.join(OUTPUT_DIR,f"{gs2_input_name}.out.nc")))/PARAMS["naky"]
+        weighted_growth_rate = np.sum(quasilinear_estimate(os.path.join(OUT_DIR,f"{gs2_input_name}.out.nc")))/PARAMS["naky"]
 
         if not np.isfinite(qavg): qavg = HEATFLUX_THRESHOLD
         if not np.isfinite(growth_rate): growth_rate = HEATFLUX_THRESHOLD
@@ -216,10 +192,10 @@ def CalculateGrowthRate(v: Vmec):
         weighted_growth_rate = GROWTHRATE_THRESHOLD
 
     try:
-        for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f"*{gs2_input_name}*")): os.remove(objective_file)
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f"*{gs2_input_name}*")): os.remove(objective_file)
     except Exception as e: pass
     try:
-        for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f".{gs2_input_name}*")): os.remove(objective_file)
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f".{gs2_input_name}*")): os.remove(objective_file)
     except Exception as e: pass
     
     if weighted_growth_rate:
@@ -250,34 +226,34 @@ def scan_task(point1):
     growth_rate = optTurbulence.J()
     return growth_rate
 
-if run_scan:
-    if os.path.exists(output_path_parameters_scan) and rank == 0:
-        os.remove(output_path_parameters_scan)
-    output_to_csv = False
-    points = np.linspace(min_bound, max_bound, npoints_scan)
-    local_points = points[rank::size]
-    local_results = [scan_task(pt) for pt in local_points]
-    all_results = comm.gather(local_results, root=0)
-    if rank == 0:
-        all_results = [item for sublist in all_results for item in sublist]
-        try:
-            for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f"wout_nfp*")): os.remove(objective_file)
-        except Exception as e: pass
-        try:
-            for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f"input.nfp*")): os.remove(objective_file)
-        except Exception as e: pass
-        try:
-            for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f"jxbout_nfp*")): os.remove(objective_file)
-        except Exception as e: pass
-        try:
-            for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f"mercier.nfp*")): os.remove(objective_file)
-        except Exception as e: pass
-        try:
-            for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f"threed*")): os.remove(objective_file)
-        except Exception as e: pass
-        try:
-            for objective_file in glob.glob(os.path.join(OUTPUT_DIR,f"parvmecinfo*")): os.remove(objective_file)
-        except Exception as e: pass
+if os.path.exists(output_path_parameters_scan) and rank == 0:
+    os.remove(output_path_parameters_scan)
+
+output_to_csv = False
+points = np.linspace(min_bound, max_bound, npoints_scan)
+local_points = points[rank::size]
+local_results = [scan_task(pt) for pt in local_points]
+all_results = comm.gather(local_results, root=0)
+if rank == 0:
+    all_results = [item for sublist in all_results for item in sublist]
+    try:
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f"wout_nfp*")): os.remove(objective_file)
+    except Exception as e: pass
+    try:
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f"input.nfp*")): os.remove(objective_file)
+    except Exception as e: pass
+    try:
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f"jxbout_nfp*")): os.remove(objective_file)
+    except Exception as e: pass
+    try:
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f"mercier.nfp*")): os.remove(objective_file)
+    except Exception as e: pass
+    try:
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f"threed*")): os.remove(objective_file)
+    except Exception as e: pass
+    try:
+        for objective_file in glob.glob(os.path.join(OUT_DIR,f"parvmecinfo*")): os.remove(objective_file)
+    except Exception as e: pass
 #### PREVIOUS SERIAL IMPLEMENTATION
 # if run_scan:
 #     if os.path.exists(output_path_parameters_scan):

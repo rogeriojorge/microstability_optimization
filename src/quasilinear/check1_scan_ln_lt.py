@@ -47,7 +47,7 @@ opt_quasisymmetry = True if (config['output_dir'][-2:] == 'QA' or config['output
 weighted_growth_rate = True #use sum(gamma/ky) instead of peak(gamma)
 weight_optTurbulence = args.wfQ
 optimizer = 'least_squares'
-n_processes_parallel = 8
+n_processes_parallel = 1
 
 plot_extent_fix_gamma = True
 plot_gamma_max = 0.5
@@ -72,7 +72,7 @@ OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APP
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)
 output_csv = os.path.join(OUT_DIR,f'scan_ln_lt_{OUT_DIR_APPENDIX}.csv')
-vmec = Vmec(os.path.join(OUT_DIR, 'input.final'))
+vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
 #### Auxiliary functions
 # Get growth rates
 def getgamma(stellFile, fractionToConsider=0.3, savefig=False):

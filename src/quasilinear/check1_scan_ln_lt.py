@@ -64,14 +64,19 @@ plot_gamma_min = 0
 plot_weighted_gamma_min = 0
 ########################################
 # Go into the output directory
-OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
-OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+if config['output_dir']=='W7-X':
+    OUT_DIR_APPENDIX='W7-X'
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
+    vmec = Vmec(os.path.join(OUT_DIR, 'wout_W7-X_standard_configuration.nc'),verbose=False)
+else:
+    OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+    OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
+    vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
 output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
-OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)
 output_csv = os.path.join(OUT_DIR,f'scan_ln_lt_{OUT_DIR_APPENDIX}.csv')
-vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
 #### Auxiliary functions
 # Get growth rates
 def getgamma(stellFile, fractionToConsider=0.3, savefig=False):

@@ -48,10 +48,17 @@ optimizer = 'least_squares'
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
-OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
-OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+
+if config['output_dir']=='W7-X':
+    OUT_DIR_APPENDIX='W7-X'
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
+else:
+    OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+    OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
 output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
-OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
+os.makedirs(OUT_DIR, exist_ok=True)
+os.chdir(OUT_DIR)
 figures_directory = os.path.join(OUT_DIR, f'figures')
 os.makedirs(figures_directory, exist_ok=True)
 
@@ -64,8 +71,8 @@ def plot_and_save(save_name, data, xlabel, ylabel, clb_title, plotExtent=None):
         im = plt.imshow(data.T, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
     clb = plt.colorbar(im, fraction=0.046, pad=0.04, ax=ax)
     title = clb.ax.set_title(clb_title, fontsize=20, pad=10)
-    if clb_title==r'$\gamma/\langle k_{\perp}^2 \rangle$': # Adjust title position to the right
-        title.set_position([1.6, 1.0])
+    if clb_title==r'$\gamma/\langle k_{\perp}^2 \rangle$' or clb_title==r'$\gamma_{\textrm{max}}$': # Adjust title position to the right
+        title.set_position([1.4, 1.0])
     ax.set_xlabel(xlabel, fontsize=20)
     ax.set_ylabel(ylabel, fontsize=20)
     ax.set_aspect('auto')

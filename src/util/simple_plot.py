@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import numpy as np
 from pathlib import Path
 from simsopt.mhd import Vmec
 from neat.fields import Simple
@@ -24,6 +25,9 @@ def main(file, OUT_DIR=".", tfinal=1e-2, nparticles=3500):
     print(f"  Loss fraction = {100*g_orbits.loss_fraction_array[-1]}% for a time of {tfinal}s")
     original_dir = os.getcwd()
     os.chdir(OUT_DIR)
+    np.savetxt('time_array.txt', g_orbits.time)
+    np.savetxt('confpart_pass_array.txt', g_orbits.confpart_pass)
+    np.savetxt('confpart_trap_array.txt', g_orbits.confpart_trap)
     g_orbits.plot_loss_fraction(show=False, save=True)
     os.chdir(original_dir)
 

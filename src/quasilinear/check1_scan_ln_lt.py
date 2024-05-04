@@ -65,7 +65,7 @@ plot_weighted_gamma_min = 0
 ########################################
 # Go into the output directory
 if config['output_dir']=='W7-X':
-    OUT_DIR_APPENDIX='W7-X'
+    OUT_DIR_APPENDIX=config['output_dir']
     OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
     vmec = Vmec(os.path.join(OUT_DIR, 'wout_W7-X_standard_configuration.nc'),verbose=False)
 else:

@@ -50,7 +50,7 @@ optimizer = 'least_squares'
 this_path = Path(__file__).parent.resolve()
 
 if config['output_dir']=='W7-X':
-    OUT_DIR_APPENDIX='W7-X'
+    OUT_DIR_APPENDIX=config['output_dir']
     OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
 else:
     OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"

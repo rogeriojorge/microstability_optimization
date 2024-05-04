@@ -43,16 +43,27 @@ weight_optTurbulence = args.wfQ
 optimizer = 'least_squares'
 prefix_save = 'optimization'
 
-OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
-OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+remove_previous_CSV = True
+
+if config['output_dir']=='W7-X':
+    OUT_DIR_APPENDIX=config['output_dir']
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
+    vmec = Vmec(os.path.join(OUT_DIR, 'wout_W7-X_standard_configuration.nc'),verbose=False)
+else:
+    OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+    OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
+    vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
+
 output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
-OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
 os.makedirs(OUT_DIR, exist_ok=True)
 os.chdir(OUT_DIR)
 OUTPUT_CSV = os.path.join(OUT_DIR, f"test_convergence_{config['output_dir']}.csv")
-vmec = Vmec(os.path.join(OUT_DIR, 'wout_final.nc'),verbose=False)
 figures_dir = 'figures_convergence'
 os.makedirs(os.path.join(OUT_DIR,figures_dir), exist_ok=True)
+
+if remove_previous_CSV and Path(OUTPUT_CSV).exists():
+        os.remove(OUTPUT_CSV)
 
 def getgamma(stellFile, fractionToConsider=0.3):
     f = netCDF4.Dataset(stellFile,'r',mmap=False)

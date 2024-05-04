@@ -32,10 +32,16 @@ optimizer = 'least_squares'
 
 # Read the CSV file into a DataFrame
 this_path = Path(__file__).parent.resolve()
-OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
-OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+
+if config['output_dir']=='W7-X':
+    OUT_DIR_APPENDIX=config['output_dir']
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
+else:
+    OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
+    OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
+    OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
+
 output_path_parameters=f"{OUT_DIR_APPENDIX}.csv"
-OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'],OUT_DIR_APPENDIX)
 figures_directory = os.path.join(OUT_DIR, f'figures')
 os.makedirs(figures_directory, exist_ok=True)
 csv_file = os.path.join(OUT_DIR, f"test_convergence_{config['output_dir']}.csv")

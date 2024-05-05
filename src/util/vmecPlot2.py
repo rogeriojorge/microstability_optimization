@@ -317,7 +317,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     # Now make 3D surface plot
     ########################################################
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(5, 4), frameon=False)
 
     ntheta = 80
     nzeta = int(150*nfp)
@@ -342,14 +342,25 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     # Rescale to lie in [0,1]:
     B_rescaled = (B - B.min()) / (B.max() - B.min())
 
-    fig.patch.set_facecolor('white')
-    ax = plt.axes(projection='3d')
-    ax.plot_surface(X, Y, Z, facecolors = cm.jet(B_rescaled), rstride=1, cstride=1, antialiased=False)
-    ax.auto_scale_xyz([X.min(), X.max()], [X.min(), X.max()], [X.min(), X.max()])
-    plt.tight_layout()
+    ax = fig.add_subplot(111, projection='3d')  # Create 3D axes
+    surf = ax.plot_surface(X, Y, Z, facecolors = cm.jet(B_rescaled), rstride=1, cstride=1, antialiased=False)
+    ax.auto_scale_xyz([0.6*X.min(), 0.6*X.max()], [0.6*X.min(), 0.6*X.max()], [0.6*X.min(), 0.6*X.max()])
+    # plt.tight_layout()
+    ax.set_box_aspect([1, 1, 1])
+    
+    # Remove axis
+    ax.axis('off')
+    
+    from matplotlib.colors import Normalize
+    cax = fig.add_axes([0.21, 0.8, 0.6, 0.03])  # Adjust position and size as needed
+    norm = Normalize(vmin=B.min(), vmax=B.max())
+    sm = cm.ScalarMappable(cmap=cm.jet, norm=norm)
+    sm.set_array([])
+    cbar = plt.colorbar(sm, orientation='horizontal', cax=cax)
+    cbar.set_label('|B| [T]')
 
-    plt.figtext(0.5,0.99,os.path.abspath(filename),ha='center',va='top',fontsize=6)
-    if savefig: plt.savefig(os.path.join(figures_folder, name+'_VMEC_3Dplot.pdf'), bbox_inches = 'tight', pad_inches = 0)
+    # plt.figtext(0.5,0.99,os.path.abspath(filename),ha='center',va='top',fontsize=6)
+    if savefig: plt.savefig(os.path.join(figures_folder, name+'_VMEC_3Dplot.png'), bbox_inches = 'tight', pad_inches = 0, dpi=400)
     else: plt.show()
 
     #### Mayavi plot ######

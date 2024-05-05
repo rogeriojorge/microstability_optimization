@@ -28,23 +28,17 @@ PARAMS = config['params']
 weight_optTurbulence = args.wfQ
 optimizer = 'least_squares'
 
-# ### Fix some values for plotting several configurations together
-# plot_extent_fix_gamma = False
-# plot_extent_fix_weighted_gamma = False
-# plot_gamma_min = 0
-# plot_overall_gamma_min = 0
-# plot_weighted_gamma_min = 0
-# plot_overall_weighted_gamma_min = 0
-# if 'QA' in config:
-#     plot_gamma_max = 0.41
-#     plot_overall_gamma_max = 0.16
-#     plot_weighted_gamma_max = 0.33
-#     plot_overall_weighted_gamma_max = 0.17
-# else:
-#     plot_gamma_max = 0.41
-#     plot_overall_gamma_max = 0.16
-#     plot_weighted_gamma_max = 0.33
-#     plot_overall_weighted_gamma_max = 0.17
+### Fix some values for plotting several configurations together
+plot_extent_fix_gamma = True
+plot_extent_fix_weighted_gamma = True
+plot_gamma_min = 0
+plot_overall_gamma_min = 0
+plot_weighted_gamma_min = 0
+plot_overall_weighted_gamma_min = 0
+plot_gamma_max = 0.5
+plot_overall_gamma_max = 0.25
+plot_weighted_gamma_max = 0.5
+plot_overall_weighted_gamma_max = 0.3
 
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
@@ -78,14 +72,14 @@ def plot_and_save(save_name, data, xlabel, ylabel, clb_title, plotExtent=None):
     ax.set_aspect('auto')
     ax.tick_params(axis='x', labelsize=20)
     ax.tick_params(axis='y', labelsize=20)
-    # if clb_title==r'max($\gamma$)' and ylabel=='$a/L_T$':
-    #     if plot_extent_fix_gamma: plt.clim(plot_gamma_min,plot_gamma_max)
-    # if clb_title==r'max($\gamma$)' and ylabel==r'$\alpha$':
-    #     if plot_extent_fix_gamma: plt.clim(plot_overall_gamma_min,plot_overall_gamma_max)
-    # if clb_title==r'$\sum\gamma/\langle k_{\perp}^2 \rangle$' and ylabel=='$a/L_T$':
-    #     if plot_extent_fix_weighted_gamma: plt.clim(plot_weighted_gamma_min,plot_weighted_gamma_max)
-    # if clb_title==r'$\sum\gamma/\langle k_{\perp}^2 \rangle$' and ylabel==r'$\alpha$':
-    #     if plot_extent_fix_weighted_gamma: plt.clim(plot_overall_weighted_gamma_min,plot_overall_weighted_gamma_max)
+    if clb_title==r'$\gamma_{\textrm{max}}$' and ylabel=='$a/L_T$':
+        if plot_extent_fix_gamma: plt.clim(plot_gamma_min,plot_gamma_max)
+    if clb_title==r'$\gamma_{\textrm{max}}$' and ylabel==r'$\alpha$':
+        if plot_extent_fix_gamma: plt.clim(plot_overall_gamma_min,plot_overall_gamma_max)
+    if clb_title==r'$\gamma/\langle k_{\perp}^2 \rangle$' and ylabel=='$a/L_T$':
+        if plot_extent_fix_weighted_gamma: plt.clim(plot_weighted_gamma_min,plot_weighted_gamma_max)
+    if clb_title==r'$\gamma/\langle k_{\perp}^2 \rangle$' and ylabel==r'$\alpha$':
+        if plot_extent_fix_weighted_gamma: plt.clim(plot_overall_weighted_gamma_min,plot_overall_weighted_gamma_max)
     if ylabel==r'$\alpha$': # Convert y-tick labels to units of pi
         ax.yaxis.set_major_locator(ticker.MultipleLocator(base=np.pi))
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda val, pos: '{:.0g}$\pi$'.format(val/np.pi) if val != 0 else '0'))    

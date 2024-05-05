@@ -194,7 +194,7 @@ plt.plot(W7X_LT_array,W7X_weighted_growth_rate_array_at_ln_0, '*--', label='W7-X
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(LT_array[i],weighted_growth_rate_array_at_ln_0[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$a/L_T$')
-plt.ylabel(r'$\gamma/\langle k_{\perp}^2 \rangle$')
+plt.ylabel(r'$f_{\textrm{Q}}$')
 plt.legend(fontsize=legend_fontsize)
 plt.tight_layout()
 plt.savefig(f'weighted_growth_rate_LT_{config["output_dir"]}.pdf', dpi=200)
@@ -248,7 +248,7 @@ plt.plot(W7X_alpha_array,W7X_weighted_growth_rate_array_at_s_025, '*--', label='
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(alpha_array[i],weighted_growth_rate_array_at_s_025[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$\alpha$')
-plt.ylabel(r'$\gamma/\langle k_{\perp}^2 \rangle$')
+plt.ylabel(r'$f_{\textrm{Q}}$')
 plt.legend(fontsize=legend_fontsize)
 plt.tight_layout()
 plt.savefig(f'weighted_growth_rate_alpha_{config["output_dir"]}.pdf', dpi=200)
@@ -291,7 +291,7 @@ plt.savefig(f'max_ky_alpha_{config["output_dir"]}.pdf', dpi=200)
 
 ## Cross Section plot
 print("  Cross Section plot")
-fig = plt.figure(figsize=(3,4), dpi=200)
+fig = plt.figure(figsize=(2.5,4), dpi=200)
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(R_array[i], Z_array[i], '-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel('R')
@@ -303,7 +303,7 @@ plt.savefig(f'cross_section_{config["output_dir"]}.pdf', dpi=200)
 
 ## Iota plot
 print("  Iota plot")
-fig = plt.figure(figsize=(4,3), dpi=200)
+fig = plt.figure(figsize=(2.5,4), dpi=200)
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(s_array[i], np.abs(iota_array[i]), label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$s = \psi/\psi_b$')

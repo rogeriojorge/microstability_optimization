@@ -58,20 +58,25 @@ os.makedirs(figures_directory, exist_ok=True)
 
 # Define a function to plot and save the figure
 def plot_and_save(save_name, data, xlabel, ylabel, clb_title, plotExtent=None):
-    fig, ax = plt.subplots(figsize=(5.5, 5.5))
+    fig, ax = plt.subplots(figsize=(4.5, 3.5))
     if plotExtent is None:
         im = plt.imshow(data.T, cmap='jet', origin='lower', interpolation='hermite')
     else:
         im = plt.imshow(data.T, cmap='jet', extent=plotExtent, origin='lower', interpolation='hermite')
     clb = plt.colorbar(im, fraction=0.046, pad=0.04, ax=ax)
-    title = clb.ax.set_title(clb_title, fontsize=20, pad=10)
+    if clb_title==r'$\gamma/\langle k_{\perp}^2 \rangle$':
+        actual_title = r'$f_{\textrm{Q}}$'
+    else:
+        actual_title = clb_title
+    title = clb.ax.set_title(actual_title, fontsize=12, pad=12)
     if clb_title==r'$\gamma/\langle k_{\perp}^2 \rangle$' or clb_title==r'$\gamma_{\textrm{max}}$': # Adjust title position to the right
-        title.set_position([1.4, 1.0])
-    ax.set_xlabel(xlabel, fontsize=20)
-    ax.set_ylabel(ylabel, fontsize=20)
+        title.set_position([1.4, 0.6])
+    clb.ax.tick_params(labelsize=10)
+    ax.set_xlabel(xlabel, fontsize=16)
+    ax.set_ylabel(ylabel, fontsize=16)
     ax.set_aspect('auto')
-    ax.tick_params(axis='x', labelsize=20)
-    ax.tick_params(axis='y', labelsize=20)
+    ax.tick_params(axis='x', labelsize=13)
+    ax.tick_params(axis='y', labelsize=13)
     if clb_title==r'$\gamma_{\textrm{max}}$' and ylabel=='$a/L_T$':
         if plot_extent_fix_gamma: plt.clim(plot_gamma_min,plot_gamma_max)
     if clb_title==r'$\gamma_{\textrm{max}}$' and ylabel==r'$\alpha$':

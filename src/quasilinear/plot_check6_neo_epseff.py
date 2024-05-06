@@ -38,9 +38,6 @@ os.chdir(OUT_DIR)
 figures_directory = os.path.join(OUT_DIR, f'figures')
 os.makedirs(figures_directory, exist_ok=True)
 
-output_path_parameters_scan = f'scan_dofs_{prefix_save}_{config["output_dir"]}.csv'
-df_scan = pd.read_csv(output_path_parameters_scan, delimiter=';')
-
 vmec = Vmec(os.path.join(OUT_DIR, 'input.final'),verbose=False)
 
 if not os.path.isfile("boozmn_final.nc"):

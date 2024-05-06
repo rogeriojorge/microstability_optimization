@@ -44,11 +44,10 @@ optimizer = 'least_squares'
 prefix_save = 'optimization'
 
 remove_previous_CSV = True
-
-if config['output_dir']=='W7-X':
+if config['output_dir']=='W7-X' or config['output_dir']=='HSX':
     OUT_DIR_APPENDIX=config['output_dir']
     OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
-    vmec = Vmec(os.path.join(OUT_DIR, 'wout_W7-X_standard_configuration.nc'),verbose=False)
+    vmec = Vmec(os.path.join(OUT_DIR, config['wout']),verbose=False)
 else:
     OUT_DIR_APPENDIX=f"{prefix_save}_{config['output_dir']}_{optimizer}"
     OUT_DIR_APPENDIX+=f'_wFQ{weight_optTurbulence:.1f}'
@@ -63,7 +62,7 @@ figures_dir = 'figures_convergence'
 os.makedirs(os.path.join(OUT_DIR,figures_dir), exist_ok=True)
 
 if remove_previous_CSV and Path(OUTPUT_CSV).exists():
-        os.remove(OUTPUT_CSV)
+    os.remove(OUTPUT_CSV)
 
 def getgamma(stellFile, fractionToConsider=0.3):
     f = netCDF4.Dataset(stellFile,'r',mmap=False)
@@ -250,7 +249,7 @@ def run_gs2(p):
 
 def main():
     param_list = [
-        # (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
+        (PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (2*PARAMS['nphi']-1, PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], 2*PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
         (PARAMS['nphi'], PARAMS['nperiod'], 2*PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']),
@@ -265,7 +264,7 @@ def main():
     ]
 
     ## RUN BASE CASE
-    run_gs2((((PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']))))
+    # run_gs2((((PARAMS['nphi'], PARAMS['nperiod'], PARAMS['nlambda'], PARAMS['nstep'], PARAMS['dt'], PARAMS['negrid'], PARAMS['ngauss'], PARAMS['aky_min'], PARAMS['aky_max'], PARAMS['naky'], PARAMS['vnewk']))))
 
     n_processors = min(args.nprocessors, len(param_list))
     with ProcessPoolExecutor(max_workers=n_processors) as executor:

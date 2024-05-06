@@ -1,9 +1,21 @@
 import os
 home_directory = os.path.expanduser("~")
 CONFIG = {
+    10: {
+        "input_file": f'{home_directory}/local/microstability_optimization/src/quasilinear/results_March1_2024/HSX/input.HSX_QHS_vacuum_ns201',
+        "output_dir": 'HSX',
+        "wout": 'wout_HSX_QHS_vacuum_ns201.nc',
+        "params": { 'nphi': 121,'nlambda': 25,'nperiod': 2.0,'nstep': 350,'dt': 0.4,
+                    'aky_min': 0.3,'aky_max': 3.0,'naky': 8,'LN': 1.0,'LT': 3.0,
+                    's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01
+                  },
+        "aspect_ratio_target": 9.96,
+        "nfp": 4,
+    },
     9: {
         "input_file": f'{home_directory}/local/microstability_optimization/src/quasilinear/results_March1_2024/W7X/input.W7-X_standard_configuration',
         "output_dir": 'W7-X',
+        "wout": 'wout_W7-X_standard_configuration.nc',
         "params": { 'nphi': 89,'nlambda': 29,'nperiod': 1.2,'nstep': 350,'dt': 0.4,
                     'aky_min': 0.3,'aky_max': 3.0,'naky': 8,'LN': 1.0,'LT': 3.0,
                     's_radius': 0.25,'alpha_fieldline': 0,'ngauss': 3,'negrid': 8,'vnewk': 0.01

@@ -1,0 +1,39 @@
+&INDATA
+!----- Runtime Parameters -----
+  DELT =   9.00E-01
+  NSTEP =  200
+  TCON0 =   2.00E+00
+  NS_ARRAY    =  5 16 131
+  NITER_ARRAY =  1000 2000 7000 
+  FTOL_ARRAY  =  1e-12 1e-12 1e-14
+  PRECON_TYPE = 'none'
+  PREC2D_THRESHOLD =   1.000000E-19
+!----- Grid Parameters -----
+  LASYM = F
+  NFP = 0004
+  MPOL = 0005
+  NTOR = 0005
+  PHIEDGE =    0.05085
+!----- Free Boundary Parameters -----
+  LFREEB = F
+  NVACSKIP =    6
+!----- Pressure Parameters -----
+  GAMMA =    0.000000000000E+000
+  BLOAT =    1.000000000000E+000
+  SPRES_PED =    1.000000000000E+000
+  PRES_SCALE =    1.000000000000E+000
+  PMASS_TYPE = 'power_series'
+  AM =   000000000E+00
+!----- Current/Iota Parameters -----
+  CURTOR =  0
+  NCURR = 1
+  PIOTA_TYPE = 'power_series'
+  PCURR_TYPE = 'power_series'
+!----- Boundary Parameters -----
+! n comes before m!
+RBC(   0,   0) =  1.000000000000000e+00,    ZBS(   0,   0) = -0.000000000000000e+00
+RBC(   1,   0) =  -3.0e-01,    ZBS(   1,   0) =  1.082988187028168e-01
+RBC(  -1,   1) = -6.723461162346533e-02,    ZBS(  -1,   1) =  7.594610197024793e-02
+RBC(   0,   1) =  1.374990289622220e-01,    ZBS(   0,   1) =  1.501451012436404e-01
+RBC(   1,   1) = -2.305673542175739e-03,    ZBS(   1,   1) = -2.782350597483152e-03
+/

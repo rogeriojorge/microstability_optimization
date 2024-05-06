@@ -344,7 +344,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
 
     ax = fig.add_subplot(111, projection='3d')  # Create 3D axes
     surf = ax.plot_surface(X, Y, Z, facecolors = cm.jet(B_rescaled), rstride=1, cstride=1, antialiased=False)
-    ax.auto_scale_xyz([0.6*X.min(), 0.6*X.max()], [0.6*X.min(), 0.6*X.max()], [0.6*X.min(), 0.6*X.max()])
+    ax.auto_scale_xyz([0.7*X.min(), 0.7*X.max()], [0.7*X.min(), 0.7*X.max()], [0.7*X.min(), 0.7*X.max()])
     # plt.tight_layout()
     ax.set_box_aspect([1, 1, 1])
     

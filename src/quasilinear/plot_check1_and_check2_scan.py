@@ -43,7 +43,7 @@ plot_overall_weighted_gamma_max = 0.3
 # Define output directories and create them if they don't exist
 this_path = Path(__file__).parent.resolve()
 
-if config['output_dir']=='W7-X':
+if config['output_dir']=='W7-X' or config['output_dir']=='HSX':
     OUT_DIR_APPENDIX=config['output_dir']
     OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
 else:

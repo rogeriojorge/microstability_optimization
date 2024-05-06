@@ -33,7 +33,7 @@ optimizer = 'least_squares'
 # Read the CSV file into a DataFrame
 this_path = Path(__file__).parent.resolve()
 
-if config['output_dir']=='W7-X':
+if config['output_dir']=='W7-X' or config['output_dir']=='HSX':
     OUT_DIR_APPENDIX=config['output_dir']
     OUT_DIR = os.path.join(this_path,results_folder,config['output_dir'])
 else:
@@ -63,8 +63,17 @@ markers = ['o', 'X']#, 'D', '^', 'v', '<', '>', 'p', '*', 'H', 's', '8', 'd', '.
 colors = plt.cm.tab20.colors
 colors = [(r*0.9, g*0.9, b*0.9) for r, g, b in colors]
 
+exclude_keys = ['LN', 'LT', 's_radius', 'alpha_fieldline']
+filtered_row_params = {key: value for key, value in PARAMS.items() if key not in exclude_keys}
+
 # Base case
-base_case = df.iloc[0]
+# base_case = df.iloc[0]
+# Iterate through the DataFrame and find the row matching the base case parameters
+for index, row in df.iterrows():
+    params = (int(row['nphi']), int(row['nlambda']), row['nperiod'], int(row['nstep']), row['dt'], row['aky_min'], row['aky_max'], int(row['naky']), int(row['ngauss']), int(row['negrid']), row['vnewk'])
+    if params == tuple(filtered_row_params.values()):
+        base_case = row
+        break
 
 # Calculate max_gamma_plot using the filtered data
 filtered_df_mode = df[(df['aky_min'] == df['aky_min'].mode().iloc[0]) & (df['aky_max'] == df['aky_max'].mode().iloc[0])]

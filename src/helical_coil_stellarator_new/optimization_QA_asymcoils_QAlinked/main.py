@@ -46,10 +46,6 @@ elif args.type == 11: QA_or_QH = 'simple_nfp3_planar'
 elif args.type == 12: QA_or_QH = 'QI_nfp2'
 else: raise ValueError('Invalid type')
 ncoils = args.ncoils
-# os.chdir('/Users/rogeriojorge/local/microstability_optimization/src/helical_coil_stellarator_new/optimization_QA_asymcoils_QAlinked')
-# vmec = Vmec('input.final', mpi=mpi)
-# vmec.run()
-# exit()
 ##########################################################################################
 ############## Input parameters
 ##########################################################################################

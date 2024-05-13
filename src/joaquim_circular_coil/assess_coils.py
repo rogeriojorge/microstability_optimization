@@ -26,19 +26,26 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 # R_axis = 0.411
 # R_max = np.max(surf.gamma()[0,:,0])
 
-nfieldlines = 13
-tmax_fl = 5000 # 5000
+nfieldlines = 12
+tmax_fl = 500 # 5000
 degree = 4
 extend_distance = 0.044 # 0.048 # 0.075
 nfieldlines_to_plot = 12
 interpolate_field = False
 print_surface = False
 
-filename_wout = f'wout_final.nc'
-filename_input = f'input.final'
-results_folder = f'optimization_simple_nfp3_order6_length1.3_cc0.04_curvature100_msc100_mirror0.33_nonplanar'
-coils_file = f'biot_savart_opt.json'
-ncoils = 2#int(re.search(r'ncoils(\d+)', results_folder).group(1))
+# filename_wout = f'wout_final.nc'
+# filename_input = f'input.final'
+# results_folder = f'optimization_simple_nfp3_order6_length1.3_cc0.04_curvature100_msc100_mirror0.33_nonplanar'
+# coils_file = f'biot_savart_opt.json'
+# ncoils = 2#int(re.search(r'ncoils(\d+)', results_folder).group(1))
+
+filename_wout = f'wout_loizu_qfm.nc'
+filename_input = f'input.loizu_qfm'
+results_folder = f'.'
+coils_file = f'circurves_opt.json'
+ncoils = 1
+
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
 os.chdir(out_dir)

@@ -15,8 +15,8 @@ curves=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_c
 # curves_symmetries = [c.curve for c in coils_symmetries]
 # curves_to_vtk(curves_symmetries, "curves_symmetries")
 # bs = BiotSavart(coils_symmetries)
-# mpol = 4
-# ntor = 4
+# mpol = 5
+# ntor = 5
 # stellsym = True
 # nfp = 3
 # vol_target=0.05
@@ -27,23 +27,25 @@ curves=load('/Users/rogeriojorge/local/microstability_optimization/src/joaquim_c
 # tol = 1e-13
 # maxiter = 1000
 # nfp_factor = 1
+# n_iterations=1
 
 curves_to_vtk(curves, "curves")
 currents = [Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5]
 coils = [Coil(curv, curr) for (curv, curr) in zip(curves, currents)]
 bs = BiotSavart(coils)
-mpol = 4
-ntor = 10
+mpol = 3
+ntor = 13
 stellsym = False
 nfp = 1
 vol_target=0.05
-constraint_weight = 1e-0
-nphi   = 64
+constraint_weight = 1e-1
+nphi   = 42
 ntheta = 32
 extend_distance = -0.00
-tol = 1e-13
-maxiter = 1000
+tol = 1e-8
+maxiter = 250
 nfp_factor = 3
+n_iterations=24
 
 phis = np.linspace(0, nfp_factor/3, nphi, endpoint=True)
 thetas = np.linspace(0, 1, ntheta, endpoint=True)
@@ -77,7 +79,6 @@ s.set_zs(1, 0*nfp_factor, 0.0900)
 # s = SurfaceRZFourier.from_wout(os.path.join(this_dir, "wout_loizu_qfm_original_original.nc"), quadpoints_phi=phis, quadpoints_theta=thetas)
 # s.change_resolution(mpol_boundary, ntor_boundary)
 
-
 s.extend_via_normal(extend_distance)
 
 bs.set_points(s.gamma().reshape((-1, 3)))
@@ -85,22 +86,22 @@ Bbs = bs.B().reshape((nphi, ntheta, 3))
 BdotN_surf = np.sum(Bbs * s.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
 pointData = {"B.n/B": BdotN_surf[:, :, None]}
 s.to_vtk("initial_qfm_surface", extra_data=pointData)
-# exit()
 
-qfm = QfmResidual(s, bs)
-qfm.J()
+for i in range(n_iterations):
+    # s = SurfaceRZFourier(dofs=s.dofs, mpol=mpol, ntor=ntor, stellsym=stellsym, nfp=nfp, quadpoints_phi=phis, quadpoints_theta=thetas)
+    # s.change_resolution(mpol, ntor)
+    # bs.set_points(s.gamma().reshape((-1, 3)))
+    qfm = QfmResidual(s, bs)
+    qfm.J()
+    vol = Volume(s)
+    # vol_target = vol.J()
+    qfm_surface = QfmSurface(bs, s, vol, vol_target)
+    res = qfm_surface.minimize_qfm_penalty_constraints_LBFGS(tol=tol, maxiter=maxiter, constraint_weight=constraint_weight)
+    print(f"||vol constraint||={0.5*(s.volume()-vol_target)**2:.8e}, ||residual||={np.linalg.norm(qfm.J()):.8e}")
+    tol=tol/2
 
-vol = Volume(s)
-# vol_target = vol.J()
-
-qfm_surface = QfmSurface(bs, s, vol, vol_target)
-
-res = qfm_surface.minimize_qfm_penalty_constraints_LBFGS(tol=tol, maxiter=maxiter,
-                                                         constraint_weight=constraint_weight)
-print(f"||vol constraint||={0.5*(s.volume()-vol_target)**2:.8e}, ||residual||={np.linalg.norm(qfm.J()):.8e}")
-
-res = qfm_surface.minimize_qfm_exact_constraints_SLSQP(tol=tol, maxiter=maxiter)
-print(f"||vol constraint||={0.5*(s.volume()-vol_target)**2:.8e}, ||residual||={np.linalg.norm(qfm.J()):.8e}")
+# res = qfm_surface.minimize_qfm_exact_constraints_SLSQP(tol=tol, maxiter=maxiter)
+# print(f"||vol constraint||={0.5*(s.volume()-vol_target)**2:.8e}, ||residual||={np.linalg.norm(qfm.J()):.8e}")
 
 s.plot()
 
@@ -120,11 +121,11 @@ pointData = {"B.n/B": BdotN_surf[:, :, None]}
 surf_big.to_vtk("final_qfm_surface_big", extra_data=pointData)
 
 equil = Vmec(os.path.join(this_dir, "input.simple_nfp3"), verbose=False)
-equil.indata.mpol = s.mpol+1
-equil.indata.ntor = s.ntor+1
-equil.indata.ns_array[:3]    = [    5,    16,     35]
-equil.indata.niter_array[:3] = [  400,   500,   5000]
-equil.indata.ftol_array[:3]  = [1e-11, 1e-11,  1e-14]
+equil.indata.mpol = s.mpol
+equil.indata.ntor = s.ntor
+equil.indata.ns_array[:4]    = [    5,    16,    35,    51]
+equil.indata.niter_array[:4] = [  200,   300,   400,  5000]
+equil.indata.ftol_array[:4]  = [1e-10, 1e-11, 1e-11, 1e-14]
 equil.indata.nfp = s.nfp
 equil.indata.lasym = not s.stellsym
 equil.boundary = qfm_surface.surface

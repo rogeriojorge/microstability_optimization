@@ -26,12 +26,12 @@ this_path = os.path.dirname(os.path.abspath(__file__))
 # R_axis = 0.411
 # R_max = np.max(surf.gamma()[0,:,0])
 
-nfieldlines = 12
-tmax_fl = 500 # 5000
+nfieldlines = 24
+tmax_fl = 7000
 degree = 4
-extend_distance = 0.044 # 0.048 # 0.075
+extend_distance = 0.033 # 0.048 # 0.075
 nfieldlines_to_plot = 12
-interpolate_field = False
+interpolate_field = True
 print_surface = False
 
 # filename_wout = f'wout_final.nc'
@@ -49,7 +49,10 @@ ncoils = 1
 out_dir = os.path.join(this_path,results_folder)
 os.makedirs(out_dir, exist_ok=True)
 os.chdir(out_dir)
-OUT_DIR = Path("coils")
+if  filename_input:
+    OUT_DIR = Path(".")
+else:
+    OUT_DIR = Path("coils")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 vmec_file_input = os.path.join(out_dir,filename_input)
 nphi=200
@@ -59,18 +62,27 @@ R_max_vmec = np.max(surf_vmec.gamma()[0,:,0])
 surf = SurfaceRZFourier.from_vmec_input(vmec_file_input, nphi=nphi, ntheta=ntheta, range="full torus")
 surf.extend_via_normal(extend_distance)
 R_max = np.max(surf.gamma()[0,:,0])
-vmec_file_wout = os.path.join(out_dir,filename_wout)
-try: R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
-except:
-    v = Vmec(vmec_file_input)
-    v.run()
-    R_axis = np.sum(v.wout.raxis_cc)
-proc0_print('Loading coils file')
-coils_filename = os.path.join(OUT_DIR,coils_file)
-bs = load(coils_filename)
-coils = bs.coils
-base_curves = [coils[i]._curve for i in range(ncoils)]
-base_currents = [coils[i]._current for i in range(ncoils)]
+if 'input.loizu_qfm' in filename_input:
+    R_axis = 0.411
+    proc0_print('Loading coils file')
+    coils_filename = os.path.join(OUT_DIR,coils_file)
+    base_curves = load(coils_filename)
+    base_currents = [Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5, Current(1) * 1e5]
+    coils = [Coil(curv, curr) for (curv, curr) in zip(base_curves, base_currents)]
+    bs = BiotSavart(coils)
+else:
+    vmec_file_wout = os.path.join(out_dir,filename_wout)
+    try: R_axis = np.sum(Vmec(vmec_file_wout).wout.raxis_cc)
+    except:
+        v = Vmec(vmec_file_input)
+        v.run()
+        R_axis = np.sum(v.wout.raxis_cc)
+    proc0_print('Loading coils file')
+    coils_filename = os.path.join(OUT_DIR,coils_file)
+    bs = load(coils_filename)
+    coils = bs.coils
+    base_curves = [coils[i]._curve for i in range(ncoils)]
+    base_currents = [coils[i]._current for i in range(ncoils)]
 coils_to_makegrid(os.path.join(OUT_DIR,"coils_makegrid_format.txt"),base_curves,base_currents,nfp=surf.nfp, stellsym=True)
 # coils_to_focus(os.path.join(OUT_DIR,"coils_focus_format.txt"),curves=[coil._curve for coil in coils],currents=[coil._current for coil in coils],nfp=surf.nfp,stellsym=True)
 
@@ -88,7 +100,7 @@ def trace_fieldlines(bfield, label):
     phis = [(i/4)*(2*np.pi/surf.nfp) for i in range(4)]
     fieldlines_tys, fieldlines_phi_hits = compute_fieldlines(
         bfield, R0, Z0, tmax=tmax_fl, tol=1e-16, comm=comm_world,
-        phis=phis)#, stopping_criteria=[LevelsetStoppingCriterion(sc_fieldline.dist)])
+        phis=phis, stopping_criteria=[LevelsetStoppingCriterion(sc_fieldline.dist)])
     t2 = time.time()
     proc0_print(f"Time for fieldline tracing={t2-t1:.3f}s. Num steps={sum([len(l) for l in fieldlines_tys])//nfieldlines}", flush=True)
     if comm_world is None or comm_world.rank == 0:

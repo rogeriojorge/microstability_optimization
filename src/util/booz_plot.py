@@ -19,6 +19,7 @@ def main(file, OUT_DIR=""):
     b1.run()
     # b1.bx.write_boozmn(os.path.join(OUT_DIR,"boozmn.nc"))
     print("Plot BOOZ_XFORM")
+    # b1.bx.nfp=3
     # fig = plt.figure(figsize=(4, 3)); bx.surfplot(b1.bx, js=1,  fill=False, ncontours=35)
     fig = plt.figure(); bx.surfplot(b1.bx, js=1,  fill=False, ncontours=35)
     plt.savefig(os.path.join(OUT_DIR, "Boozxform_surfplot_1.pdf"), bbox_inches = 'tight', pad_inches = 0); plt.close()

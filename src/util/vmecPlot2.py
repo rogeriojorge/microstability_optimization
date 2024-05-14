@@ -320,7 +320,7 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     fig = plt.figure(figsize=(5, 4), frameon=False)
 
     ntheta = 80
-    nzeta = int(150*nfp)
+    nzeta = np.max((500,int(150*nfp)))
     theta1D = np.linspace(0,2*np.pi,num=ntheta)
     zeta1D = np.linspace(0,2*np.pi,num=nzeta)
     zeta2D, theta2D = np.meshgrid(zeta1D,theta1D)

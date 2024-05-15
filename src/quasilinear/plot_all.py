@@ -172,7 +172,7 @@ ax.set_yscale('log')
 plt.xlabel(r'$s=\psi/\psi_b$', fontsize=12)
 plt.ylabel(r'$\epsilon_{eff}$', fontsize=14)
 plt.xlim([0,1])
-plt.legend(fontsize=legend_fontsize)
+# plt.legend(fontsize=legend_fontsize)
 plt.tight_layout()
 fig.savefig(os.path.join(figures_directory,f'neo_out_{config["output_dir"]}.pdf'), dpi=fig.dpi)#, bbox_inches = 'tight', pad_inches = 0)
 

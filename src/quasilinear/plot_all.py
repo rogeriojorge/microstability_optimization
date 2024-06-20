@@ -164,8 +164,8 @@ eps_eff_HSX = np.array(eps_eff_HSX)[np.argwhere(~np.isnan(np.array(eps_eff_HSX))
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4, 2.5), dpi=200)
 ax = fig.add_subplot(111)
-plt.plot(s_radial_W7X,eps_eff_W7X, linestyle='dashed', label='W7-X')
-plt.plot(s_radial_HSX,eps_eff_HSX, linestyle='dotted', label='HSX')
+plt.plot(s_radial_W7X,eps_eff_W7X, linestyle='dashed', label='W7-X', color='black')
+plt.plot(s_radial_HSX,eps_eff_HSX, linestyle='dotted', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(neo_sradial_array[i],neo_epseff_array[i], label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 ax.set_yscale('log')
@@ -190,8 +190,8 @@ HSX_simple_confpart_trap_array = np.loadtxt(f'confpart_trap_array.txt')
 
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4, 2.5), dpi=200)
-plt.semilogx(W7X_simple_time_array, 1 - (W7X_simple_confpart_pass_array + W7X_simple_confpart_trap_array), linestyle='dashed', label='W7-X')
-plt.semilogx(HSX_simple_time_array, 1 - (HSX_simple_confpart_pass_array + HSX_simple_confpart_trap_array), linestyle='dotted', label='HSX')
+plt.semilogx(W7X_simple_time_array, 1 - (W7X_simple_confpart_pass_array + W7X_simple_confpart_trap_array), linestyle='dashed', label='W7-X', color='black')
+plt.semilogx(HSX_simple_time_array, 1 - (HSX_simple_confpart_pass_array + HSX_simple_confpart_trap_array), linestyle='dotted', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.semilogx(simple_time_array[i], 1 - (simple_confpart_pass_array[i] + simple_confpart_trap_array[i]), label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlim([1e-6, 1e-2])
@@ -215,8 +215,8 @@ HSX_weighted_growth_rate_array_at_ln_0 = df[abs(df['ln'] - 1.0)<0.29].groupby('l
 
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4,3), dpi=200)
-plt.plot(W7X_LT_array,W7X_weighted_growth_rate_array_at_ln_0, '*--', label='W7-X')
-plt.plot(HSX_LT_array,HSX_weighted_growth_rate_array_at_ln_0, '.--', label='HSX')
+plt.plot(W7X_LT_array,W7X_weighted_growth_rate_array_at_ln_0, '*--', label='W7-X', color='black')
+plt.plot(HSX_LT_array,HSX_weighted_growth_rate_array_at_ln_0, '.--', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(LT_array[i],weighted_growth_rate_array_at_ln_0[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$a/L_T$')
@@ -239,8 +239,8 @@ HSX_growth_rate_array_at_ln_0 = df[abs(df['ln'] - 1.0)<0.29].groupby('lt')['grow
 
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4,3), dpi=200)
-plt.plot(W7X_LT_array,W7X_growth_rate_array_at_ln_0, '*--', label='W7-X')
-plt.plot(HSX_LT_array,HSX_growth_rate_array_at_ln_0, '.--', label='HSX')
+plt.plot(W7X_LT_array,W7X_growth_rate_array_at_ln_0, '*--', label='W7-X', color='black')
+plt.plot(HSX_LT_array,HSX_growth_rate_array_at_ln_0, '.--', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(LT_array[i],growth_rate_array_at_ln_0[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$a/L_T$')
@@ -263,8 +263,8 @@ HSX_ky_array_at_ln_0 = df[abs(df['ln'] - 1.0)<0.29].groupby('lt')['ky'].first().
 
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4,3), dpi=200)
-plt.plot(W7X_LT_array,W7X_ky_array_at_ln_0, '*--', label='W7-X')
-plt.plot(HSX_LT_array,HSX_ky_array_at_ln_0, '.--', label='HSX')
+plt.plot(W7X_LT_array,W7X_ky_array_at_ln_0, '*--', label='W7-X', color='black')
+plt.plot(HSX_LT_array,HSX_ky_array_at_ln_0, '.--', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(LT_array[i],ky_array_at_ln_0[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$a/L_T$')
@@ -287,8 +287,8 @@ HSX_weighted_growth_rate_array_at_s_025 = df[abs(df['s'] - 0.25)<0.04].groupby('
 
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4,3), dpi=200)
-plt.plot(W7X_alpha_array,W7X_weighted_growth_rate_array_at_s_025, '*--', label='W7-X')
-plt.plot(HSX_alpha_array,HSX_weighted_growth_rate_array_at_s_025, '.--', label='HSX')
+plt.plot(W7X_alpha_array,W7X_weighted_growth_rate_array_at_s_025, '*--', label='W7-X', color='black')
+plt.plot(HSX_alpha_array,HSX_weighted_growth_rate_array_at_s_025, '.--', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(alpha_array[i],weighted_growth_rate_array_at_s_025[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$\alpha$')
@@ -311,8 +311,8 @@ HSX_growth_rate_array_at_s_025 = df[abs(df['s'] - 0.25)<0.04].groupby('alpha')['
 
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4,3), dpi=200)
-plt.plot(W7X_alpha_array,W7X_growth_rate_array_at_s_025, '*--', label='W7-X')
-plt.plot(HSX_alpha_array,HSX_growth_rate_array_at_s_025, '.--', label='HSX')
+plt.plot(W7X_alpha_array,W7X_growth_rate_array_at_s_025, '*--', label='W7-X', color='black')
+plt.plot(HSX_alpha_array,HSX_growth_rate_array_at_s_025, '.--', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(alpha_array[i],growth_rate_array_at_s_025[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$\alpha$')
@@ -335,8 +335,8 @@ HSX_ky_array_at_s_025 = df[abs(df['s'] - 0.25)<0.04].groupby('alpha')['ky'].firs
 
 os.chdir(figures_directory)
 fig = plt.figure(figsize=(4,3), dpi=200)
-plt.plot(W7X_alpha_array,W7X_ky_array_at_s_025, '*--', label='W7-X')
-plt.plot(HSX_alpha_array,HSX_ky_array_at_s_025, '.--', label='HSX')
+plt.plot(W7X_alpha_array,W7X_ky_array_at_s_025, '*--', label='W7-X', color='black')
+plt.plot(HSX_alpha_array,HSX_ky_array_at_s_025, '.--', label='HSX', color='gray')
 for i, weight_optTurbulence in enumerate(wfQ_array):
     plt.plot(alpha_array[i],ky_array_at_s_025[i], '+-', label=r'$\omega_{f_{\textrm{Q}}}=$ '+f'{weight_optTurbulence:.1f}')
 plt.xlabel(r'$\alpha$')

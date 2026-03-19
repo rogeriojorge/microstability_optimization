@@ -55,7 +55,7 @@ else: stellsym_coils = False
 if args.extra==1: use_extra_coils = True
 else:             use_extra_coils = False
 MAXITER_stage_1 = 20
-MAXITER_stage_2 = 100 # 300
+MAXITER_stage_2 = 350 # 300
 # MAXITER_single_stage = 25
 # MAXFEV_single_stage  = 42
 max_mode_array = [1]*2 + [2]*1 + [3]*1
@@ -71,7 +71,7 @@ else:
     nquadpoints = int(LENGTH_THRESHOLD*26)
 ro_coil = 0.4
 aspect_ratio_target = 10
-JACOBIAN_THRESHOLD = 150 if ncoils >0 else 2e2
+JACOBIAN_THRESHOLD = 350
 aspect_ratio_weight = 1e-1
 nfp_min_iota_nfp4 = 0.15
 nfp_min_iota_nfp3 = 0.15

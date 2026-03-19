@@ -341,6 +341,11 @@ def main(file,name='',figures_folder='.', coils_curves=None, s_plot_ignore=0.2,s
     Y = R * np.sin(zeta2D)
     # Rescale to lie in [0,1]:
     B_rescaled = (B - B.min()) / (B.max() - B.min())
+    
+    # from simsopt.mhd import Vmec
+    # vmec = Vmec(file, ntheta=ntheta, nphi=nzeta)
+    # surface = vmec.boundary
+    # gaussian_curvature = surface.surface_curvatures()[:,:,1]
 
     ax = fig.add_subplot(111, projection='3d')  # Create 3D axes
     surf = ax.plot_surface(X, Y, Z, facecolors = cm.jet(B_rescaled), rstride=1, cstride=1, antialiased=False)

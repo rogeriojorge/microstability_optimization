@@ -71,7 +71,7 @@ else:
     nquadpoints = int(LENGTH_THRESHOLD*26)
 ro_coil = 0.4
 aspect_ratio_target = 10
-JACOBIAN_THRESHOLD = 150 if ncoils >0 else 2e2
+JACOBIAN_THRESHOLD = 350
 aspect_ratio_weight = 1e-1
 nfp_min_iota_nfp4 = 0.15
 nfp_min_iota_nfp3 = 0.15

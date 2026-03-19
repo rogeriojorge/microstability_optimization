@@ -30,7 +30,7 @@ parser.add_argument("--type", type=int, default=2)
 parser.add_argument("--ncoils", type=int, default=1)
 parser.add_argument("--extra", type=int, default=2)
 parser.add_argument("--symcoils", type=int, default=2)
-parser.add_argument("--l0", type=int, default=6)
+parser.add_argument("--l0", type=int, default=2)
 args = parser.parse_args()
 if args.type == 1: QA_or_QH = 'simple_nfp1'
 elif args.type == 2: QA_or_QH = 'QA'

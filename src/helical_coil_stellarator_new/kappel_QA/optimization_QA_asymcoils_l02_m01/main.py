@@ -68,7 +68,7 @@ if ncoils==0:
     LENGTH_THRESHOLD = 12
     nquadpoints = 350
 else:
-    LENGTH_THRESHOLD = 5.0*l0_coil
+    LENGTH_THRESHOLD = 10.0*l0_coil
     nquadpoints = int(LENGTH_THRESHOLD*26)
 ro_coil = 0.4
 aspect_ratio_target = 10
@@ -434,11 +434,7 @@ for iteration, max_mode in enumerate(max_mode_array):
     with MPIFiniteDifference(prob.objective, mpi, diff_method=diff_method, abs_step=finite_difference_abs_step, rel_step=finite_difference_rel_step) as prob_jacobian:
         if mpi.proc0_world:
             res = minimize(fun, dofs, args=(prob_jacobian, {'Nfeval': 0}), jac=True, method='BFGS', options={'maxiter': MAXITER_single_stage, 'maxfev': MAXFEV_single_stage, 'gtol': ftol, 'ftol': ftol}, tol=ftol)
-            dofs[:] = res.x
     mpi.comm_world.Bcast(dofs, root=0)
-    JF.x = dofs[:-number_vmec_dofs]
-    prob.x = dofs[-number_vmec_dofs:]
-    bs.set_points(surf.gamma().reshape((-1, 3)))
     Bbs = bs.B().reshape((nphi_VMEC, ntheta_VMEC, 3))
     BdotN_surf = np.sum(Bbs * surf.unitnormal(), axis=2) / np.linalg.norm(Bbs, axis=2)
     if comm_world.rank == 0:

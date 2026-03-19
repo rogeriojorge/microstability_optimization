@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import numpy as np
 from pathlib import Path
 import sys
 
@@ -63,10 +64,16 @@ def resolve_default_files() -> list[Path]:
     )
 
 
-def default_filenames_for_maxmode(maxmode: int) -> tuple[str, str]:
+def candidate_surface_filenames(maxmode: int) -> list[str]:
     if maxmode == 0:
-        return DEFAULT_FILENAMES
-    return (f"curves_opt_maxmode{maxmode}.vtu", f"surf_big_opt_maxmode{maxmode}.vts")
+        return ["surf_init_big.vts", "surf_init.vts"]
+    return [f"surf_big_opt_maxmode{maxmode}.vts", f"surf_opt_maxmode{maxmode}.vts"]
+
+
+def default_filenames_for_maxmode(maxmode: int) -> tuple[str, list[str]]:
+    if maxmode == 0:
+        return ("curves_init.vtu", candidate_surface_filenames(maxmode))
+    return (f"curves_opt_maxmode{maxmode}.vtu", candidate_surface_filenames(maxmode))
 
 
 def resolve_directory_input(raw_path: str, maxmode: int = 0) -> list[Path]:
@@ -89,14 +96,16 @@ def resolve_directory_input(raw_path: str, maxmode: int = 0) -> list[Path]:
     if path not in candidate_dirs:
         candidate_dirs.append(path)
 
-    filenames = default_filenames_for_maxmode(maxmode)
+    curve_filename, surface_filenames = default_filenames_for_maxmode(maxmode)
     for directory in candidate_dirs:
-        default_paths = [directory / filename for filename in filenames]
-        if all(candidate.exists() for candidate in default_paths):
-            return default_paths
+        curve_path = directory / curve_filename
+        for surface_filename in surface_filenames:
+            surface_path = directory / surface_filename
+            if curve_path.exists() and surface_path.exists():
+                return [curve_path, surface_path]
 
     searched = ", ".join(str(directory) for directory in candidate_dirs)
-    missing = ", ".join(filenames)
+    missing = ", ".join([curve_filename] + surface_filenames)
     raise FileNotFoundError(
         f"Could not find default files {missing} in directory input: {path}. Checked: {searched}"
     )
@@ -131,9 +140,83 @@ def validate_path(raw_path: str) -> Path:
     return path
 
 
+def matching_regular_surface(path: Path) -> Path | None:
+    if path.suffix.lower() != ".vts" or "surf_big" not in path.name:
+        return None
+
+    regular_name = path.name.replace("surf_big_", "surf_")
+    regular_path = path.with_name(regular_name)
+    if regular_path.exists():
+        return regular_path
+    return None
+
+
+def copy_periodic_scalar_to_big_surface(big_dataset: pv.DataSet, regular_dataset: pv.DataSet, scalar_name: str) -> bool:
+    if not hasattr(big_dataset, "dimensions") or not hasattr(regular_dataset, "dimensions"):
+        return False
+
+    big_dims = tuple(int(value) for value in big_dataset.dimensions)
+    regular_dims = tuple(int(value) for value in regular_dataset.dimensions)
+    if len(big_dims) != 3 or len(regular_dims) != 3:
+        return False
+
+    regular_phi = regular_dims[1]
+    regular_theta = regular_dims[2]
+    big_phi = big_dims[1]
+    big_theta = big_dims[2]
+
+    if regular_phi <= 0 or regular_theta <= 0:
+        return False
+    if big_theta != regular_theta + 1:
+        return False
+    if (big_phi - 1) % regular_phi != 0:
+        return False
+
+    phi_periods = (big_phi - 1) // regular_phi
+    if phi_periods <= 0:
+        return False
+
+    regular_scalar = regular_dataset[scalar_name]
+    if len(regular_scalar.shape) != 1:
+        return False
+
+    regular_grid = regular_scalar.reshape((regular_theta, regular_phi), order="C")
+    regular_grid_closed_theta = np.concatenate([regular_grid, regular_grid[:1, :]], axis=0)
+    repeated_grid = np.tile(regular_grid_closed_theta, (1, phi_periods))
+    big_grid = np.concatenate([repeated_grid, regular_grid_closed_theta[:, :1]], axis=1)
+
+    big_dataset[scalar_name] = big_grid.reshape(-1, order="C")
+    return True
+
+
+def prepare_dataset(path: Path) -> pv.DataSet:
+    dataset = pv.read(path)
+    regular_path = matching_regular_surface(path)
+    if regular_path is None:
+        return dataset
+
+    regular_dataset = pv.read(regular_path)
+    if "B.n/B" in dataset.array_names and "B.n/B" in regular_dataset.array_names:
+        if copy_periodic_scalar_to_big_surface(dataset, regular_dataset, "B.n/B"):
+            print(f"{path.name}: using B.n/B from {regular_path.name} on big geometry")
+    return dataset
+
+
 def choose_scalars(dataset: pv.DataSet) -> str | None:
-    scalar_names = [name for name in dataset.array_names if name not in {"Normals", "vtkOriginalPointIds"}]
+    ignored_scalar_names = {"Normals", "vtkOriginalPointIds", "idx", "ids", "object_id"}
+    scalar_names = [name for name in dataset.array_names if name not in ignored_scalar_names]
     return scalar_names[0] if scalar_names else None
+
+
+def scalar_limits(dataset: pv.DataSet, scalar_name: str) -> tuple[float, float] | None:
+    array = dataset[scalar_name]
+    if len(array.shape) != 1:
+        return None
+
+    max_abs = float(abs(array).max())
+    if max_abs == 0.0:
+        return (0.0, 0.0)
+    return (-max_abs, max_abs)
 
 
 def add_dataset(
@@ -156,6 +239,16 @@ def add_dataset(
 
     if scalars is not None:
         kwargs["scalars"] = scalars
+        kwargs["scalar_bar_args"] = {"title": scalars}
+        limits = scalar_limits(dataset, scalars)
+        if limits is not None:
+            kwargs["clim"] = limits
+            kwargs["cmap"] = "coolwarm"
+        scalar_array = dataset[scalars]
+        print(
+            f"{label}: {scalars} min={float(scalar_array.min()):.6g}, "
+            f"max={float(scalar_array.max()):.6g}, absmax={float(abs(scalar_array).max()):.6g}"
+        )
 
     if is_line_like:
         kwargs.update(
@@ -193,7 +286,7 @@ def main() -> int:
 
     for raw_path in input_paths:
         path = validate_path(raw_path)
-        dataset = pv.read(path)
+        dataset = prepare_dataset(path)
         add_dataset(
             plotter=plotter,
             dataset=dataset,

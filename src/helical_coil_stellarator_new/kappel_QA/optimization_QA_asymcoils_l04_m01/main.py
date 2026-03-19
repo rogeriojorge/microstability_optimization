@@ -68,7 +68,7 @@ if ncoils==0:
     LENGTH_THRESHOLD = 12
     nquadpoints = 350
 else:
-    LENGTH_THRESHOLD = 5.0*l0_coil
+    LENGTH_THRESHOLD = 10.0*l0_coil
     nquadpoints = int(LENGTH_THRESHOLD*26)
 ro_coil = 0.4
 aspect_ratio_target = 10
